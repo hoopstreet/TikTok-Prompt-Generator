@@ -13,7 +13,7 @@ Architecture details:
 4. Multi-headed attention with learned position- and data-dependent temperature scaling
 5. Vision encoder initialized from SigLIP-SO-400M, with multi-crop channel concatenation for token-efficient high resolution image processing
 
-For more details, please refer to our ||coming soon release blog post||.
+For more details, please refer to our ||coming soon release blog post||. Or try the model out in our [playground demo](https://moondream.ai/c/playground).
 
 ## Usage
 
