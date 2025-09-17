@@ -19,14 +19,21 @@ For more details, please refer to our ||coming soon release blog post||. Or try 
 
 Load the model and prepare it for inference. We use [FlexAttention for inference](https://pytorch.org/blog/flexattention-for-inference/), so calling `.compile()` is critical for fast decoding. Our `compile` implementation also handles warmup, so you can start making requests directly once it returns.
 
-```
-    moondream = AutoModelForCausalLM.from_pretrained(
-        "moondream/moondream3-preview",
-        trust_remote_code=True,
-        dtype=torch.bfloat16,
-        device_map={"": "cuda"},
-    )
-    moondream.compile()
+```python
+import torch
+from transformers import AutoModelForCausalLM
+
+moondream = AutoModelForCausalLM.from_pretrained(
+    "moondream/moondream3-preview",
+    trust_remote_code=True,
+    dtype=torch.bfloat16,
+    device_map={"": "cuda"},
+)
+moondream.compile()
 ```
 
 * TODO: Add usage examples
+  * Query
+  * Caption
+  * Detect
+  * Point
