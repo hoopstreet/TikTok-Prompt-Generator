@@ -60,8 +60,10 @@ Whether you want short, normal-sized or long descriptions of images, the `captio
 
 It accepts the same streaming and temperature etc. settings as the `query` skill.
 
----
+## Point
 
-* TODO: Add usage examples
-  * Detect
-  * Point
+TK
+
+## Detect
+
+TK
