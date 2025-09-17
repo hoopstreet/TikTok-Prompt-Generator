@@ -15,6 +15,8 @@ Architecture details:
 
 For more details, please refer to our ||coming soon release blog post||. Or try the model out in our [playground demo](https://moondream.ai/c/playground).
 
+The following instructions demonstrate how to run the model locally using Transformers. We also offer a [cloud API](https://moondream.ai/c/docs/quickstart) with a generous free tier that can help you get started quicker!
+
 ## Usage
 
 Load the model and prepare it for inference. We use [FlexAttention for inference](https://pytorch.org/blog/flexattention-for-inference/), so calling `.compile()` is critical for fast decoding. Our `compile` implementation also handles warmup, so you can start making requests directly once it returns.
