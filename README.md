@@ -189,3 +189,9 @@ for q in questions:
 caption = moondream.caption(encoded, length="normal")
 objects = moondream.detect(encoded, "vehicle")
 ```
+
+---
+
+Copyright (c) 2025 M87 Labs, Inc.
+
+This distribution includes Model Weights licensed under the [Business Source License 1.1 with an Additional Use Grant (No Third-Party Service)](https://huggingface.co/moondream/moondream3-preview/blob/main/LICENSE.md). Commercial hosting or rehosting requires an agreement with <contact@m87.ai>.
