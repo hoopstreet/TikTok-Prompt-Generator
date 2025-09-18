@@ -3,7 +3,9 @@ library_name: transformers
 tags: []
 ---
 
-Moondream 3 (Preview) is vision language model with a mixture of experts architecture (9B total parameters, 2B active).
+Moondream 3 (Preview) is an efficient vision language model with a mixture of experts architecture (9B total parameters, 2B active).
+
+[✨ Demo](https://moondream.ai/c/playground) / [☁️ Cloud API](https://moondream.ai/c/docs/quickstart) / [📝 Release notes]()
 
 Architecture details:
 
@@ -13,7 +15,7 @@ Architecture details:
 4. Multi-headed attention with learned position- and data-dependent temperature scaling
 5. SigLIP-based vision encoder, with multi-crop channel concatenation for token-efficient high resolution image processing
 
-For more details, please refer to our ||coming soon release blog post||. Or try the model out in our [playground demo](https://moondream.ai/c/playground).
+For more details, please refer to the **release notes** (coming soon). Or try the model out in our [playground demo](https://moondream.ai/c/playground).
 
 The following instructions demonstrate how to run the model locally using Transformers. We also offer a [cloud API](https://moondream.ai/c/docs/quickstart) with a generous free tier that can help you get started quicker!
 
