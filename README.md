@@ -6,9 +6,9 @@ library_name: transformers
 
 [✨ Demo](https://moondream.ai/c/playground) &#8201; · &#8201; [☁️ Cloud API](https://moondream.ai/c/docs/quickstart) &#8201; · &#8201; _📝 Release notes_ (coming soon)
 
-
-![](https://huggingface.co/moondream/moondream3-preview/resolve/main/structured_outputs.png)
 ![](https://huggingface.co/moondream/moondream3-preview/resolve/main/open_vocab_detect.png)
+![](https://huggingface.co/moondream/moondream3-preview/resolve/main/point_count.png)
+![](https://huggingface.co/moondream/moondream3-preview/resolve/main/structured_outputs.png)
 
 ## Architecture
 
