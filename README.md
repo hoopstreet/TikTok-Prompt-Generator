@@ -6,12 +6,11 @@ library_name: transformers
 
 [✨ Demo](https://moondream.ai/c/playground) &#8201; · &#8201; [☁️ Cloud API](https://moondream.ai/c/docs/quickstart) &#8201; · &#8201; _📝 Release notes_ (coming soon)
 
-### Examples
 
 ![](https://huggingface.co/moondream/moondream3-preview/resolve/main/structured_outputs.png)
 ![](https://huggingface.co/moondream/moondream3-preview/resolve/main/open_vocab_detect.png)
 
-### Architecture
+## Architecture
 
 1. 24 layers; the first four are dense, the rest have MoE FFNs with 64 experts, 8 activated per token
 2. MoE FFNs have GeGLU architecture, with inner/gate dim of 1024. The model's hidden dim is 2048.
