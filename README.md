@@ -9,6 +9,7 @@ library_name: transformers
 ### Examples
 
 ![](https://huggingface.co/moondream/moondream3-preview/resolve/main/structured_outputs.png)
+![](https://huggingface.co/moondream/moondream3-preview/resolve/main/open_vocab_detect.png)
 
 ### Architecture
 
