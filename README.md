@@ -4,7 +4,7 @@ library_name: transformers
 
 **Moondream 3 (Preview)** is an vision language model with a mixture-of-experts architecture (9B total parameters, 2B active). This model makes no compromises, delivering state-of-the-art visual reasoning while still retaining our efficient and deployment-friendly ethos.
 
-[✨ Demo](https://moondream.ai/c/playground) &#8201; · &#8201; [☁️ Cloud API](https://moondream.ai/c/docs/quickstart) &#8201; · &#8201; _📝 Release notes_ (coming soon)
+[✨ Demo](https://moondream.ai/c/playground) &#8201; · &#8201; [☁️ Cloud API](https://moondream.ai/c/docs/quickstart) &#8201; · &#8201; [📝 Release notes](https://moondream.ai/blog/moondream-3-preview)
 
 ![](https://huggingface.co/moondream/moondream3-preview/resolve/main/open_vocab_detect.png)
 ![](https://huggingface.co/moondream/moondream3-preview/resolve/main/visual_reasoning.png)
@@ -19,7 +19,7 @@ library_name: transformers
 4. Multi-headed attention with learned position- and data-dependent temperature scaling
 5. SigLIP-based vision encoder, with multi-crop channel concatenation for token-efficient high resolution image processing
 
-For more details, please refer to the **release notes** (coming soon). Or try the model out in our [playground demo](https://moondream.ai/c/playground).
+For more details, please refer to the [release notes]((https://moondream.ai/blog/moondream-3-preview). Or try the model out in our [playground demo](https://moondream.ai/c/playground).
 
 The following instructions demonstrate how to run the model locally using Transformers. We also offer a [cloud API](https://moondream.ai/c/docs/quickstart) with a generous free tier that can help you get started quicker!
 
