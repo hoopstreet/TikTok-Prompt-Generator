@@ -36,3 +36,4 @@ saved_model/**/* filter=lfs diff=lfs merge=lfs -text
 structured_outputs.png filter=lfs diff=lfs merge=lfs -text
 open_vocab_detect.png filter=lfs diff=lfs merge=lfs -text
 point_count.png filter=lfs diff=lfs merge=lfs -text
+visual_reasoning.png filter=lfs diff=lfs merge=lfs -text
