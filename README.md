@@ -201,4 +201,15 @@ objects = moondream.detect(encoded, "vehicle")
 
 Copyright (c) 2025 M87 Labs, Inc.
 
-This distribution includes Model Weights licensed under the [Business Source License 1.1 with an Additional Use Grant (No Third-Party Service)](https://huggingface.co/moondream/moondream3-preview/blob/main/LICENSE.md). Commercial hosting or rehosting requires an agreement with <contact@m87.ai>.
+This distribution includes Model Weights licensed under the [Business Source License 1.1 with an Additional Use Grant (No Third-Party Service)](https://huggingface.co/moondream/moondream3-preview/blob/main/LICENSE.md).
+
+**You can:** use the weights for personal projects or **self-host inside your company** (commercial use OK).
+
+**You can’t (without a deal):** offer the model’s functionality **to anyone outside your organization**—e.g., an external **API**, **SaaS** feature, or managed hosting for customers.
+
+**Examples:**
+
+* “Run it on our servers for our internal team.” → **Allowed**
+* “Sell an API for customers to use.” → **Requires an agreement**
+
+*This summary is for convenience only; the BSL 1.1 + Additional Use Grant controls. Questions or commercial use: **[contact@m87.ai](mailto:contact@m87.ai)***.
