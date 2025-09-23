@@ -27,11 +27,11 @@ def extract_question(text):
 
 class HfConfig(PretrainedConfig):
     _auto_class = "AutoConfig"
-    model_type = "moondream1"
+    model_type = "moondream3"
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.config = {}
+        self.config = {"skills": ["query", "caption", "detect", "point"]}
 
 
 class HfMoondream(PreTrainedModel):
