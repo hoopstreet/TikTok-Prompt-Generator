@@ -205,7 +205,7 @@ This distribution includes Model Weights licensed under the [Business Source Lic
 
 **You can:** use the weights for personal projects or **self-host inside your company** (commercial use OK).
 
-**You can’t (without a deal):** offer the model’s functionality **to anyone outside your organization**—e.g., an external **API**, **SaaS** feature, or managed hosting for customers.
+**You can’t (without a deal):** offer the model’s functionality **to anyone outside your organization**—e.g., an external **API**, or managed hosting for customers.
 
 **Examples:**
 
