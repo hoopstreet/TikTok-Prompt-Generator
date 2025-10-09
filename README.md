@@ -203,13 +203,38 @@ Copyright (c) 2025 M87 Labs, Inc.
 
 This distribution includes Model Weights licensed under the [Business Source License 1.1 with an Additional Use Grant (No Third-Party Service)](https://huggingface.co/moondream/moondream3-preview/blob/main/LICENSE.md).
 
-**You can:** use the weights for personal projects or **self-host inside your company** (commercial use OK).
+TL;DR — You can use Moondream 3 (Preview) freely for personal, research, and most commercial uses. What’s NOT allowed without a separate deal is offering a paid product that competes with M87 Labs’ paid versions (e.g., selling hosted or embedded access to the model’s capabilities to third parties).
 
-**You can’t (without a deal):** offer the model’s functionality **to anyone outside your organization**—e.g., an external **API**, or managed hosting for customers.
+What’s allowed (no special agreement needed):
 
-**Examples:**
+* Internal use at your company, including production use (affiliates count as the same org).
+* Personal projects, research, benchmarks, fine-tunes, merges, quantizations, weight deltas.
+* Using the model inside your product when it does not substantially overlap with M87’s paid offerings.
+* Free/zero-price services (free community demos, noncommercial tools).
 
-* “Run it on our servers for our internal team.” → **Allowed**
-* “Sell an API for customers to use.” → **Requires an agreement**
+What requires an agreement (because it competes with M87’s paid offerings):
 
-*This summary is for convenience only; the BSL 1.1 + Additional Use Grant controls. Questions or commercial use: **[contact@m87.ai](mailto:contact@m87.ai)***.
+* Selling a hosted API that exposes similar vision or general AI capabilities.
+* Managed hosting or “MOE/Moondream-as-a-service” for customers.
+* Embedding the weights/code in a paid SDK or appliance that delivers comparable capabilities.
+* B2B offerings for computer vision, data labeling, or generic AI APIs that meaningfully overlap with M87’s paid versions.
+
+**Examples**
+
+Allowed:
+* “Run it on our servers for employees across our company.” ✔
+* “Use it in our consumer photo app to auto-tag images.” ✔ (not a competing B2B offering)
+* “Publish a free demo site for the community.” ✔
+
+Requires an agreement:
+* “Sell a computer-vision API to enterprise customers.” ✖
+* “Offer managed hosting of this model for other companies.” ✖
+* “Ship a paid SDK that bundles these weights for third-party apps.” ✖
+
+Notes
+
+* “Competitive offering” = a paid product (including paid support) offered to third parties that significantly overlaps with M87’s paid version(s). Free products are not competitive.
+* “Embedded” includes bundling the model’s code/weights in a competitive offering or packaging it so the model must be accessed/downloaded for that offering to work.
+* On the Change Date (two years after first public release of this version), this version switches to Apache 2.0.
+
+This summary is for convenience only. The Business Source License 1.1 and the Additional Use Grant in the repository control. Questions or commercial licensing: contact@m87.ai.
