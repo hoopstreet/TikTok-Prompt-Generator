@@ -215,7 +215,7 @@ What’s allowed (no special agreement needed):
 What requires an agreement (because it competes with M87’s paid offerings):
 
 * Selling a hosted API that exposes similar vision or general AI capabilities.
-* Managed hosting or “MOE/Moondream-as-a-service” for customers.
+* Managed hosting or “Moondream-as-a-service” for customers.
 * Embedding the weights/code in a paid SDK or appliance that delivers comparable capabilities.
 * B2B offerings for computer vision, data labeling, or generic AI APIs that meaningfully overlap with M87’s paid versions.
 
