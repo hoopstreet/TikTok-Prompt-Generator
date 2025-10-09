@@ -231,10 +231,4 @@ Requires an agreement:
 * “Offer managed hosting of this model for other companies.” ✖
 * “Ship a paid SDK that bundles these weights for third-party apps.” ✖
 
-Notes
-
-* “Competitive offering” = a paid product (including paid support) offered to third parties that significantly overlaps with M87’s paid version(s). Free products are not competitive.
-* “Embedded” includes bundling the model’s code/weights in a competitive offering or packaging it so the model must be accessed/downloaded for that offering to work.
-* On the Change Date (two years after first public release of this version), this version switches to Apache 2.0.
-
 This summary is for convenience only. The Business Source License 1.1 and the Additional Use Grant in the repository control. Questions or commercial licensing: contact@m87.ai.
