@@ -31,10 +31,6 @@ class LinearWeights:
     bias: torch.Tensor
 
 
-def linear(x: torch.Tensor, w: LinearWeights) -> torch.Tensor:
-    return F.linear(x, w.weight, w.bias)
-
-
 def dequantize_tensor(W_q, scale, zero, orig_shape, dtype=torch.bfloat16):
     _step = W_q.shape[0]
     W_r = torch.empty([2 * _step, W_q.shape[1]], dtype=dtype, device=W_q.device)
@@ -226,9 +222,9 @@ def attn(x: torch.Tensor, w: AttentionWeights, n_heads: int) -> torch.Tensor:
 
     q, k, v = [
         t.view(bsz, q_len, n_heads, head_dim).transpose(1, 2)
-        for t in linear(x, w.qkv).chunk(3, dim=-1)
+        for t in w.qkv(x).chunk(3, dim=-1)
     ]
     out = F.scaled_dot_product_attention(q, k, v)
     out = out.transpose(1, 2).reshape(bsz, q_len, d_model)
-    out = linear(out, w.proj)
+    out = w.proj(out)
     return out
