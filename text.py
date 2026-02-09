@@ -8,6 +8,7 @@ from typing import Optional
 from .layers import layer_norm, mlp, QuantizedLinear, moe_mlp
 from .rope import apply_rotary_emb, precompute_freqs_cis
 from .config import TextConfig
+from .lora import select_layer_lora
 
 
 def text_encoder(input_ids: torch.Tensor, w: nn.Module):
@@ -23,15 +24,12 @@ def attn(
     n_heads: int,
     n_kv_heads: int,
     position_ids: torch.Tensor,
-    lora: Optional[dict] = None,
     flex_block_mask_slice=None,
 ):
     bsz, q_len, d_model = x.shape
     head_dim = d_model // n_heads
 
     qkv_out = w.qkv(x)  # shape: (bsz, q_len, (n_heads + 2*n_kv_heads)*head_dim)
-    if lora is not None:
-        qkv_out += F.linear(F.linear(x, lora["qkv"]["A"]), lora["qkv"]["B"])
     q_dim = n_heads * head_dim
     kv_dim = n_kv_heads * head_dim
     q, k, v = qkv_out.split([q_dim, kv_dim, kv_dim], dim=-1)
@@ -69,14 +67,7 @@ def attn(
 
     out = out.transpose(1, 2).reshape(bsz, q_len, d_model)
 
-    out0 = w.proj(out)
-    if lora is not None:
-        out1 = F.linear(F.linear(x, lora["proj"]["A"]), lora["proj"]["B"])
-        out = out0 + out1
-    else:
-        out = out0
-
-    return out
+    return w.proj(out)
 
 
 def text_decoder(
@@ -85,17 +76,13 @@ def text_decoder(
     attn_mask: torch.Tensor,
     position_ids: torch.Tensor,
     config: TextConfig,
-    lora: Optional[dict] = None,
+    lora: Optional[object] = None,
     flex_block_mask_slice=None,
 ):
     for i, block in enumerate(w.blocks):
-        if lora is not None:
-            layer_lora = lora["text"]["blocks"][str(i)]
-            mlp_lora = layer_lora["mlp"]
-            attn_lora = layer_lora["attn"]
-        else:
-            mlp_lora = None
-            attn_lora = None
+        layer_lora = select_layer_lora(
+            lora, i, is_moe=config.moe is not None and i >= config.moe.start_layer
+        )
 
         l_in = layer_norm(x, block.ln)
         l_attn = attn(
@@ -107,14 +94,15 @@ def text_decoder(
             n_heads=config.n_heads,
             n_kv_heads=config.n_kv_heads,
             position_ids=position_ids,
-            lora=attn_lora,
             flex_block_mask_slice=flex_block_mask_slice,
         )
 
         if config.moe is not None and i >= config.moe.start_layer:
-            l_mlp = moe_mlp(l_in, block.mlp, config.moe.experts_per_token)
+            l_mlp = moe_mlp(
+                l_in, block.mlp, config.moe.experts_per_token, lora=layer_lora
+            )
         else:
-            l_mlp = mlp(l_in, block.mlp, lora=mlp_lora)
+            l_mlp = mlp(l_in, block.mlp, lora=layer_lora)
 
         x = x + l_attn + l_mlp
 
@@ -145,7 +133,7 @@ def build_dense_mlp(d_model, d_ffn, dtype, linear_cls):
 
 def build_moe_mlp(d_model, d_ffn, n_experts, dtype):
     # For GeGLU, fc1 needs to output 2 * d_ffn (for gating)
-    return nn.ModuleDict(
+    mlp = nn.ModuleDict(
         {
             "router": nn.Linear(d_model, n_experts, dtype=dtype),
             "fc1": nn.ParameterDict(
@@ -164,6 +152,7 @@ def build_moe_mlp(d_model, d_ffn, n_experts, dtype):
             ),
         }
     )
+    return mlp
 
 
 def build_text_model(config: TextConfig, dtype: torch.dtype) -> nn.Module:
