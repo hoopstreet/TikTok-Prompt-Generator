@@ -52,6 +52,7 @@ def decode_coordinate(hidden_state: torch.Tensor, w: nn.Module) -> torch.Tensor:
     Returns:
         A single logit representing the predicted coordinate value (x or y)
     """
+    hidden_state = w.ln(hidden_state)
     return w.coord_decoder(hidden_state)
 
 
@@ -88,6 +89,7 @@ def decode_size(hidden_state: torch.Tensor, w: nn.Module) -> torch.Tensor:
         A tensor containing logits for 1024 bins for width and height.
         Shape is (2, 1024) where the first dimension corresponds to width and height.
     """
+    hidden_state = w.ln(hidden_state)
     return w.size_decoder(hidden_state).view(2, -1)
 
 

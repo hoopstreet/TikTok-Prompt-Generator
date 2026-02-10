@@ -5,6 +5,14 @@ import torch.nn.functional as F
 from dataclasses import dataclass
 from typing import Literal, Optional
 
+from .lora import (
+    DenseLoRALayer,
+    MoELoRALayer,
+    apply_dense_lora,
+    apply_moe_lora_fc1_flat,
+    apply_moe_lora_fc2_flat,
+)
+
 try:
     from torchao import quantize_
     from torchao.quantization import int4_weight_only
@@ -126,11 +134,12 @@ class MLPWeights:
     act: Literal["gelu_approx"] = "gelu_approx"
 
 
-def mlp(x: torch.Tensor, w: MLPWeights, lora: Optional[dict] = None) -> torch.Tensor:
+def mlp(
+    x: torch.Tensor, w: MLPWeights, lora: Optional[DenseLoRALayer] = None
+) -> torch.Tensor:
     x0 = w.fc1(x)
     if lora is not None:
-        x1 = F.linear(F.linear(x, lora["fc1"]["A"]), lora["fc1"]["B"])
-        x = x0 + x1
+        x = x0 + apply_dense_lora(x, lora.up_a, lora.up_b)
     else:
         x = x0
 
@@ -138,8 +147,7 @@ def mlp(x: torch.Tensor, w: MLPWeights, lora: Optional[dict] = None) -> torch.Te
 
     x0 = w.fc2(x)
     if lora is not None:
-        x1 = F.linear(F.linear(x, lora["fc2"]["A"]), lora["fc2"]["B"])
-        x = x0 + x1
+        x = x0 + apply_dense_lora(x, lora.down_a, lora.down_b)
     else:
         x = x0
 
@@ -147,7 +155,10 @@ def mlp(x: torch.Tensor, w: MLPWeights, lora: Optional[dict] = None) -> torch.Te
 
 
 def moe_mlp(
-    x: torch.Tensor, mlp_module: nn.Module, experts_per_token: int
+    x: torch.Tensor,
+    mlp_module: nn.Module,
+    experts_per_token: int,
+    lora: Optional[MoELoRALayer] = None,
 ) -> torch.Tensor:
     B, T, C = x.shape
     x = x.reshape(-1, C)
@@ -167,21 +178,23 @@ def moe_mlp(
         flat_weights = topk_weights.view(-1)  # [T*A]
 
         # Select expert weights
-        w1_selected = w1_weight[flat_idxs]  # [T*A, H, D]
-        w2_selected = w2_weight[flat_idxs]  # [T*A, D, H]
+        w1_selected = w1_weight[flat_idxs]
+        w2_selected = w2_weight[flat_idxs]
 
         # Expand input for all token-expert pairs
         x_expanded = x.unsqueeze(1).expand(-1, top_k, -1).reshape(-1, C)  # [T*A, D]
 
         # First linear layer with GeGLU: [T*A, H, D] @ [T*A, D, 1] -> [T*A, H]
-        x1_full = torch.bmm(w1_selected, x_expanded.unsqueeze(-1)).squeeze(
-            -1
-        )  # [T*A, H]
+        x1_full = torch.bmm(w1_selected, x_expanded.unsqueeze(-1)).squeeze(-1)  # [T*A, H]
+        if lora is not None:
+            x1_full = x1_full + apply_moe_lora_fc1_flat(x_expanded, lora, flat_idxs)
         x1, g = x1_full.chunk(2, dim=-1)
         x1 = F.gelu(x1) * (g + 1)
 
         # Second linear layer: [T*A, D, H] @ [T*A, H, 1] -> [T*A, D]
         expert_outs = torch.bmm(w2_selected, x1.unsqueeze(-1)).squeeze(-1)  # [T*A, D]
+        if lora is not None:
+            expert_outs = expert_outs + apply_moe_lora_fc2_flat(x1, lora, flat_idxs)
 
         # Apply weights and reshape
         weighted_outs = expert_outs * flat_weights.unsqueeze(-1)  # [T*A, D]
@@ -203,10 +216,22 @@ def moe_mlp(
             x_tok = x.index_select(0, token_pos)
             gate_tok = topk_weights[token_pos, which_k]
 
-            h_full = F.linear(x_tok, mlp_module.fc1.weight[expert_id])
+            w1 = mlp_module.fc1.weight[expert_id]
+            h_full = F.linear(x_tok, w1)
+            if lora is not None:
+                lora_up_a = lora.up_a[expert_id]
+                lora_up_b = lora.up_b[expert_id]
+                lora_mid = F.linear(x_tok, lora_up_a)
+                h_full = h_full + F.linear(lora_mid, lora_up_b)
             h, g = h_full.chunk(2, dim=-1)
             h = F.gelu(h) * (g + 1)
-            y = F.linear(h, mlp_module.fc2.weight[expert_id])
+            w2 = mlp_module.fc2.weight[expert_id]
+            y = F.linear(h, w2)
+            if lora is not None:
+                lora_down_a = lora.down_a[expert_id]
+                lora_down_b = lora.down_b[expert_id]
+                lora_mid = F.linear(h, lora_down_a)
+                y = y + F.linear(lora_mid, lora_down_b)
 
             y.mul_(gate_tok.unsqueeze(-1))
             out.index_add_(0, token_pos, y)

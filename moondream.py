@@ -21,12 +21,12 @@ from .region import (
     SpatialRefs,
 )
 from .layers import QuantizedLinear
-from .lora import variant_state_dict
+from .lora import load_adapter, normalize_adapter_id
 from .utils import remove_outlier_points
 
 ImageEncodingSettings = TypedDict(
     "ImageEncodingSettings",
-    {"variant": str},
+    {"adapter": str, "model": str},
     total=False,
 )
 
@@ -36,14 +36,15 @@ TextSamplingSettings = TypedDict(
         "max_tokens": int,
         "temperature": float,
         "top_p": float,
-        "variant": str,
+        "adapter": str,
+        "model": str,
     },
     total=False,
 )
 
 ObjectSamplingSettings = TypedDict(
     "ObjectSamplingSettings",
-    {"max_objects": int, "variant": str},
+    {"max_objects": int, "adapter": str, "model": str},
     total=False,
 )
 
@@ -120,6 +121,7 @@ class MoondreamModel(nn.Module):
                 "size_decoder": linear_cls(
                     config.region.dim, config.region.size_out_dim, dtype=dtype
                 ),
+                "ln": nn.LayerNorm(config.region.dim, dtype=dtype),
             }
         )
         self.region.coord_features = nn.Parameter(
@@ -180,6 +182,29 @@ class MoondreamModel(nn.Module):
                 device=self.device,
                 dtype=self.vision.pos_emb.dtype,
             )
+
+    def _adapter_id_from_settings(self, settings: Optional[dict]) -> Optional[str]:
+        if settings is None:
+            return None
+        adapter = settings.get("adapter")
+        if adapter is not None:
+            return normalize_adapter_id(adapter)
+
+        model_value = settings.get("model")
+        if isinstance(model_value, str):
+            return normalize_adapter_id(model_value)
+        return None
+
+    def _resolve_lora(self, settings: Optional[dict]) -> Optional[object]:
+        adapter_id = self._adapter_id_from_settings(settings)
+        if adapter_id is None:
+            return None
+        return load_adapter(
+            adapter_id,
+            text_config=self.config.text,
+            device=self.device,
+            dtype=self.vision.pos_emb.dtype,
+        )
 
     @property
     def device(self):
@@ -303,11 +328,7 @@ class MoondreamModel(nn.Module):
         elif not isinstance(image, Image.Image):
             raise ValueError("image must be a PIL Image or EncodedImage")
 
-        lora = (
-            variant_state_dict(settings["variant"], device=self.device)
-            if settings is not None and "variant" in settings
-            else None
-        )
+        lora = self._resolve_lora(settings)
 
         # Run through text model in addition to the vision encoder, to minimize
         # re-computation if multiple queries are performed on this image.
@@ -408,11 +429,7 @@ class MoondreamModel(nn.Module):
             if settings
             else DEFAULT_TEMPERATURE
         )
-        lora = (
-            variant_state_dict(settings["variant"], device=self.device)
-            if settings is not None and "variant" in settings
-            else None
-        )
+        lora = self._resolve_lora(settings)
 
         top_p = settings.get("top_p", DEFAULT_TOP_P) if settings else DEFAULT_TOP_P
         eos_id = self.config.tokenizer.answer_id
@@ -524,11 +541,7 @@ class MoondreamModel(nn.Module):
         )
         top_p = settings.get("top_p", DEFAULT_TOP_P) if settings else DEFAULT_TOP_P
         eos_id = eos_id if eos_id is not None else self.config.tokenizer.eos_id
-        lora = (
-            variant_state_dict(settings["variant"], device=self.device)
-            if settings is not None and "variant" in settings
-            else None
-        )
+        lora = self._resolve_lora(settings)
 
         _, _, next_token, pos = self._prefill_prompt(
             prompt_tokens,
@@ -671,6 +684,7 @@ class MoondreamModel(nn.Module):
             reasoning_dict = {
                 "reasoning": {"text": reasoning_text, "grounding": reasoning_grounding}
             }
+            spatial_refs = None
         else:
             prompt_tokens[0] += self.config.tokenizer.templates["query"]["suffix"]
             reasoning_dict = {}
@@ -834,11 +848,7 @@ class MoondreamModel(nn.Module):
             device=self.device,
         )
 
-        lora = (
-            variant_state_dict(settings["variant"], device=self.device)
-            if settings is not None and "variant" in settings
-            else None
-        )
+        lora = self._resolve_lora(settings)
 
         _, hidden, next_token, pos = self._prefill_prompt(
             prompt_tokens, image.pos, temperature=0, top_p=0, lora=lora
@@ -882,11 +892,7 @@ class MoondreamModel(nn.Module):
             device=self.device,
         )
 
-        lora = (
-            variant_state_dict(settings["variant"], device=self.device)
-            if settings is not None and "variant" in settings
-            else None
-        )
+        lora = self._resolve_lora(settings)
 
         _, hidden, next_token, pos = self._prefill_prompt(
             prompt_tokens, image.pos, temperature=0, top_p=0, lora=lora
