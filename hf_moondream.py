@@ -43,6 +43,7 @@ class HfMoondream(PreTrainedModel):
             MoondreamConfig.from_dict(config.config), setup_caches=False
         )
         self._is_kv_cache_setup = False
+        self.post_init()
 
     def _setup_caches(self):
         if not self._is_kv_cache_setup:
