@@ -132,7 +132,15 @@ class MoondreamModel(nn.Module):
             torch.empty(config.region.size_feat_dim // 2, 2, dtype=dtype).T
         )
 
-        self.register_buffer("attn_mask", self._build_attn_mask(), persistent=False)
+        attn_mask = torch.tril(
+            torch.ones(
+                1, 1, config.text.max_context, config.text.max_context, dtype=torch.bool
+            )
+        )
+        patch_w = config.vision.crop_size // config.vision.enc_patch_size
+        prefix_attn_len = 1 + patch_w**2
+        attn_mask[..., :prefix_attn_len, :prefix_attn_len] = 1
+        self.register_buffer("attn_mask", attn_mask, persistent=False)
 
         self.use_flex_decoding = True
         self._causal_block_mask = None
@@ -164,7 +172,7 @@ class MoondreamModel(nn.Module):
             )
         return self._point_gen_indices
 
-    def _build_attn_mask(self):
+    def _refresh_runtime_buffers(self):
         attn_mask = torch.tril(
             torch.ones(
                 1,
@@ -172,15 +180,13 @@ class MoondreamModel(nn.Module):
                 self.config.text.max_context,
                 self.config.text.max_context,
                 dtype=torch.bool,
+                device=self.device,
             )
         )
         patch_w = self.config.vision.crop_size // self.config.vision.enc_patch_size
         prefix_attn_len = 1 + patch_w**2
         attn_mask[..., :prefix_attn_len, :prefix_attn_len] = 1
-        return attn_mask
-
-    def _refresh_runtime_buffers(self):
-        self.attn_mask = self._build_attn_mask().to(device=self.device)
+        self.attn_mask = attn_mask
         self.text.freqs_cis = precompute_freqs_cis(
             self.config.text.dim // (2 * self.config.text.n_heads),
             self.config.text.max_context,
