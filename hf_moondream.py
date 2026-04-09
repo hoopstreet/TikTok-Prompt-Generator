@@ -45,6 +45,13 @@ class HfMoondream(PreTrainedModel):
         self._is_kv_cache_setup = False
         self.post_init()
 
+    @classmethod
+    def from_pretrained(cls, *args, **kwargs):
+        output = super().from_pretrained(*args, **kwargs)
+        model = output[0] if isinstance(output, tuple) else output
+        model.model._refresh_runtime_buffers()
+        return output
+
     def _setup_caches(self):
         if not self._is_kv_cache_setup:
             self.model._setup_caches()

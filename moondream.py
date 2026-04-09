@@ -22,6 +22,7 @@ from .region import (
 )
 from .layers import QuantizedLinear
 from .lora import load_adapter, normalize_adapter_id
+from .rope import precompute_freqs_cis
 from .utils import remove_outlier_points
 
 ImageEncodingSettings = TypedDict(
@@ -170,6 +171,26 @@ class MoondreamModel(nn.Module):
                 device=self.device,
             )
         return self._point_gen_indices
+
+    def _refresh_runtime_buffers(self):
+        attn_mask = torch.tril(
+            torch.ones(
+                1,
+                1,
+                self.config.text.max_context,
+                self.config.text.max_context,
+                dtype=torch.bool,
+                device=self.device,
+            )
+        )
+        patch_w = self.config.vision.crop_size // self.config.vision.enc_patch_size
+        prefix_attn_len = 1 + patch_w**2
+        attn_mask[..., :prefix_attn_len, :prefix_attn_len] = 1
+        self.attn_mask = attn_mask
+        self.text.freqs_cis = precompute_freqs_cis(
+            self.config.text.dim // (2 * self.config.text.n_heads),
+            self.config.text.max_context,
+        ).to(device=self.device)
 
     def _setup_caches(self):
         c = self.config.text
