@@ -154,4 +154,7 @@ git push origin main
 - `structured_outputs.png`
 - `visual_reasoning.png`
 * **v1.0.6:** [STABLE] Implementing Taglish Video Script templates in hf_moondream.py.
-* **v1.0.7:** [CURRENT] Fixed Dual-Action Workflow (Main/Tag) and clean HF Sync logic.
+* **v1.0.7:** [STABLE] Fixed Dual-Action Workflow (Main/Tag) and clean HF Sync logic.
+v1.0.8: [STABLE] Workflow syntax fix (Literal EOF protection).
+v1.0.9: [STABLE] Finalized Weightless Build: Strict version tagging, removed 'latest' bloat, and cleaned HF metadata.
+v1.1.0: [CURRENT] Scaling TikTok Automation: Multi-product batch processing logic.
