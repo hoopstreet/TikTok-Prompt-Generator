@@ -310,3 +310,15 @@ Auto-generated summary:\n- update: DNA v1.1.x structured logs + protocol upgrade
 - update: mobile commit
 - fix: proper Docker + app structure
 
+
+---
+
+### v1.1.8 [STABLE]
+- Timestamp: 2026-04-18 20:57
+- Source: iSH Mobile Deploy
+- Location: iPhone (iSH) → GitHub → Docker → HF
+- Execution: AI-Protocol Validated
+- Notes:
+  - Transition bridge to v1.2.0 logic.
+  - Verified DNA.md manifest completeness.
+  - Security Check: Token rotation recommended.
