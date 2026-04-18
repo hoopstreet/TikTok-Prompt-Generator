@@ -1,51 +1,71 @@
 # TikTok-Prompt-Generator DNA 🧬
 
 ## 🚀 1. The Architecture (Weightless Deployment)
-This project uses a "Remote-Control" architecture. We use low-power mobile hardware to trigger high-power cloud infrastructure.
+This project is designed for **"Zero-Local-Load"** development. Management happens on mobile (iPhone), while heavy lifting happens in the cloud.
 
-* **Control Center (iSH iPhone):** The "Brain" where code is written and version tags are issued.
-* **The Factory (GitHub Actions):** The "Muscle" that builds heavy Docker images.
-* **The Registry (Docker Hub):** The "Storage" for pre-built versioned environments.
-* **The Storefront (Hugging Face):** The "Stage" where the AI runs on a T4 GPU.
+* **Control Center (iSH iPhone):** The "Commander." Used for coding via terminal, Git management, and issuing version tags.
+* **The Factory (GitHub Actions):** The "Builder." When a tag is pushed, it builds the Docker environment.
+* **The Registry (Docker Hub):** The "Warehouse." Stores massive pre-baked AI model images.
+* **The Storefront (Hugging Face):** The "Live App." Runs the Moondream 3 model on a T4 GPU for the end user.
 
-## 🛠 2. Tech Stack & Tools
-* **Vision Model:** Moondream 3 (9B Parameters).
-* **Runtime:** Python 3.10-slim.
-* **iSH (Alpine Linux):** Local Git, DNS management, and versioning.
-* **GitHub Actions:** Dual-workflow automation engine.
-* **Hugging Face Spaces:** Production environment (GPU enabled).
+## 🛠 2. Tool Purposes & Tech Stack
+| Tool | Purpose | Tech Specs |
+| :--- | :--- | :--- |
+| **iSH (iPhone)** | Local terminal env to bypass the need for a PC. | Alpine Linux |
+| **GitHub** | Version control and Automation hosting. | Git |
+| **GitHub Actions** | CI/CD pipeline to build and sync deployments. | YAML Workflows |
+| **Docker Hub** | Hosting pre-built images to avoid 20+ min build times on HF. | Docker Registry |
+| **Hugging Face** | Hosting the production Gradio UI on free GPU. | T4 GPU (Small) |
+| **Moondream 3** | Vision-language model to analyze video/images. | 9B Parameters |
 
-## 🤖 3. Dual-Action Workflow (Expansion Logic)
-When a version tag (`v1.x.x`) is pushed from iSH, two automated jobs trigger:
+## 🔗 3. Project Links
+* **GitHub Repository:** https://github.com/hoopstreet/TikTok-Prompt-Generator
+* **Docker Hub Registry:** https://hub.docker.com/r/hoopstreet/tiktok-prompt-generator
+* **Hugging Face Space:** https://huggingface.co/spaces/hoopstreet/TikTok-Prompt-Generator
 
-### Workflow A: Build & Push
-* **Trigger:** New Tag (`v*`).
-* **Process:** GitHub builds the full Docker environment including model weights.
-* **Output:** A tagged image in Docker Hub (e.g., `hoopstreet/tiktok-prompt-generator:v1.0.4`).
+## 🔐 4. Variables & Secrets (GitHub Settings)
+To make the automation work, the following **GitHub Actions Secrets** must be configured:
+1.  `DOCKERHUB_USERNAME`: Your Docker Hub account name.
+2.  `DOCKERHUB_TOKEN`: Personal Access Token from Docker Hub.
+3.  `HF_TOKEN`: Write-access token from Hugging Face.
 
-### Workflow B: Sync & Deploy (The Auto-Editor)
-* **Trigger:** Success of Workflow A.
-* **Process:** 1. GitHub automatically edits `hf.Dockerfile`.
-    2. It updates the `FROM` line to match the new version tag.
-    3. It force-pushes ONLY `hf.Dockerfile` and `README.md` to Hugging Face.
-* **Result:** Hugging Face pulls the new pre-built image instantly.
+## 🤖 5. Dual-Action Workflow (GitHub Actions)
+### Workflow 1: Build & Push (`docker-publish.yml`)
+* **Purpose:** Compiles the heavy Python environment, Torch, and Moondream 3 weights into a Docker image.
+* **Outcome:** Creates a versioned image like `v1.0.4` in Docker Hub.
 
-## 🧱 4. Source Code Logic Map
-* **hf_moondream.py:** Core AI entry point (Gradio UI + Inference logic).
-* **Dockerfile:** Build instructions for the "Factory" (Docker Hub).
-* **hf.Dockerfile:** The "Expansion" link used by Hugging Face (Lightweight).
-* **deploy.sh:** Local master script for tagging and pushing.
-* **.github/workflows/:** Contains `docker-publish.yml` and `hf-sync.yml`.
+### Workflow 2: Sync & Update HF (`hf-sync.yml`)
+* **Purpose:** The "Auto-Editor." It edits the `hf.Dockerfile` on the fly to point to the new version and pushes it to Hugging Face.
+* **Outcome:** Triggers an instant "reboot" on Hugging Face using the new pre-built image.
 
-## 🤖 5. AI Developer Protocol (For AI/LLMs)
-To maintain the integrity of this mobile-first environment, all AI providers must follow these rules:
-1.  **Keyboard-less Input:** Use `cat <<EOF >` or `sed` for all code. Never ask for manual edits.
-2.  **DNS Resilience:** Always include `echo "nameserver 8.8.8.8" > /etc/resolv.conf` in Git operations.
-3.  **Step-by-Step Blocks:** Break code longer than 200 characters into numbered segments (1, 2, 3).
-4.  **Automatic Sync:** Always end a logic update with a Git commit and push.
-5.  **No Overwriting:** Insert or append code into target places instead of rewriting the entire project.
+## ⌨️ 6. AI Developer Protocol (For AI/LLM Providers)
+### The "Keyboard-less" Delivery Template
+All AI providers must deliver code in the following structure for iSH compatibility:
 
-## 📌 6. Version History
-* **v1.0.0 - v1.0.2:** Infrastructure setup and refactoring.
-* **v1.0.3:** [STABLE] Fixed Dockerfile renaming and iSH-to-GitHub pipeline.
-* **v1.0.4:** [CURRENT] Implemented AI Protocol and organized DNA structure.
+**Part 1: Setup & Target (Summary)**
+```bash
+# [Number]. [Action Description]
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+cd ~/TikTok-Prompt-Generator
+# [Specific Command: e.g., cat <<EOF > filename.ext]
+# [Code Content]
+# EOF
+```
+
+**Part 2: Execution & Sync**
+```bash
+# [Number]. Sync to Remote
+git add .
+git commit -m "update: [Specific Change]"
+git push origin main
+```
+
+### Fundamental Rules:
+1.  **NO MANUAL EDITS:** Never ask the user to open 'nano' or 'vi'.
+2.  **DNS FIRST:** Every block involving Git or Network must start with `echo "nameserver 8.8.8.8" > /etc/resolv.conf`.
+3.  **FRAGMENTATION:** If the code is >200 characters, split it into numbered steps (1, 2, 3) to avoid mobile clipboard crashes.
+4.  **INSERTION PREFERENCE:** Use `sed` or `cat >>` to add logic to existing files instead of overwriting the whole file.
+
+## 📌 7. Version History
+* **v1.0.0 - v1.0.3:** Infrastructure stabilization and DNS fixes.
+* **v1.0.4:** [CURRENT] Master DNA Overhaul. Implemented AI Developer Protocol and Secret Documentation.

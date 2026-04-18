@@ -3,365 +3,74 @@
 # TikTok-Prompt-Generator DNA 🧬
 
 ## 🚀 1. The Architecture (Weightless Deployment)
-This project uses a "Remote-Control" architecture. We use low-power mobile hardware to trigger high-power cloud infrastructure.
+This project is designed for **"Zero-Local-Load"** development. Management happens on mobile (iPhone), while heavy lifting happens in the cloud.
 
-* **Control Center (iSH iPhone):** The "Brain" where code is written and version tags are issued.
-* **The Factory (GitHub Actions):** The "Muscle" that builds heavy Docker images.
-* **The Registry (Docker Hub):** The "Storage" for pre-built versioned environments.
-* **The Storefront (Hugging Face):** The "Stage" where the AI runs on a T4 GPU.
+* **Control Center (iSH iPhone):** The "Commander." Used for coding via terminal, Git management, and issuing version tags.
+* **The Factory (GitHub Actions):** The "Builder." When a tag is pushed, it builds the Docker environment.
+* **The Registry (Docker Hub):** The "Warehouse." Stores massive pre-baked AI model images.
+* **The Storefront (Hugging Face):** The "Live App." Runs the Moondream 3 model on a T4 GPU for the end user.
 
-## 🛠 2. Tech Stack & Tools
-* **Vision Model:** Moondream 3 (9B Parameters).
-* **Runtime:** Python 3.10-slim.
-* **iSH (Alpine Linux):** Local Git, DNS management, and versioning.
-* **GitHub Actions:** Dual-workflow automation engine.
-* **Hugging Face Spaces:** Production environment (GPU enabled).
+## 🛠 2. Tool Purposes & Tech Stack
+| Tool | Purpose | Tech Specs |
+| :--- | :--- | :--- |
+| **iSH (iPhone)** | Local terminal env to bypass the need for a PC. | Alpine Linux |
+| **GitHub** | Version control and Automation hosting. | Git |
+| **GitHub Actions** | CI/CD pipeline to build and sync deployments. | YAML Workflows |
+| **Docker Hub** | Hosting pre-built images to avoid 20+ min build times on HF. | Docker Registry |
+| **Hugging Face** | Hosting the production Gradio UI on free GPU. | T4 GPU (Small) |
+| **Moondream 3** | Vision-language model to analyze video/images. | 9B Parameters |
 
-## 🤖 3. Dual-Action Workflow (Expansion Logic)
-When a version tag (`v1.x.x`) is pushed from iSH, two automated jobs trigger:
+## 🔗 3. Project Links
+* **GitHub Repository:** https://github.com/hoopstreet/TikTok-Prompt-Generator
+* **Docker Hub Registry:** https://hub.docker.com/r/hoopstreet/tiktok-prompt-generator
+* **Hugging Face Space:** https://huggingface.co/spaces/hoopstreet/TikTok-Prompt-Generator
 
-### Workflow A: Build & Push
-* **Trigger:** New Tag (`v*`).
-* **Process:** GitHub builds the full Docker environment including model weights.
-* **Output:** A tagged image in Docker Hub (e.g., `hoopstreet/tiktok-prompt-generator:v1.0.4`).
+## 🔐 4. Variables & Secrets (GitHub Settings)
+To make the automation work, the following **GitHub Actions Secrets** must be configured:
+1.  `DOCKERHUB_USERNAME`: Your Docker Hub account name.
+2.  `DOCKERHUB_TOKEN`: Personal Access Token from Docker Hub.
+3.  `HF_TOKEN`: Write-access token from Hugging Face.
 
-### Workflow B: Sync & Deploy (The Auto-Editor)
-* **Trigger:** Success of Workflow A.
-* **Process:** 1. GitHub automatically edits `hf.Dockerfile`.
-    2. It updates the `FROM` line to match the new version tag.
-    3. It force-pushes ONLY `hf.Dockerfile` and `README.md` to Hugging Face.
-* **Result:** Hugging Face pulls the new pre-built image instantly.
+## 🤖 5. Dual-Action Workflow (GitHub Actions)
+### Workflow 1: Build & Push (`docker-publish.yml`)
+* **Purpose:** Compiles the heavy Python environment, Torch, and Moondream 3 weights into a Docker image.
+* **Outcome:** Creates a versioned image like `v1.0.4` in Docker Hub.
 
-## 🧱 4. Source Code Logic Map
-* **hf_moondream.py:** Core AI entry point (Gradio UI + Inference logic).
-* **Dockerfile:** Build instructions for the "Factory" (Docker Hub).
-* **hf.Dockerfile:** The "Expansion" link used by Hugging Face (Lightweight).
-* **deploy.sh:** Local master script for tagging and pushing.
-* **.github/workflows/:** Contains `docker-publish.yml` and `hf-sync.yml`.
+### Workflow 2: Sync & Update HF (`hf-sync.yml`)
+* **Purpose:** The "Auto-Editor." It edits the `hf.Dockerfile` on the fly to point to the new version and pushes it to Hugging Face.
+* **Outcome:** Triggers an instant "reboot" on Hugging Face using the new pre-built image.
 
-## 🤖 5. AI Developer Protocol (For AI/LLMs)
-To maintain the integrity of this mobile-first environment, all AI providers must follow these rules:
-1.  **Keyboard-less Input:** Use `cat <<EOF >` or `sed` for all code. Never ask for manual edits.
-2.  **DNS Resilience:** Always include `echo "nameserver 8.8.8.8" > /etc/resolv.conf` in Git operations.
-3.  **Step-by-Step Blocks:** Break code longer than 200 characters into numbered segments (1, 2, 3).
-4.  **Automatic Sync:** Always end a logic update with a Git commit and push.
-5.  **No Overwriting:** Insert or append code into target places instead of rewriting the entire project.
+## ⌨️ 6. AI Developer Protocol (For AI/LLM Providers)
+### The "Keyboard-less" Delivery Template
+All AI providers must deliver code in the following structure for iSH compatibility:
 
-## 📌 6. Version History
-* **v1.0.0 - v1.0.2:** Infrastructure setup and refactoring.
-* **v1.0.3:** [STABLE] Fixed Dockerfile renaming and iSH-to-GitHub pipeline.
-* **v1.0.4:** [CURRENT] Implemented AI Protocol and organized DNA structure.
+**Part 1: Setup & Target (Summary)**
+```bash
+# [Number]. [Action Description]
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+cd ~/TikTok-Prompt-Generator
+# [Specific Command: e.g., cat <<EOF > filename.ext]
+# [Code Content]
+# EOF
+```
+
+**Part 2: Execution & Sync**
+```bash
+# [Number]. Sync to Remote
+git add .
+git commit -m "update: [Specific Change]"
+git push origin main
+```
+
+### Fundamental Rules:
+1.  **NO MANUAL EDITS:** Never ask the user to open 'nano' or 'vi'.
+2.  **DNS FIRST:** Every block involving Git or Network must start with `echo "nameserver 8.8.8.8" > /etc/resolv.conf`.
+3.  **FRAGMENTATION:** If the code is >200 characters, split it into numbered steps (1, 2, 3) to avoid mobile clipboard crashes.
+4.  **INSERTION PREFERENCE:** Use `sed` or `cat >>` to add logic to existing files instead of overwriting the whole file.
+
+## 📌 7. Version History
+* **v1.0.0 - v1.0.3:** Infrastructure stabilization and DNS fixes.
+* **v1.0.4:** [CURRENT] Master DNA Overhaul. Implemented AI Developer Protocol and Secret Documentation.
 
 ---
 
-
-# TikTok-Prompt-Generator DNA 🧬
-
-## 🚀 The Architecture (Weightless Deployment)
-This project is designed to be managed entirely from a mobile environment (iSH on iPhone) and deployed to high-performance GPU environments without a local VPS.
-
-1.  **Control Center (iSH):** Code editing, Git operations, and version tagging.
-2.  **Automation (GitHub Actions):** Triggered by tags (`v*`). Builds and pushes Docker images.
-3.  **Registry (Docker Hub):** Stores pre-built images with versioned tags (`v1.x.x`).
-4.  **Deployment (Hugging Face Spaces):** Pulls the pre-built image to run **Moondream 3** on a free T4 GPU.
-
-## 🛠 Tech Stack
-- **Vision Model:** Moondream 3 (9B Parameters)
-- **Runtime:** Python 3.10-slim
-- **Infrastructure:** Docker (CI/CD via GitHub Actions)
-- **Local Env:** Alpine Linux (iSH)
-
-## 📌 Version History
-- **v1.0.0:** Initial Setup.
-- **v1.0.1:** Added Moondream 3 dependencies.
-- **v1.0.2:** Infrastructure refactor.
-- **v1.0.3:** **[CURRENT]** Fixed Dockerfile renaming and stabilized iSH-to-GitHub pipeline.
-
-## 📡 Deployment Commands (Internal)
-To deploy a new version from iSH:
-`./deploy.sh v1.x.x`
-
-## 🔗 Project Links
-- **GitHub:** https://github.com/hoopstreet/TikTok-Prompt-Generator
-- **Docker Hub:** https://hub.docker.com/r/hoopstreet/tiktok-prompt-generator
-- **Hugging Face:** https://huggingface.co/spaces/hoopstreet/TikTok-Prompt-Generator
-
-## 🏗 Project Structure & Setup
-1. **Local Repository (iSH/iPhone):**
-   - `hf_moondream.py`: Core vision logic for TikTok prompt generation.
-   - `Dockerfile`: Instructions for the Docker image (pulled by HF).
-   - `deploy.sh`: Automation script for DNS, tagging, and pushing.
-   - `.github/workflows/docker-publish.yml`: CI/CD pipeline logic.
-   - `.env`: Local environment variables (not pushed to GitHub).
-
-2. **Source Control (GitHub):**
-   - **Main Branch**: Holds the current stable code.
-   - **Tags (v1.x.x)**: Triggers the Docker Hub build.
-   - **Secrets**: Stores `DOCKERHUB_TOKEN`, `DOCKERHUB_USERNAME`, and `HF_TOKEN`.
-
-3. **Image Registry (Docker Hub):**
-   - Stores the built image layers (Torch, Transformers, Moondream weights).
-   - Provides the "Pre-built" image to Hugging Face to bypass long build times.
-
-4. **Production (Hugging Face Spaces):**
-   - **Hardware**: T4 Small (Free GPU tier).
-   - **Deployment**: Pulls from Docker Hub using the versioned tag.
-   - **Interface**: Gradio/Streamlit UI for generating prompts from images/videos.
-
-## ⚙️ Initial Setup Guide
-1. Initialize local Git: `git init`
-2. Set remote: `git remote add origin https://github.com/hoopstreet/TikTok-Prompt-Generator.git`
-3. Create deployer: `chmod +x deploy.sh`
-4. First Push: `./deploy.sh v1.0.0`
-
-## 🛠 Project Tools
-1. **iSH iPhone**: Control Center for Git and versioning.
-2. **GitHub**: Source code hosting and Automation engine.
-3. **Docker Hub**: Versioned image registry.
-4. **Hugging Face**: GPU-accelerated deployment space.
-
-## 🤖 Dual-Action Workflow
-1. **Build & Push**: Triggered by tag (v*). Builds image and pushes to Docker Hub.
-2. **Sync HF**: Triggered by tag. Updates 'hf.Dockerfile' with the new tag and pushes to Hugging Face Space.
-
-## 🏷 Version Expansion (v1.x.x)
-- Tagging v1.x.x creates a matching name in Docker Hub.
-- GitHub Actions automatically edits 'hf.Dockerfile' to point to the new Docker Hub tag.
-
----
-
----
-library_name: transformers
-pipeline_tag: image-text-to-text
-license: other
----
-
-**Moondream 3 (Preview)** is an vision language model with a mixture-of-experts architecture (9B total parameters, 2B active). This model makes no compromises, delivering state-of-the-art visual reasoning while still retaining our efficient and deployment-friendly ethos.
-
-[✨ Demo](https://moondream.ai/c/playground) &#8201; · &#8201; [☁️ Cloud API](https://moondream.ai/c/docs/quickstart) &#8201; · &#8201; [📝 Release notes](https://moondream.ai/blog/moondream-3-preview)
-
-![](https://huggingface.co/moondream/moondream3-preview/resolve/main/open_vocab_detect.png)
-![](https://huggingface.co/moondream/moondream3-preview/resolve/main/visual_reasoning.png)
-![](https://huggingface.co/moondream/moondream3-preview/resolve/main/point_count.png)
-![](https://huggingface.co/moondream/moondream3-preview/resolve/main/structured_outputs.png)
-
-## Architecture
-
-1. 24 layers; the first four are dense, the rest have MoE FFNs with 64 experts, 8 activated per token
-2. MoE FFNs have GeGLU architecture, with inner/gate dim of 1024. The model's hidden dim is 2048.
-3. Usable context length increased to 32K, with [a custom efficient SuperBPE tokenizer](https://huggingface.co/moondream/starmie-v1)
-4. Multi-headed attention with learned position- and data-dependent temperature scaling
-5. SigLIP-based vision encoder, with multi-crop channel concatenation for token-efficient high resolution image processing
-
-For more details, please refer to the [release notes]((https://moondream.ai/blog/moondream-3-preview). Or try the model out in our [playground demo](https://moondream.ai/c/playground).
-
-The following instructions demonstrate how to run the model locally using Transformers. We also offer a [cloud API](https://moondream.ai/c/docs/quickstart) with a generous free tier that can help you get started quicker!
-
-## Usage
-
-Load the model and prepare it for inference. We use [FlexAttention for inference](https://pytorch.org/blog/flexattention-for-inference/), so calling `.compile()` is critical for fast decoding. Our `compile` implementation also handles warmup, so you can start making requests directly once it returns.
-
-```python
-import torch
-from transformers import AutoModelForCausalLM
-
-moondream = AutoModelForCausalLM.from_pretrained(
-    "moondream/moondream3-preview",
-    trust_remote_code=True,
-    dtype=torch.bfloat16,
-    device_map={"": "cuda"},
-)
-moondream.compile()
-```
-
-The model comes with four skills, tailored towards different visual understanding tasks.
-
-### Query
-
-The `query` skill can be used to ask open-ended questions about images.
-
-```python
-from PIL import Image
-
-# Simple VQA
-image = Image.open("photo.jpg")
-result = moondream.query(image=image, question="What's in this image?")
-print(result["answer"])
-```
-
-By default, `query` runs in reasoning mode, allowing the model to "think" about the question before generating an answer. This is helpful for more complicated tasks, but sometimes the task you're running is simple and doesn't benefit from reasoning. To save on inference cost when this is the case, you can disable reasoning:
-
-```python
-# Without reasoning for simple questions
-result = moondream.query(
-    image=image, 
-    question="What color is the sky?",
-    reasoning=False
-)
-print(result["answer"])
-```
-
-If you want to stream outputs, pass in `stream=True`. You can control the temperature, top-p, and maximum number of tokens generated by passing in optional settings.
-
-```python
-# Streaming with custom settings
-settings = {
-    "temperature": 0.7,
-    "top_p": 0.95,
-    "max_tokens": 512
-}
-
-result = moondream.query(
-    image=image,
-    question="Describe what's happening in detail",
-    stream=True,
-    settings=settings
-)
-
-# Stream the answer
-for chunk in result["answer"]:
-    print(chunk, end="", flush=True)
-```
-
-Note that this isn't just for images; Moondream is also a strong general-purpose text model.
-
-```python
-# Text-only example (no image)
-result = moondream.query(
-    question="Explain the concept of machine learning in simple terms"
-)
-print(result["answer"])
-```
-
-### Caption
-
-Whether you want short, normal-sized or long descriptions of images, the `caption` skill has you covered.
-
-```python
-# Different caption lengths
-image = Image.open("landscape.jpg")
-
-# Short caption
-short = moondream.caption(image, length="short")
-print(f"Short: {short['caption']}")
-
-# Normal caption (default)
-normal = moondream.caption(image, length="normal")
-print(f"Normal: {normal['caption']}")
-
-# Long caption
-long = moondream.caption(image, length="long")
-print(f"Long: {long['caption']}")
-```
-
-It accepts the same streaming and temperature etc. settings as the `query` skill.
-
-```python
-# Streaming caption with custom settings
-result = moondream.caption(
-    image,
-    length="long",
-    stream=True,
-    settings={"temperature": 0.3}
-)
-
-for chunk in result["caption"]:
-    print(chunk, end="", flush=True)
-```
-
-### Point
-
-The `point` skill identifies specific points (x, y coordinates) for objects in an image.
-
-```python
-# Find points for specific objects
-image = Image.open("crowd.jpg")
-result = moondream.point(image, "person wearing a red shirt")
-
-# Points are normalized coordinates (0-1)
-for i, point in enumerate(result["points"]):
-    print(f"Point {i+1}: x={point['x']:.3f}, y={point['y']:.3f}")
-```
-
-### Detect
-
-The `detect` skill provides bounding boxes for objects in an image.
-
-```python
-# Detect objects with bounding boxes
-image = Image.open("street_scene.jpg")
-result = moondream.detect(image, "car")
-
-# Bounding boxes are normalized coordinates (0-1)
-for i, obj in enumerate(result["objects"]):
-    print(f"Object {i+1}: "
-          f"x_min={obj['x_min']:.3f}, y_min={obj['y_min']:.3f}, "
-          f"x_max={obj['x_max']:.3f}, y_max={obj['y_max']:.3f}")
-
-# Control maximum number of objects
-settings = {"max_objects": 10}
-result = moondream.detect(image, "person", settings=settings)
-```
-
-### Caching image encodings (advanced)
-
-If you're planning to run multiple inferences on the same image, you can pre-encode it once and reuse the encoding for better performance.
-
-```python
-# Encode image once
-image = Image.open("complex_scene.jpg")
-encoded = moondream.encode_image(image)
-
-# Reuse the encoding for multiple queries
-questions = [
-    "How many people are in this image?",
-    "What time of day was this taken?",
-    "What's the weather like?"
-]
-
-for q in questions:
-    result = moondream.query(image=encoded, question=q, reasoning=False)
-    print(f"Q: {q}")
-    print(f"A: {result['answer']}
-")
-
-# Also works with other skills
-caption = moondream.caption(encoded, length="normal")
-objects = moondream.detect(encoded, "vehicle")
-```
-
----
-
-Copyright (c) 2025 M87 Labs, Inc.
-
-This distribution includes Model Weights licensed under the [Business Source License 1.1 with an Additional Use Grant (No Third-Party Service)](https://huggingface.co/moondream/moondream3-preview/blob/main/LICENSE.md).
-
-TL;DR — You can use Moondream 3 (Preview) freely for personal, research, and most commercial uses. What’s NOT allowed without a separate deal is offering a paid product that competes with M87 Labs’ paid versions (e.g., selling hosted or embedded access to the model’s capabilities to third parties).
-
-What’s allowed (no special agreement needed):
-
-* Internal use at your company, including production use (affiliates count as the same org).
-* Personal projects, research, benchmarks, fine-tunes, merges, quantizations, weight deltas.
-* Using the model inside your product when it does not substantially overlap with M87’s paid offerings.
-* Free/zero-price services (free community demos, noncommercial tools).
-
-What requires an agreement (because it competes with M87’s paid offerings):
-
-* Selling a hosted API that exposes similar vision or general AI capabilities.
-* Managed hosting or “Moondream-as-a-service” for customers.
-* Embedding the weights/code in a paid SDK or appliance that delivers comparable capabilities.
-* B2B offerings for computer vision, data labeling, or generic AI APIs that meaningfully overlap with M87’s paid versions.
-
-**Examples**
-
-Allowed:
-* “Run it on our servers for employees across our company.” ✔
-* “Use it in our consumer photo app to auto-tag images.” ✔ (not a competing B2B offering)
-* “Publish a free demo site for the community.” ✔
-
-Requires an agreement:
-* “Sell a computer-vision API to enterprise customers.” ✖
-* “Offer managed hosting of this model for other companies.” ✖
-* “Ship a paid SDK that bundles these weights for third-party apps.” ✖
-
-This summary is for convenience only. The Business Source License 1.1 and the Additional Use Grant in the repository control. Questions or commercial licensing: contact@m87.ai.
