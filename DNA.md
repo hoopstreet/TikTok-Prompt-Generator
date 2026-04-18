@@ -83,3 +83,17 @@ To deploy a new version from iSH:
 ### Why this structure?
 - **Speed**: We never build on Hugging Face (too slow). We build on GitHub.
 - **Persistence**: iSH is the "Remote Control." GitHub is the "Factory." HF is the "Storefront."
+
+## 🧱 Source Code Structure
+1. **hf_moondream.py**: The entry point. Contains the Gradio UI and Moondream 3 inference logic.
+2. **hf.Dockerfile**: The production Dockerfile used by Hugging Face to pull the pre-built image.
+3. **Dockerfile**: The build-instruction file used by GitHub Actions to create the Docker Hub image.
+4. **deploy.sh**: The local master script for versioning and pushing from iSH.
+5. **.github/workflows/**: Contains 'docker-publish.yml' (Build) and 'hf-sync.yml' (Deploy).
+
+## 🔢 Step-by-Step AI Setup
+1. **Sync**: iSH pushes code to GitHub main branch.
+2. **Tag**: iSH pushes version tag (e.g., v1.0.4).
+3. **Build**: GitHub Actions builds the Moondream environment and pushes to Docker Hub.
+4. **Link**: GitHub Actions updates the 'FROM' line in 'hf.Dockerfile' to match the new tag.
+5. **Reboot**: Hugging Face detects the 'hf.Dockerfile' change and pulls the fresh image.
