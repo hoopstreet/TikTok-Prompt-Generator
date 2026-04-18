@@ -406,3 +406,19 @@ Auto-generated summary:\n- Update Dockerfile to use version 1.2.3
 - fix: HF crash header error + enforce strict local Moondream mode
 - fix: HF offline mode + local Moondream execution fix
 
+
+---
+
+### v1.1.7 [AUTO+AI]
+- Timestamp: 2026-04-18 22:53
+- Source: iSH Mobile Deploy
+- Location: iPhone (iSH) → GitHub → Docker → HF
+- Execution: Manual Trigger → Automated CI/CD
+
+#### 🧠 AI Summary
+Auto-generated summary:\n- release: v1.1.5 (AI DNA log)
+- Update Dockerfile to use version 1.2.3
+- Refactor app.py for safe mode and UI updates
+- fix: HF crash header error + enforce strict local Moondream mode
+- fix: HF crash header error + enforce strict local Moondream mode
+
