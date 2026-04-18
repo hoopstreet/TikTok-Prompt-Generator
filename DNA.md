@@ -160,3 +160,12 @@ v1.0.9: [STABLE] Finalized Weightless Build: Strict version tagging, removed 'la
 v1.1.0: [CURRENT] Scaling TikTok Automation: Multi-product batch processing logic.
 v1.1.3: [STABLE] Infrastructure Gold - Absolute Imports v1.1.3: [CURRENT] Torch 2.5.1 Deployment Global removal of relative imports to fix 'no known parent package' error.
 v1.1.3: [STABLE] Final Infrastructure Gold release. Fully mobile-manageable. Absolute imports validated.
+
+## v1.1.5: [AUTO] Mobile Release
+- Timestamp: 2026-04-18 20:19
+- Source: iSH Mobile Deploy
+- Notes:
+  - Auto-commit from mobile
+  - Synced with GitHub Actions
+  - Triggered Docker + HF pipeline
+
