@@ -118,3 +118,16 @@ When you push a tag (v1.x.x) from iSH, the Cloud Factory performs these steps:
 2. **Edit**: Replaces the 'FROM' version tag to match the new GitHub Tag.
 3. **Deploy**: Pushes the modified Dockerfile and README.md to Hugging Face.
 4. **Result**: Hugging Face instantly reboots and pulls the pre-baked image.
+
+## 🤖 AI Developer Protocol (For LLMs)
+1. **No Manual Edits**: Never ask the user to manually edit files via 'vi' or 'nano'.
+2. **Automated Input**: Always provide code using 'cat <<EOF >' or 'sed' for easy copy-pasting into iSH.
+3. **Connectivity First**: Always include 'echo "nameserver 8.8.8.8" > /etc/resolv.conf' in the first line of Git operations.
+4. **Scannability**: Break long scripts into numbered parts (1, 2, 3) to prevent clipboard issues in iSH.
+5. **Contextual Sync**: Always end a logic update with a Git commit and push to maintain the 'Remote Control' status of the iPhone.
+
+## 🏗 Source Code Structure (Logic Map)
+- **hf_moondream.py**: Core AI Brain (Gradio UI + Moondream 3).
+- **hf.Dockerfile**: The "Expansion" link (Points to Docker Hub).
+- **Dockerfile**: The "Factory" instructions (Builds the environment).
+- **.github/workflows/**: The "Cloud Hands" (Automates the deployment).
