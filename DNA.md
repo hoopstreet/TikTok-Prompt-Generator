@@ -56,3 +56,17 @@ To deploy a new version from iSH:
 2. Set remote: `git remote add origin https://github.com/hoopstreet/TikTok-Prompt-Generator.git`
 3. Create deployer: `chmod +x deploy.sh`
 4. First Push: `./deploy.sh v1.0.0`
+
+## 🛠 Project Tools
+1. **iSH iPhone**: Control Center for Git and versioning.
+2. **GitHub**: Source code hosting and Automation engine.
+3. **Docker Hub**: Versioned image registry.
+4. **Hugging Face**: GPU-accelerated deployment space.
+
+## 🤖 Dual-Action Workflow
+1. **Build & Push**: Triggered by tag (v*). Builds image and pushes to Docker Hub.
+2. **Sync HF**: Triggered by tag. Updates 'hf.Dockerfile' with the new tag and pushes to Hugging Face Space.
+
+## 🏷 Version Expansion (v1.x.x)
+- Tagging v1.x.x creates a matching name in Docker Hub.
+- GitHub Actions automatically edits 'hf.Dockerfile' to point to the new Docker Hub tag.
