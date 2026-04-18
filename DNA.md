@@ -169,3 +169,12 @@ v1.1.3: [STABLE] Final Infrastructure Gold release. Fully mobile-manageable. Abs
   - Synced with GitHub Actions
   - Triggered Docker + HF pipeline
 
+
+## v1.1.6: [AUTO] Mobile Release
+- Timestamp: 2026-04-18 20:19
+- Source: iSH Mobile Deploy
+- Notes:
+  - Auto-commit from mobile
+  - Synced with GitHub Actions
+  - Triggered Docker + HF pipeline
+
