@@ -118,5 +118,43 @@ git push origin main
 - `hf.Dockerfile`: The Space (Hugging Face) redirect instructions.
 - `.github/workflows/`: Automation engine.
 
+## 📄 11. Exhaustive Repository Manifest (Full List)
+### ⚙️ Core System & Infrastructure
+- `.github/workflows/`: CI/CD automation logic.
+- `.gitattributes`: Git LFS and file handling rules.
+- `DNA.md`: Master project blueprint and protocol.
+- `README.md`: Main repository documentation.
+- `LICENSE.md`: Legal and usage permissions.
+- `deploy.sh`: Mobile controller script for iSH.
+- `Dockerfile`: Primary build instructions (Docker Hub).
+- `hf.Dockerfile`: Redirect instructions (Hugging Face).
+
+### 🧠 Model Architecture & Logic
+- `hf_moondream.py`: Gradio production entry point.
+- `moondream.py`: Core model class definition.
+- `config.json` / `config.py`: Model configuration settings.
+- `vision.py` / `text.py`: Modality-specific logic.
+- `layers.py` / `rope.py` / `utils.py`: Transformer components.
+- `lora.py` / `region.py` / `image_crops.py`: Specialized inference tools.
+
+### 🏋️ Weights & Data (High Volume)
+- `model-00001-of-00004.safetensors`
+- `model-00002-of-00004.safetensors`
+- `model-00003-of-00004.safetensors`
+- `model-00004-of-00004.safetensors`
+- `model.safetensors.index.json`: Weight mapping index.
+- `model_fp8.pt`: Quantized performance weights.
+- `modelv2-00001-of-00004.safetensors`
+- `modelv2-00002-of-00004.safetensors`
+- `modelv2-00003-of-00004.safetensors`
+- `modelv2-00004-of-00004.safetensors`
+
+### 🖼 Visual Demonstration Assets
+- `open_vocab_detect.png`
+- `point_count.png`
+- `region.png`
+- `structured_outputs.png`
+- `visual_reasoning.png`
+
 ---
 
