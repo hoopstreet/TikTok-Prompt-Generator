@@ -28,3 +28,31 @@ To deploy a new version from iSH:
 - **GitHub:** https://github.com/hoopstreet/TikTok-Prompt-Generator
 - **Docker Hub:** https://hub.docker.com/r/hoopstreet/tiktok-prompt-generator
 - **Hugging Face:** https://huggingface.co/spaces/hoopstreet/TikTok-Prompt-Generator
+
+## 🏗 Project Structure & Setup
+1. **Local Repository (iSH/iPhone):**
+   - `hf_moondream.py`: Core vision logic for TikTok prompt generation.
+   - `Dockerfile`: Instructions for the Docker image (pulled by HF).
+   - `deploy.sh`: Automation script for DNS, tagging, and pushing.
+   - `.github/workflows/docker-publish.yml`: CI/CD pipeline logic.
+   - `.env`: Local environment variables (not pushed to GitHub).
+
+2. **Source Control (GitHub):**
+   - **Main Branch**: Holds the current stable code.
+   - **Tags (v1.x.x)**: Triggers the Docker Hub build.
+   - **Secrets**: Stores `DOCKERHUB_TOKEN`, `DOCKERHUB_USERNAME`, and `HF_TOKEN`.
+
+3. **Image Registry (Docker Hub):**
+   - Stores the built image layers (Torch, Transformers, Moondream weights).
+   - Provides the "Pre-built" image to Hugging Face to bypass long build times.
+
+4. **Production (Hugging Face Spaces):**
+   - **Hardware**: T4 Small (Free GPU tier).
+   - **Deployment**: Pulls from Docker Hub using the versioned tag.
+   - **Interface**: Gradio/Streamlit UI for generating prompts from images/videos.
+
+## ⚙️ Initial Setup Guide
+1. Initialize local Git: `git init`
+2. Set remote: `git remote add origin https://github.com/hoopstreet/TikTok-Prompt-Generator.git`
+3. Create deployer: `chmod +x deploy.sh`
+4. First Push: `./deploy.sh v1.0.0`
