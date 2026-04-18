@@ -92,7 +92,7 @@ git push origin main
 1. **Secrets**: Populate `DOCKERHUB_*` and `HF_TOKEN` in Settings > Secrets.
 2. **Space Creation**: Set up a Hugging Face Space using the "Docker" SDK.
 3. **Linkage**: Ensure the HF Space name matches the one defined in `hf-sync.yml`.
-* **v1.0.5:** [CURRENT] Preparing TikTok-specific Taglish prompt logic.
+* **v1.0.5:** [STABLE] Preparing TikTok-specific Taglish prompt logic.
 
 ## 📂 10. Complete Source Inventory
 ### 🧠 AI Logic & Entry Points
@@ -153,3 +153,4 @@ git push origin main
 - `region.png`
 - `structured_outputs.png`
 - `visual_reasoning.png`
+* **v1.0.6:** [CURRENT] Implementing Taglish Video Script templates in hf_moondream.py.
