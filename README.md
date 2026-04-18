@@ -70,7 +70,7 @@ git push origin main
 
 ## 📌 7. Version History
 * **v1.0.0 - v1.0.3:** Infrastructure stabilization and DNS fixes.
-* **v1.0.4:** [CURRENT] Master DNA Overhaul. Implemented AI Developer Protocol and Secret Documentation.
+* **v1.0.4:** [STABLE] Master DNA Overhaul. Implemented AI Developer Protocol and Secret Documentation.
 
 ## 🧱 8. Original Repository Code Structure
 - **Root Directory:**
@@ -94,6 +94,29 @@ git push origin main
 1. **Secrets**: Populate `DOCKERHUB_*` and `HF_TOKEN` in Settings > Secrets.
 2. **Space Creation**: Set up a Hugging Face Space using the "Docker" SDK.
 3. **Linkage**: Ensure the HF Space name matches the one defined in `hf-sync.yml`.
+* **v1.0.5:** [CURRENT] Preparing TikTok-specific Taglish prompt logic.
+
+## 📂 10. Complete Source Inventory
+### 🧠 AI Logic & Entry Points
+- `hf_moondream.py`: Primary Gradio UI (Production).
+- `moondream.py`: Local model interface.
+- `vision.py`, `text.py`, `layers.py`, `rope.py`, `utils.py`: Core model architecture components.
+- `lora.py`, `region.py`, `image_crops.py`: Advanced inference and fine-tuning utilities.
+
+### 🏋️ Model Weights (The Heavy Lifting)
+- `model-0000x-of-00004.safetensors`: Sharded model weights (v1/v2).
+- `model_fp8.pt`: Quantized model weights for performance.
+- `config.json`, `config.py`: Model configuration and hyper-parameters.
+
+### 🖼 Assets & Docs
+- `DNA.md`, `README.md`, `LICENSE.md`: Documentation suite.
+- `*.png`: Visual demonstration assets (Visual reasoning, region detection).
+
+### 🛠 Deployment Files
+- `deploy.sh`: The iSH Controller script.
+- `Dockerfile`: The Factory (GitHub/Docker Hub) instructions.
+- `hf.Dockerfile`: The Space (Hugging Face) redirect instructions.
+- `.github/workflows/`: Automation engine.
 
 ---
 
