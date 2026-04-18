@@ -322,3 +322,43 @@ Auto-generated summary:\n- update: DNA v1.1.x structured logs + protocol upgrade
   - Transition bridge to v1.2.0 logic.
   - Verified DNA.md manifest completeness.
   - Security Check: Token rotation recommended.
+
+---
+
+## 🚨 v1.2.0+ ARCHITECTURE FIX (CRITICAL SHIFT)
+
+### 🔥 Problem
+HF Spaces failed due to:
+- Invalid model ID: moondream/moondream-3
+- Unauthorized gated repo access (401 error)
+
+### 🧠 Root Cause
+System attempted cloud model loading instead of local repo inference.
+
+---
+
+## ✅ Solution Implemented
+
+### 🧬 New Architecture Rule:
+- ❌ NO Hugging Face model downloads in runtime
+- ✅ ALL inference runs from local GitHub repository clone
+
+### 📦 Execution Mode:
+- Source: GitHub Repo (hoopstreet/TikTok-Prompt-Generator)
+- Runtime: Hugging Face Space container
+- Model: Locally bundled Moondream 3 implementation
+
+---
+
+## 🔐 Security Fix
+- Removed direct HF model dependency
+- Introduced HF_TOKEN only for optional gated features
+- Prevented unauthorized API resolution calls
+
+---
+
+## 🚀 Deployment Stability Upgrade
+- Fixed 401 Unauthorized crash loop
+- Enabled offline-safe inference mode
+- Hardened CI/CD pipeline stability
+

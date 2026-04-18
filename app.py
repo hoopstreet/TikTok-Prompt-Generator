@@ -1,62 +1,41 @@
 import gradio as gr
 import torch
 from PIL import Image
-from hf_moondream import HfMoondream, HfConfig
+from hf_moondream import HfMoondream
 
-# ✅ Stable Moondream 3 reference (safe fallback format)
-model_id = "moondream/moondream-3"
-
-# Load model safely with fallback compatibility
+# ✅ LOCAL REPO MODEL ONLY (NO HF HUB DOWNLOAD)
 model = HfMoondream.from_pretrained(
-    model_id,
-    trust_remote_code=True
-).to("cuda" if torch.cuda.is_available() else "cpu")
+    "./",   # <-- IMPORTANT: use local repo weights
+    trust_remote_code=True,
+    local_files_only=True
+)
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model = model.to(device)
 model.eval()
 
 def generate_tiktok_hook(image, tone):
     if image is None:
-        return "Please upload a product photo first, boss!"
+        return "Upload product image first"
 
     if tone == "Budol (Aggressive)":
-        prompt = (
-            "Describe this product. Focus on why it is a must-buy budol find. "
-            "Use Taglish and mention 'Check the yellow basket'."
-        )
+        prompt = "Describe this product as a viral budol TikTok find. Taglish. Mention yellow basket."
     else:
-        prompt = (
-            "Provide a short, honest review of this product in Taglish. "
-            "Keep it relatable for a TikTok audience."
-        )
+        prompt = "Give a relatable short Taglish review for TikTok."
 
-    result = model.query(
-        image=image,
-        question=prompt
-    )
-
+    result = model.query(image=image, question=prompt)
     return result["answer"]
 
-with gr.Blocks(theme=gr.themes.Soft()) as demo:
-    gr.Markdown("# 🛒 TikTok Affiliate Budol Generator (Moondream 3)")
+with gr.Blocks() as demo:
+    gr.Markdown("# TikTok Prompt Generator (Moondream LOCAL MODE)")
 
     with gr.Row():
-        with gr.Column():
-            input_img = gr.Image(type="pil", label="Product Photo")
-            tone_sel = gr.Radio(
-                ["Budol (Aggressive)", "Relatable/Honest"],
-                label="Content Tone",
-                value="Budol (Aggressive)"
-            )
-            submit_btn = gr.Button("🚀 Generate Viral Hook")
+        img = gr.Image(type="pil")
+        tone = gr.Radio(["Budol (Aggressive)", "Relatable"], value="Budol (Aggressive)")
+        btn = gr.Button("Generate")
 
-        with gr.Column():
-            output_text = gr.Textbox(label="Generated Script", lines=10)
+    out = gr.Textbox()
 
-    submit_btn.click(
-        fn=generate_tiktok_hook,
-        inputs=[input_img, tone_sel],
-        outputs=output_text
-    )
+    btn.click(generate_tiktok_hook, inputs=[img, tone], outputs=out)
 
-if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=7860)
+demo.launch(server_name="0.0.0.0", server_port=7860)
