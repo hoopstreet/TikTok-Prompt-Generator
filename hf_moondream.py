@@ -1,47 +1,39 @@
 import torch
 import torch.nn as nn
-from transformers import PreTrainedModel, PretrainedConfig
+import gradio as gr
+from transformers import PreTrainedModel, PretrainedConfig, AutoTokenizer
 from typing import Union
+from PIL import Image
 
-from .config import MoondreamConfig
-from .moondream import MoondreamModel
-
-# Files sometimes don't get loaded without these...
-from .image_crops import *
-from .vision import *
-from .text import *
-from .region import *
-from .utils import *
-
+# FIXED: Changed relative imports to absolute for Docker compatibility
+from config import MoondreamConfig
+from moondream import MoondreamModel
+from image_crops import *
+from vision import *
+from text import *
+from region import *
+from utils import *
 
 def extract_question(text):
     prefix = "<image>\n\nQuestion: "
     suffix = "\n\nAnswer:"
-
     if text.startswith(prefix) and text.endswith(suffix):
         return text[len(prefix) : -len(suffix)]
-    else:
-        return None
-
+    return None
 
 class HfConfig(PretrainedConfig):
     _auto_class = "AutoConfig"
     model_type = "moondream3"
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.config = {"skills": ["query", "caption", "detect", "point"]}
 
-
 class HfMoondream(PreTrainedModel):
     _auto_class = "AutoModelForCausalLM"
     config_class = HfConfig
-
     def __init__(self, config):
         super().__init__(config)
-        self.model = MoondreamModel(
-            MoondreamConfig.from_dict(config.config), setup_caches=False
-        )
+        self.model = MoondreamModel(MoondreamConfig.from_dict(config.config), setup_caches=False)
         self._is_kv_cache_setup = False
         self.post_init()
 
@@ -57,134 +49,49 @@ class HfMoondream(PreTrainedModel):
             self.model._setup_caches()
             self._is_kv_cache_setup = True
 
-    @property
-    def encode_image(self):
+    def query(self, image, question):
         self._setup_caches()
-        return self.model.encode_image
+        return self.model.query(image, question)
 
-    @property
-    def query(self):
-        self._setup_caches()
-        return self.model.query
+# --- GRADIO INTERFACE LOGIC ---
 
-    @property
-    def caption(self):
-        self._setup_caches()
-        return self.model.caption
+def generate_tiktok_script(image):
+    if image is None:
+        return "Hoy! Mag-upload ka muna ng image. (Upload an image first!)"
+    
+    # Initialize model (points to current directory weights)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = HfMoondream.from_pretrained(".")
+    
+    # Analyze Image
+    description = model.query(image, "Describe this product's aesthetic and key selling points.")["answer"]
+    
+    # Taglish Marketing Framework
+    taglish_script = f"""
+🚀 TIKTOK VIRAL DNA SCRIPT
+--------------------------
+🪝 HOOK (0-3s):
+"Grabe guys, hindi niyo aakalain 'to! Check out this product..."
 
-    @property
-    def detect(self):
-        self._setup_caches()
-        return self.model.detect
+📦 BODY (3-10s):
+"Sobrang solid ng features nito. Very aesthetic and perfect for your daily grind. 
+Detailed features: {description}"
 
-    @property
-    def point(self):
-        self._setup_caches()
-        return self.model.point
+🔥 CALL TO ACTION (10-15s):
+"Kaya wag na kayong mag-pahuli. Click the yellow basket and check out na! 
+Budol find of the day! ✨ #TikTokFinds #BudolPH #TaglishAds"
+    """
+    return taglish_script
 
-    @property
-    def detect_gaze(self):
-        self._setup_caches()
-        return self.model.detect_gaze
+with gr.Blocks(theme=gr.themes.Soft()) as demo:
+    gr.Markdown("# 🧬 TikTok Taglish Prompt Generator (v1.1.1)")
+    with gr.Row():
+        with gr.Column():
+            input_img = gr.Image(type="pil", label="Product Image")
+            generate_btn = gr.Button("Generate Taglish DNA", variant="primary")
+        with gr.Column():
+            output_text = gr.Textbox(label="TikTok Script (Taglish)", lines=12)
+    generate_btn.click(generate_tiktok_script, inputs=input_img, outputs=output_text)
 
-    def answer_question(
-        self,
-        image_embeds,
-        question,
-        tokenizer=None,
-        chat_history="",
-        result_queue=None,
-        max_new_tokens=256,
-        **kwargs
-    ):
-        answer = self.query(image_embeds, question)["answer"].strip()
-
-        if result_queue is not None:
-            result_queue.put(answer)
-        return answer
-
-    def batch_answer(self, images, prompts, tokenizer=None, **kwargs):
-        answers = []
-        for image, prompt in zip(images, prompts):
-            answers.append(self.query(image, prompt)["answer"].strip())
-        return answers
-
-    def _unsupported_exception(self):
-        raise NotImplementedError(
-            "This method is not supported in the latest version of moondream. "
-            "Consider upgrading to the updated API spec, or alternately pin "
-            "to 'revision=2024-08-26'."
-        )
-
-    def generate(self, image_embeds, prompt, tokenizer, max_new_tokens=128, **kwargs):
-        """
-        Function definition remains unchanged for backwards compatibility.
-        Be aware that tokenizer, max_new_takens, and kwargs are ignored.
-        """
-        prompt_extracted = extract_question(prompt)
-        if prompt_extracted is not None:
-            answer = self.model.query(
-                image=image_embeds, question=prompt_extracted, stream=False
-            )["answer"]
-        else:
-            image_embeds = self.encode_image(image_embeds)
-            prompt_tokens = torch.tensor(
-                [self.model.tokenizer.encode(prompt).ids],
-                device=self.device,
-            )
-
-            def generator():
-                for token in self.model._generate_answer(
-                    prompt_tokens,
-                    image_embeds.kv_cache,
-                    image_embeds.pos,
-                    max_new_tokens,
-                ):
-                    yield token
-
-            answer = "".join(list(generator()))
-
-        return [answer]
-
-    def get_input_embeddings(self) -> nn.Embedding:
-        """
-        Lazily wrap the raw parameter `self.model.text.wte` in a real
-        `nn.Embedding` layer so that HF mix-ins recognise it.  The wrapper
-        **shares** the weight tensor—no copy is made.
-        """
-        if not hasattr(self, "_input_embeddings"):
-            self._input_embeddings = nn.Embedding.from_pretrained(
-                self.model.text.wte,  # tensor created in text.py
-                freeze=True,  # set to False if you need it trainable
-            )
-        return self._input_embeddings
-
-    def set_input_embeddings(self, value: Union[nn.Embedding, nn.Module]) -> None:
-        """
-        Lets HF functions (e.g. `resize_token_embeddings`) replace or resize the
-        embeddings and keeps everything tied to `self.model.text.wte`.
-        """
-        # 1. point the low-level parameter to the new weight matrix
-        self.model.text.wte = value.weight
-        # 2. keep a reference for get_input_embeddings()
-        self._input_embeddings = value
-
-    def input_embeds(
-        self,
-        input_ids: Union[torch.LongTensor, list, tuple],
-        *,
-        device: torch.device | None = None
-    ) -> torch.FloatTensor:
-        """
-        Back-compat wrapper that turns token IDs into embeddings.
-
-        Example:
-            ids = torch.tensor([[1, 2, 3]])
-            embeds = model.input_embeds(ids)      # (1, 3, hidden_dim)
-        """
-        if not torch.is_tensor(input_ids):
-            input_ids = torch.as_tensor(input_ids)
-        if device is not None:
-            input_ids = input_ids.to(device)
-
-        return self.get_input_embeddings()(input_ids)
+if __name__ == "__main__":
+    demo.launch(server_name="0.0.0.0", server_port=7860)
