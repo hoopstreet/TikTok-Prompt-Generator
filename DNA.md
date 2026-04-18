@@ -111,3 +111,10 @@ To deploy a new version from iSH:
 ## 🏷 Version Expansion (v1.x.x)
 Pushing a tag (e.g., v1.0.4) triggers the 'Expansion' logic:
 GitHub Actions -> Edits 'FROM hoopstreet/tiktok-prompt-generator:v1.0.4' in 'hf.Dockerfile' -> Pushes to HF Space -> HF pulls the pre-built image.
+
+## 🧬 Expansion Logic: The Auto-Editor
+When you push a tag (v1.x.x) from iSH, the Cloud Factory performs these steps:
+1. **Target**: Identifies the latest 'hf.Dockerfile' in the main branch.
+2. **Edit**: Replaces the 'FROM' version tag to match the new GitHub Tag.
+3. **Deploy**: Pushes the modified Dockerfile and README.md to Hugging Face.
+4. **Result**: Hugging Face instantly reboots and pulls the pre-baked image.
