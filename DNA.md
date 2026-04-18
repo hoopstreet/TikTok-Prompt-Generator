@@ -70,3 +70,16 @@ To deploy a new version from iSH:
 ## 🏷 Version Expansion (v1.x.x)
 - Tagging v1.x.x creates a matching name in Docker Hub.
 - GitHub Actions automatically edits 'hf.Dockerfile' to point to the new Docker Hub tag.
+
+## 🧠 AI Developer Logic: The Deployment Engine
+### The "Push-to-GPU" Chain
+1. **Local (iSH)**: User runs `./deploy.sh v1.x.x`.
+   - **Logic**: Fixes DNS -> Updates local 'hf.Dockerfile' text -> Commits -> Pushes Tag.
+2. **Cloud (GitHub Actions)**: Detects the new Tag.
+   - **Job A (DockerHub)**: Builds the heavy Python environment + Moondream 3 weights.
+   - **Job B (Hugging Face)**: Auto-edits the 'hf.Dockerfile' in the cloud to match the new Tag, then force-pushes to the Hugging Face Space.
+3. **Execution (Hugging Face)**: Sees the new 'Dockerfile' -> Pulls the pre-baked image from DockerHub -> Starts the GPU server in seconds.
+
+### Why this structure?
+- **Speed**: We never build on Hugging Face (too slow). We build on GitHub.
+- **Persistence**: iSH is the "Remote Control." GitHub is the "Factory." HF is the "Storefront."
