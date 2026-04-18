@@ -178,3 +178,119 @@ v1.1.3: [STABLE] Final Infrastructure Gold release. Fully mobile-manageable. Abs
   - Synced with GitHub Actions
   - Triggered Docker + HF pipeline
 
+
+---
+
+## 👤 12. Project Owner Identity
+
+- **Name:** hoopstreet
+- **Email:** hoopstreet143@gmail.com
+- **Role:** System Architect / Mobile DevOps Operator
+- **Primary Control Device:** iPhone (iSH Terminal)
+- **Control Method:** Zero-Local-Load (Cloud-Orchestrated AI Deployment)
+
+---
+
+## 🧠 13. AI Developer Protocol (STRICT MODE)
+
+### 🔍 Code Update Rules (MANDATORY)
+
+1. **ALWAYS CHECK EXISTING CODE FIRST**
+   - Read current file structure from GitHub before modifying
+   - NEVER assume file structure
+
+2. **NO FULL OVERWRITE (CRITICAL RULE)**
+   - ❌ Do NOT rewrite entire files
+   - ✅ Use:
+     - `sed` (modify specific lines)
+     - `cat >>` (append only)
+     - targeted patching
+
+3. **INSERTION PRIORITY**
+   - Add logic only where needed
+   - Preserve all existing working code
+
+4. **IF FILE DOES NOT EXIST**
+   - THEN create using:
+     - `cat <<EOF > filename`
+
+5. **MOBILE COMPATIBILITY REQUIRED**
+   - Fragment code blocks (>200 chars)
+   - Avoid clipboard overflow
+
+6. **DNS FIRST RULE (NON-NEGOTIABLE)**
+   - Every network command MUST start with:
+     ```
+     echo "nameserver 8.8.8.8" > /etc/resolv.conf
+     ```
+
+7. **ZERO MANUAL EDIT POLICY**
+   - ❌ No nano / vi
+   - ✅ Fully automated script-based updates only
+
+---
+
+## 📍 14. Deployment Source Tracking
+
+All releases MUST include:
+
+- **Source Location:**
+  - iSH (Mobile)
+  - GitHub Actions (CI/CD)
+  - Hugging Face (Runtime)
+
+- **Execution Type:**
+  - Manual (iSH Trigger)
+  - Automated (GitHub Actions)
+
+---
+
+
+---
+
+## 📌 15. Structured Version Log (v1.1.3 → Present)
+
+### v1.1.3 [STABLE]
+- Source: GitHub Actions
+- Location: Cloud
+- Notes:
+  - Absolute imports finalized
+  - Torch 2.5.1 enforced
+  - Infrastructure stabilized
+
+---
+
+### v1.1.4 [STABLE]
+- Source: iSH Mobile Deploy
+- Location: iPhone → GitHub → Docker → HF
+- Notes:
+  - Master deployment fix
+  - Docker + Gradio integration corrected
+  - First stable mobile pipeline
+
+---
+
+### v1.1.5 [AUTO]
+- Timestamp: 2026-04-18 20:19
+- Source: iSH Mobile Deploy
+- Location: iPhone (iSH)
+- Execution: Manual Trigger → Automated CI/CD
+- Notes:
+  - Auto DNA logging introduced
+  - deploy.sh automation active
+  - GitHub → Docker → HF sync confirmed
+
+---
+
+### v1.1.6 [AUTO]
+- Timestamp: 2026-04-18 20:19
+- Source: iSH Mobile Deploy
+- Location: iPhone (iSH)
+- Execution: Manual Trigger → Automated CI/CD
+- Notes:
+  - Batch deploy validated
+  - Multi-version tagging confirmed
+  - Pipeline stability verified
+
+---
+
