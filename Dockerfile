@@ -1,9 +1,25 @@
-FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+FROM python:3.11-slim
+
 WORKDIR /app
-RUN apt-get update && apt-get install -y libgl1-mesa-glx libglib2.0-0 git && rm -rf /var/lib/apt/lists/*
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+
+# system deps
+RUN apt-get update && apt-get install -y \
+    git \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# copy project
 COPY . .
-ENV PYTHONPATH="/app"
+
+# install deps
+RUN pip install --no-cache-dir -r requirements.txt
+
+# HF SAFE ENV
+ENV HF_HUB_OFFLINE=1
+ENV TRANSFORMERS_OFFLINE=1
+ENV PYTHONPATH=/app
+
 EXPOSE 7860
+
 CMD ["python", "app.py"]
