@@ -362,3 +362,17 @@ System attempted cloud model loading instead of local repo inference.
 - Enabled offline-safe inference mode
 - Hardened CI/CD pipeline stability
 
+
+---
+## 🚨 v1.2.2 HF CRASH HOTFIX
+
+### Fix Applied:
+- Forced HF offline mode
+- Disabled all remote model downloads
+- Enforced local Moondream inference only
+- Removed HF fallback dependency path
+
+### Runtime Rule:
+- model_path MUST point to local ./moondream3 directory
+- HF Hub access is fully disabled during inference
+

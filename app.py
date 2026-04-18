@@ -1,13 +1,19 @@
-import gradio as gr
+import os
 import torch
-from PIL import Image
+import gradio as gr
 from hf_moondream import HfMoondream
 
-# ✅ LOCAL REPO MODEL ONLY (NO HF HUB DOWNLOAD)
+# FORCE OFFLINE MODE (PREVENT HF DOWNLOAD CRASH)
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
+
+# LOCAL MODEL ONLY
+model_path = "./moondream3"
+
 model = HfMoondream.from_pretrained(
-    "./",   # <-- IMPORTANT: use local repo weights
-    trust_remote_code=True,
-    local_files_only=True
+    model_path,
+    local_files_only=True,
+    trust_remote_code=True
 )
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -19,21 +25,19 @@ def generate_tiktok_hook(image, tone):
         return "Upload product image first"
 
     if tone == "Budol (Aggressive)":
-        prompt = "Describe this product as a viral budol TikTok find. Taglish. Mention yellow basket."
+        prompt = "Describe this product as viral budol TikTok find. Taglish style."
     else:
-        prompt = "Give a relatable short Taglish review for TikTok."
+        prompt = "Give short relatable Taglish TikTok review."
 
     result = model.query(image=image, question=prompt)
     return result["answer"]
 
 with gr.Blocks() as demo:
-    gr.Markdown("# TikTok Prompt Generator (Moondream LOCAL MODE)")
-
-    with gr.Row():
-        img = gr.Image(type="pil")
-        tone = gr.Radio(["Budol (Aggressive)", "Relatable"], value="Budol (Aggressive)")
-        btn = gr.Button("Generate")
-
+    gr.Markdown("# TikTok Prompt Generator (LOCAL MOONDREAM 3)")
+    
+    img = gr.Image(type="pil")
+    tone = gr.Radio(["Budol (Aggressive)", "Relatable"], value="Budol (Aggressive)")
+    btn = gr.Button("Generate")
     out = gr.Textbox()
 
     btn.click(generate_tiktok_hook, inputs=[img, tone], outputs=out)
