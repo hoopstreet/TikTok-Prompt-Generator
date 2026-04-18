@@ -68,7 +68,7 @@ git push origin main
 
 ## 📌 7. Version History
 * **v1.0.0 - v1.0.3:** Infrastructure stabilization and DNS fixes.
-* **v1.0.4:** [CURRENT] Master DNA Overhaul. Implemented AI Developer Protocol and Secret Documentation.
+* **v1.0.4:** [STABLE] Master DNA Overhaul. Implemented AI Developer Protocol and Secret Documentation.
 
 ## 🧱 8. Original Repository Code Structure
 - **Root Directory:**
@@ -92,3 +92,4 @@ git push origin main
 1. **Secrets**: Populate `DOCKERHUB_*` and `HF_TOKEN` in Settings > Secrets.
 2. **Space Creation**: Set up a Hugging Face Space using the "Docker" SDK.
 3. **Linkage**: Ensure the HF Space name matches the one defined in `hf-sync.yml`.
+* **v1.0.5:** [CURRENT] Preparing TikTok-specific Taglish prompt logic.
