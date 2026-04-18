@@ -1,0 +1,20 @@
+166fff1 fix: HF crash header error + enforce strict local Moondream mode
+811dfd7 fix: HF crash header error + enforce strict local Moondream mode
+95a7053 fix: HF offline mode + local Moondream execution fix
+8260aaa fix: stable moondream3 integration (auth-safe + loader fix)
+1a5a9cc release: v1.1.8 - DNA manifest finalized & bridge to v1.2.0
+8f3ec7e release: v1.1.7 (AI DNA log)
+a4664c5 update: DNA v1.1.x structured logs + protocol upgrade
+12801b2 release: v1.1.6 (auto DNA update)
+dc9bd36 release: v1.1.5 (auto DNA update)
+1ed666c update: mobile commit
+cf27c33 fix: proper Docker + app structure
+49ec6ed docs: finalize v1.1.3 DNA entry
+43243d8 release: v1.1.3 infrastructure gold - fixed imports and torch env
+2ca22b2 fix: global shift from relative to absolute imports
+b033da6 fix: force install torch 2.5.1 for moondream3 stability
+8421afd fix: force pytorch 2.4.0 devel for HF GPU compatibility
+a7648aa fix: resolve relative import errors and merge Taglish UI logic
+4ba3e01 docs: finalize v1.0.9 DNA and update version history
+32b4539 fix: remove variable from Dockerfile FROM and enforce strict version tagging
+505a44d fix: use literal EOF to prevent local variable expansion

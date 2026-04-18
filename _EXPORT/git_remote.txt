@@ -1,0 +1,2 @@
+origin	https://github.com/hoopstreet/TikTok-Prompt-Generator.git (fetch)
+origin	https://github.com/hoopstreet/TikTok-Prompt-Generator.git (push)
