@@ -1,0 +1,5 @@
+__pycache__
+*.pyc
+.git
+_EXPORT
+project_snapshot.tar.gz
