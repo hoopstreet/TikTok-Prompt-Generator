@@ -1,24 +1,29 @@
-FROM pytorch/pytorch:2.4.0-cuda12.4-cudnn9-devel
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Crucial: Ensure the container uses the high-version torch
-ENV PYTHONPATH="/app:${PYTHONPATH}"
-ENV TORCH_CUDA_ARCH_LIST="7.5 8.0 8.6 8.9 9.0"
+# Install system dependencies for GPU and Git
+RUN apt-get update && apt-get install -y \
+    git \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+# FORCE INSTALL: PyTorch 2.5.1 (Extra stable for Flex Attention)
+RUN pip install --no-cache-dir torch==2.5.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+
+# Install AI/Gradio stack
+RUN pip install --no-cache-dir \
+    gradio \
+    transformers>=4.46.0 \
+    pillow \
+    einops \
+    accelerate
 
 COPY . .
 
-# Force upgrade dependencies to match Moondream 3
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir \
-    gradio \
-    transformers>=4.44.2 \
-    pillow>=10.0.0 \
-    einops \
-    accelerate \
-    sentencepiece
+# Set Path to ensure local imports work
+ENV PYTHONPATH="/app"
 
 EXPOSE 7860
 
