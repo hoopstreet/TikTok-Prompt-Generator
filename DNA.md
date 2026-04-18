@@ -97,3 +97,17 @@ To deploy a new version from iSH:
 3. **Build**: GitHub Actions builds the Moondream environment and pushes to Docker Hub.
 4. **Link**: GitHub Actions updates the 'FROM' line in 'hf.Dockerfile' to match the new tag.
 5. **Reboot**: Hugging Face detects the 'hf.Dockerfile' change and pulls the fresh image.
+
+## 🛠 Tools & Ecosystem
+1. **iSH iPhone**: Mobile Control Center (Git, versioning, DNS fixes).
+2. **GitHub**: Automation Hub (Source code & Actions).
+3. **Docker Hub**: Registry for versioned pre-built images.
+4. **Hugging Face**: GPU Deployment Space (Free T4 tier).
+
+## 🤖 Dual GitHub Actions Workflow
+- **Workflow 1 (Build)**: Triggered by tags (v*). Builds the Docker image and pushes it to Docker Hub as 'v1.x.x'.
+- **Workflow 2 (Sync)**: Triggered by tags. Automatically edits 'hf.Dockerfile' to match the new tag and pushes ONLY 'hf.Dockerfile' and 'README.md' to Hugging Face.
+
+## 🏷 Version Expansion (v1.x.x)
+Pushing a tag (e.g., v1.0.4) triggers the 'Expansion' logic:
+GitHub Actions -> Edits 'FROM hoopstreet/tiktok-prompt-generator:v1.0.4' in 'hf.Dockerfile' -> Pushes to HF Space -> HF pulls the pre-built image.

@@ -1,24 +1,26 @@
-name: Sync to Hugging Face
+name: Sync and Update HF
 on:
   push:
     tags:
       - 'v*'
 jobs:
-  deploy:
+  update-hf:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Update hf.Dockerfile version
+      - name: Auto-edit hf.Dockerfile version
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
           sed -i "s|hoopstreet/tiktok-prompt-generator:v.*|hoopstreet/tiktok-prompt-generator:$VERSION|g" hf.Dockerfile
-      - name: Push to HF Space
+      - name: Force Push to HF Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           git config --global user.email "bot@github.com"
           git config --global user.name "GitHub Action"
+          git add hf.Dockerfile
+          git commit -m "auto: sync version to $VERSION"
           git remote add hf https://hoopstreet:$HF_TOKEN@huggingface.co/spaces/hoopstreet/TikTok-Prompt-Generator
           git push hf main --force
