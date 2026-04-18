@@ -1,8 +1,8 @@
-name: Sync and Update HF
+name: Sync to Hugging Face
 
 on:
   workflow_run:
-    workflows: ["Build and Push Versioned Image"]
+    workflows: ["Build and Push to Docker Hub"]
     types:
       - completed
 
@@ -16,17 +16,38 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Update hf.Dockerfile Tag
+      - name: Prepare Clean HF Files
         run: |
-          sed -i "s|FROM .*|FROM ${{ secrets.DOCKERHUB_USERNAME }}/tiktok-prompt-generator:${{ github.event.workflow_run.head_branch }}|g" hf.Dockerfile
+          # Detect if this was a tag or a branch push
+          BRANCH_OR_TAG=${{ github.event.workflow_run.head_branch }}
           
-      - name: Push to Hugging Face
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: |
+          # Update hf.Dockerfile to point to the new Docker Hub image
+          sed -i "s|FROM .*|FROM ${{ secrets.DOCKERHUB_USERNAME }}/tiktok-prompt-generator:$BRANCH_OR_TAG|g" hf.Dockerfile
+          
+          # Create the HF-specific README with Metadata
+          echo "---" > hf_readme.md
+          echo "title: TikTok Prompt Generator" >> hf_readme.md
+          echo "emoji: ⚡" >> hf_readme.md
+          echo "colorFrom: red" >> hf_readme.md
+          echo "colorTo: gray" >> hf_readme.md
+          echo "sdk: docker" >> hf_readme.md
+          echo "pinned: false" >> hf_readme.md
+          echo "---" >> hf_readme.md
+          cat README.md >> hf_readme.md
+          
+          # Move files to a clean deployment directory
+          mkdir deploy_dir
+          cp hf.Dockerfile deploy_dir/Dockerfile
+          cp hf_readme.md deploy_dir/README.md
+          
+          # Initialize clean git for HF push
+          cd deploy_dir
+          git init
           git config --global user.email "bot@hoopstreet.com"
           git config --global user.name "Hoopstreet Bot"
-          git remote add hf https://hoopstreet:$HF_TOKEN@huggingface.co/spaces/hoopstreet/TikTok-Prompt-Generator
-          git add hf.Dockerfile
-          git commit -m "deploy: update image to ${{ github.event.workflow_run.head_branch }}"
-          git push hf main --force
+          git add .
+          git commit -m "deploy: update to $BRANCH_OR_TAG"
+          
+          # Push ONLY the Dockerfile and README to HF
+          git remote add hf https://hoopstreet:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/hoopstreet/TikTok-Prompt-Generator
+          git push hf master:main --force

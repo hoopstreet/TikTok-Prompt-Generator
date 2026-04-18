@@ -153,4 +153,5 @@ git push origin main
 - `region.png`
 - `structured_outputs.png`
 - `visual_reasoning.png`
-* **v1.0.6:** [CURRENT] Implementing Taglish Video Script templates in hf_moondream.py.
+* **v1.0.6:** [STABLE] Implementing Taglish Video Script templates in hf_moondream.py.
+* **v1.0.7:** [CURRENT] Fixed Dual-Action Workflow (Main/Tag) and clean HF Sync logic.
