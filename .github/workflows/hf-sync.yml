@@ -18,13 +18,12 @@ jobs:
 
       - name: Prepare Clean HF Files
         run: |
-          # Detect if this was a tag or a branch push
           BRANCH_OR_TAG=${{ github.event.workflow_run.head_branch }}
           
-          # Update hf.Dockerfile to point to the new Docker Hub image
+          # Update hf.Dockerfile with the built image tag
           sed -i "s|FROM .*|FROM ${{ secrets.DOCKERHUB_USERNAME }}/tiktok-prompt-generator:$BRANCH_OR_TAG|g" hf.Dockerfile
           
-          # Create the HF-specific README with Metadata
+          # Build README with HF Metadata
           echo "---" > hf_readme.md
           echo "title: TikTok Prompt Generator" >> hf_readme.md
           echo "emoji: ⚡" >> hf_readme.md
@@ -35,19 +34,15 @@ jobs:
           echo "---" >> hf_readme.md
           cat README.md >> hf_readme.md
           
-          # Move files to a clean deployment directory
           mkdir deploy_dir
           cp hf.Dockerfile deploy_dir/Dockerfile
           cp hf_readme.md deploy_dir/README.md
           
-          # Initialize clean git for HF push
           cd deploy_dir
           git init
           git config --global user.email "bot@hoopstreet.com"
           git config --global user.name "Hoopstreet Bot"
           git add .
           git commit -m "deploy: update to $BRANCH_OR_TAG"
-          
-          # Push ONLY the Dockerfile and README to HF
           git remote add hf https://hoopstreet:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/hoopstreet/TikTok-Prompt-Generator
           git push hf master:main --force
