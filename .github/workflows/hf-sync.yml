@@ -1,26 +1,32 @@
 name: Sync and Update HF
+
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_run:
+    workflows: ["Build and Push Versioned Image"]
+    types:
+      - completed
+
 jobs:
-  update-hf:
+  deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Auto-edit hf.Dockerfile version
+
+      - name: Update hf.Dockerfile Tag
         run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          sed -i "s|hoopstreet/tiktok-prompt-generator:v.*|hoopstreet/tiktok-prompt-generator:$VERSION|g" hf.Dockerfile
-      - name: Force Push to HF Space
+          sed -i "s|FROM .*|FROM ${{ secrets.DOCKERHUB_USERNAME }}/tiktok-prompt-generator:${{ github.event.workflow_run.head_branch }}|g" hf.Dockerfile
+          
+      - name: Push to Hugging Face
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git config --global user.email "bot@github.com"
-          git config --global user.name "GitHub Action"
-          git add hf.Dockerfile
-          git commit -m "auto: sync version to $VERSION"
+          git config --global user.email "bot@hoopstreet.com"
+          git config --global user.name "Hoopstreet Bot"
           git remote add hf https://hoopstreet:$HF_TOKEN@huggingface.co/spaces/hoopstreet/TikTok-Prompt-Generator
+          git add hf.Dockerfile
+          git commit -m "deploy: update image to ${{ github.event.workflow_run.head_branch }}"
           git push hf main --force
