@@ -1,4 +1,4 @@
-FROM hoopstreet/tiktok-prompt-generator:v1.0.0
+FROM hoopstreet/tiktok-prompt-generator:$NEW_TAG
 
 # Hugging Face requirement
 EXPOSE 7860
