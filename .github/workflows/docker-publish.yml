@@ -1,8 +1,9 @@
-name: Build and Push to Docker Hub
+name: Build and Push Versioned Image
 
 on:
   push:
-    branches: [ "main" ]
+    tags:
+      - 'v*'
 
 jobs:
   build-and-push:
@@ -17,9 +18,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Extract Metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/tiktok-prompt-generator
+          tags: |
+            type=semver,pattern={{version}}
+
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tiktok-generator:latest
+          tags: ${{ steps.meta.outputs.tags }}

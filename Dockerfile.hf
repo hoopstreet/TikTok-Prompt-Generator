@@ -1,0 +1,5 @@
+FROM hoopstreet/tiktok-prompt-generator:v1.0.0
+
+# Hugging Face requirement
+EXPOSE 7860
+RUN mkdir -p /app/.cache && chmod -R 777 /app
