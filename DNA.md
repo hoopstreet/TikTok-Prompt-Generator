@@ -69,3 +69,26 @@ git push origin main
 ## 📌 7. Version History
 * **v1.0.0 - v1.0.3:** Infrastructure stabilization and DNS fixes.
 * **v1.0.4:** [CURRENT] Master DNA Overhaul. Implemented AI Developer Protocol and Secret Documentation.
+
+## 🧱 8. Original Repository Code Structure
+- **Root Directory:**
+    - `hf_moondream.py`: The Gradio app logic. Connects to Moondream 3.
+    - `Dockerfile`: The "Heavy" build config for GitHub Actions. Includes Torch/CUDA.
+    - `hf.Dockerfile`: The "Light" redirect config for Hugging Face Spaces.
+    - `deploy.sh`: Local automation script for versioning and DNS resolution.
+    - `DNA.md`: This master documentation file.
+    - `README.md`: Public-facing project overview (auto-synced with DNA).
+- **.github/workflows/:**
+    - `docker-publish.yml`: Manages the Docker Hub image build on tags.
+    - `hf-sync.yml`: Manages the auto-editing and syncing to Hugging Face.
+
+## ⚙️ 9. Full Project Setup Details
+### Mobile Initialization (iSH)
+1. **DNS Fix**: `echo "nameserver 8.8.8.8" > /etc/resolv.conf`
+2. **Git Setup**: `git init`, then `git remote add origin [URL]`
+3. **Permissions**: `chmod +x deploy.sh`
+
+### Cloud Initialization (GitHub)
+1. **Secrets**: Populate `DOCKERHUB_*` and `HF_TOKEN` in Settings > Secrets.
+2. **Space Creation**: Set up a Hugging Face Space using the "Docker" SDK.
+3. **Linkage**: Ensure the HF Space name matches the one defined in `hf-sync.yml`.
