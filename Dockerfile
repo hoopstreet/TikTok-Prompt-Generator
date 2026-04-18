@@ -1,18 +1,25 @@
-FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
+FROM pytorch/pytorch:2.4.0-cuda12.4-cudnn9-devel
 
-# Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y git && rm -rf /lib/apt/lists/*
+# Crucial: Ensure the container uses the high-version torch
+ENV PYTHONPATH="/app:${PYTHONPATH}"
+ENV TORCH_CUDA_ARCH_LIST="7.5 8.0 8.6 8.9 9.0"
 
-# Copy all files (including weights) into the image
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
 COPY . .
 
-# Install Python requirements
-RUN pip install --no-cache-dir gradio transformers pillow
+# Force upgrade dependencies to match Moondream 3
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+    gradio \
+    transformers>=4.44.2 \
+    pillow>=10.0.0 \
+    einops \
+    accelerate \
+    sentencepiece
 
-# Export port for Gradio
 EXPOSE 7860
 
 CMD ["python", "hf_moondream.py"]
