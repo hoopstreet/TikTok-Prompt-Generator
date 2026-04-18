@@ -8,11 +8,11 @@ from dataclasses import dataclass
 from tokenizers import Tokenizer
 from torch.nn.attention.flex_attention import create_block_mask
 
-from .config import MoondreamConfig
-from .image_crops import reconstruct_from_crops
-from .vision import vision_encoder, vision_projection, prepare_crops, build_vision_model
-from .text import build_text_model, text_encoder, lm_head, text_decoder
-from .region import (
+from config import MoondreamConfig
+from image_crops import reconstruct_from_crops
+from vision import vision_encoder, vision_projection, prepare_crops, build_vision_model
+from text import build_text_model, text_encoder, lm_head, text_decoder
+from region import (
     decode_coordinate,
     encode_coordinate,
     decode_size,
@@ -20,10 +20,10 @@ from .region import (
     encode_spatial_refs,
     SpatialRefs,
 )
-from .layers import QuantizedLinear
-from .lora import load_adapter, normalize_adapter_id
-from .rope import precompute_freqs_cis
-from .utils import remove_outlier_points
+from layers import QuantizedLinear
+from lora import load_adapter, normalize_adapter_id
+from rope import precompute_freqs_cis
+from utils import remove_outlier_points
 
 ImageEncodingSettings = TypedDict(
     "ImageEncodingSettings",

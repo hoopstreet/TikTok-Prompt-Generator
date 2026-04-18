@@ -9,7 +9,7 @@ from urllib.request import Request, urlopen
 
 import torch
 
-from .config import TextConfig
+from config import TextConfig
 
 
 class AdapterLoadError(RuntimeError):

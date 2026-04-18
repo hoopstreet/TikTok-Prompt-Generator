@@ -158,5 +158,6 @@ git push origin main
 v1.0.8: [STABLE] Workflow syntax fix (Literal EOF protection).
 v1.0.9: [STABLE] Finalized Weightless Build: Strict version tagging, removed 'latest' bloat, and cleaned HF metadata.
 v1.1.0: [CURRENT] Scaling TikTok Automation: Multi-product batch processing logic.
-v1.1.2: [STABLE] Switched to Devel CUDA image to fix 'torch.nn.attention' missing on HF Basic GPU.
-v1.1.2: [STABLE] Forced torch==2.5.1 installation to fix FlexAttention compatibility on HF.
+v1.1.2: [STABLE] Env fixed. Switched to Devel CUDA image to fix 'torch.nn.attention' missing on HF Basic GPU.
+v1.1.2: [STABLE] Env fixed. Forced torch==2.5.1 installation to fix FlexAttention compatibility on HF.
+v1.1.3: [CURRENT] Global removal of relative imports to fix 'no known parent package' error.

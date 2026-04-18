@@ -5,10 +5,10 @@ from torch.nn import functional as F
 from torch.nn.attention.flex_attention import flex_attention
 from typing import Optional
 
-from .layers import layer_norm, mlp, QuantizedLinear, moe_mlp
-from .rope import apply_rotary_emb, precompute_freqs_cis
-from .config import TextConfig
-from .lora import select_layer_lora
+from layers import layer_norm, mlp, QuantizedLinear, moe_mlp
+from rope import apply_rotary_emb, precompute_freqs_cis
+from config import TextConfig
+from lora import select_layer_lora
 
 
 def text_encoder(input_ids: torch.Tensor, w: nn.Module):

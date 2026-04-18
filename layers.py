@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from dataclasses import dataclass
 from typing import Literal, Optional
 
-from .lora import (
+from lora import (
     DenseLoRALayer,
     MoELoRALayer,
     apply_dense_lora,
