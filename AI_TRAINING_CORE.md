@@ -16,6 +16,8 @@
 | 45 seconds | Exactly 15 shots | 3 seconds |
 | 55 seconds | Exactly 18 shots | 3 seconds |
 | 60 seconds | Exactly 20 shots | 3 seconds |
+| 65 seconds | Exactly 22 shots | 3 seconds |
+| 65 seconds | Exactly 22 shots | 3 seconds |
 
 RULE: No exceptions. Every shot = 3 seconds exactly.
 
@@ -35,6 +37,9 @@ RULE: No exceptions. Every shot = 3 seconds exactly.
 | Gaming | No lag, RGB setup |
 | Sports | Full sublimation, custom IGN, sulit-tela |
 | Tools | Heavy-duty, rechargeable, handy |
+| Pet Supplies | Durable, safe, pet-friendly, chew-resistant |
+| Pet Supplies | Durable, safe, pet-friendly, chew-resistant |
+| NewNiche | Focus points |
 
 
 ## 3. Localization: Taglish Protocol
@@ -51,6 +56,11 @@ RULE: No exceptions. Every shot = 3 seconds exactly.
 | Trust me | Swerte niyo |
 | Amazing | Panalo |
 | Cheap but quality | Mura pero quality |
+| Hurry up | Bilisan niyo na |
+| Limited stock | Konti na lang natitira |
+| Hurry up | Bilisan niyo na |
+| Limited stock | Konti na lang natitira |
+| New English | New Taglish |
 
 ### FORBIDDEN PATTERNS:
 - No store names
@@ -189,9 +199,7 @@ Valid Example:
 - No store names mentioned
 
 
-# PHASE 6: APPEND SHOT MATCHING DETAILS TO AI TRAINING CORE
 cat << 'EOF' >> AI_TRAINING_CORE.md
-# PHASE 6: APPEND SHOT MATCHING DETAILS TO AI TRAINING CORE
 cat << 'EOF' >> AI_TRAINING_CORE.md
 
 ---
@@ -309,4 +317,9 @@ Infinity Loop: Enabled - video auto-replays seamlessly
 3. #Sulit
 4. #Quality
 5. #Affiliate (or niche-specific: #Athletic, #Gaming, #Audio)
+
+
+### Pet Supplies
+Keywords: durable, safe, pet-friendly, chew-resistant, non-toxic
+Forbidden: fast-charging, RGB, noise cancellation, oversized fit
 

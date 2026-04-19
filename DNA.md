@@ -91,7 +91,7 @@ This project is designed for "Zero-Local-Load" development.
 
 ---
 
-## 📦 7. Current Version: v2.5.0
+## 📦 7. Current Version: v2.6.0
 
 ### Features Implemented
 
@@ -184,7 +184,7 @@ Supabase Cloud (generation_history, training_materials, chat_history, testing_ex
 ---
 
 **DNA-Signature: HOOPSTREET-AFFILIATE-LOGIC-2026**
-**Version: v2.5.0**
+**Version: v2.6.0**
 
 
 ### Supabase Connection Details (supabase_connection.py)
@@ -272,4 +272,529 @@ TikTok-Prompt-Generator/
 | `save_test_result()` | test_name, test_input, test_output, status, duration_ms | Boolean | Stores test result |
 | `get_test_results()` | limit=50 | Array | Retrieves test history |
 | `get_test_stats()` | None | Dict | Returns pass/fail statistics |
+
+
+## 📚 13. AI Training Materials Responsibility
+
+### Purpose of AI_TRAINING_CORE.md
+This file serves as the **master training manual** for the TikTok-Prompt-Generator AI. It contains:
+
+| Section | Purpose |
+|---------|---------|
+| 1-3 | Visual pacing, niche framework, Taglish localization |
+| 4-5 | Output protocol, database column mapping |
+| 6-10 | Keyword library, anti-repetition, video directives |
+| 11-14 | Shot matching, Supabase integration, infinity loop, title rules |
+
+### Update Protocol for Training Materials
+When new features are added, the AI must:
+
+1. **APPEND** new sections to AI_TRAINING_CORE.md
+2. **NEVER** rewrite existing content
+3. **MAINTAIN** section numbering sequentially
+4. **DOCUMENT** all behavioral rules
+
+### Auto-Update Triggers
+The training materials auto-update when:
+- New niche categories are added
+- Duration options expand (15s, 30s, 45s, 55s, 60s)
+- Output format changes
+- Database schema evolves
+- New Taglish phrases are introduced
+
+
+## 📝 14. DNA Update Protocol
+
+### Purpose of DNA.md
+This file serves as the **master documentation** for:
+- Project architecture and deployment
+- Tool purposes and tech stack
+- Environment variables and secrets
+- CI/CD workflows
+- Version history tracking
+- File structure reference
+- API documentation
+
+### When to Update DNA.md
+| Trigger | Action |
+|---------|--------|
+| New version tag | Append to Version History (Section 9) |
+| New file added | Update File Structure (Section 11) |
+| New API method | Update API Reference (Section 12) |
+| Architecture change | Update Deployment Flow (Section 10) |
+| New secret/variable | Update Variables (Section 4) |
+
+### Update Rules (STRICT)
+1. **APPEND** new information - NEVER overwrite
+2. **PRESERVE** existing documentation
+3. **MAINTAIN** section numbering
+4. **KEEP** DNA-Signature at bottom
+
+
+## 🤖 15. AI Auto-Update Instructions
+
+### For Training Materials (AI_TRAINING_CORE.md)
+When AI detects new requirements, append to appropriate section:
+
+```bash
+# Example: Adding new duration
+sed -i '/| 60 seconds/a| 65 seconds | Exactly 22 shots | 3 seconds |' AI_TRAINING_CORE.md
+
+# Example: Adding new niche
+sed -i '/| Tools/a| NewNiche | Focus points |' AI_TRAINING_CORE.md
+
+# Example: Adding new Taglish phrase
+sed -i '/| Cheap but quality/a| New English | New Taglish |' AI_TRAINING_CORE.md
+# Example: Adding new version
+sed -i '/### v2.6.0/a\
+\
+### v2.7.0 (YYYY-MM-DD) - STABLE\
+- New feature description' DNA.md
+# PHASE 5: APPEND AUTO-UPDATE INSTRUCTIONS FOR AI
+cat << 'EOF' >> DNA.md
+
+## 🤖 15. AI Auto-Update Instructions
+
+### For Training Materials (AI_TRAINING_CORE.md)
+When AI detects new requirements, append to appropriate section:
+
+# PHASE 5: APPEND AUTO-UPDATE INSTRUCTIONS FOR AI
+cat << 'EOF' >> DNA.md
+
+## 🤖 15. AI Auto-Update Instructions
+
+### For Training Materials (AI_TRAINING_CORE.md)
+When AI detects new requirements, append to appropriate section:
+
+## 📚 13. AI Training Materials Responsibility
+
+### Purpose of AI_TRAINING_CORE.md
+This file serves as the **master training manual** for the TikTok-Prompt-Generator AI. It contains:
+
+| Section | Purpose |
+|---------|---------|
+| 1-3 | Visual pacing, niche framework, Taglish localization |
+| 4-5 | Output protocol, database column mapping |
+| 6-10 | Keyword library, anti-repetition, video directives |
+| 11-14 | Shot matching, Supabase integration, infinity loop, title rules |
+
+### Update Protocol for Training Materials
+When new features are added, the AI must:
+
+1. **APPEND** new sections to AI_TRAINING_CORE.md
+2. **NEVER** rewrite existing content
+3. **MAINTAIN** section numbering sequentially
+4. **DOCUMENT** all behavioral rules
+
+### Auto-Update Triggers
+The training materials auto-update when:
+- New niche categories are added
+- Duration options expand (15s, 30s, 45s, 55s, 60s)
+- Output format changes
+- Database schema evolves
+- New Taglish phrases are introduced
+
+
+## 📝 14. DNA Update Protocol
+
+### Purpose of DNA.md
+This file serves as the **master documentation** for:
+- Project architecture and deployment
+- Tool purposes and tech stack
+- Environment variables and secrets
+- CI/CD workflows
+- Version history tracking
+- File structure reference
+- API documentation
+
+### When to Update DNA.md
+| Trigger | Action |
+|---------|--------|
+| New version tag | Append to Version History (Section 9) |
+| New file added | Update File Structure (Section 11) |
+| New API method | Update API Reference (Section 12) |
+| Architecture change | Update Deployment Flow (Section 10) |
+| New secret/variable | Update Variables (Section 4) |
+
+### Update Rules (STRICT)
+1. **APPEND** new information - NEVER overwrite
+2. **PRESERVE** existing documentation
+3. **MAINTAIN** section numbering
+4. **KEEP** DNA-Signature at bottom
+
+
+## 📚 13. AI Training Materials Responsibility
+
+### Purpose of AI_TRAINING_CORE.md
+This file serves as the **master training manual** for the TikTok-Prompt-Generator AI. It contains:
+
+| Section | Purpose |
+|---------|---------|
+| 1-3 | Visual pacing, niche framework, Taglish localization |
+| 4-5 | Output protocol, database column mapping |
+| 6-10 | Keyword library, anti-repetition, video directives |
+| 11-14 | Shot matching, Supabase integration, infinity loop, title rules |
+
+### Update Protocol for Training Materials
+When new features are added, the AI must:
+
+1. **APPEND** new sections to AI_TRAINING_CORE.md
+2. **NEVER** rewrite existing content
+3. **MAINTAIN** section numbering sequentially
+4. **DOCUMENT** all behavioral rules
+
+### Auto-Update Triggers
+The training materials auto-update when:
+- New niche categories are added
+- Duration options expand (15s, 30s, 45s, 55s, 60s)
+- Output format changes
+- Database schema evolves
+- New Taglish phrases are introduced
+
+
+## 📝 14. DNA Update Protocol
+
+### Purpose of DNA.md
+This file serves as the **master documentation** for:
+- Project architecture and deployment
+- Tool purposes and tech stack
+- Environment variables and secrets
+- CI/CD workflows
+- Version history tracking
+- File structure reference
+- API documentation
+
+### When to Update DNA.md
+| Trigger | Action |
+|---------|--------|
+| New version tag | Append to Version History (Section 9) |
+| New file added | Update File Structure (Section 11) |
+| New API method | Update API Reference (Section 12) |
+| Architecture change | Update Deployment Flow (Section 10) |
+| New secret/variable | Update Variables (Section 4) |
+
+### Update Rules (STRICT)
+1. **APPEND** new information - NEVER overwrite
+2. **PRESERVE** existing documentation
+3. **MAINTAIN** section numbering
+4. **KEEP** DNA-Signature at bottom
+
+
+## 🤖 15. AI Auto-Update Instructions
+
+### For Training Materials (AI_TRAINING_CORE.md)
+When AI detects new requirements, append to appropriate section:
+
+```bash
+# Example: Adding new duration
+sed -i '/| 60 seconds/a| 65 seconds | Exactly 22 shots | 3 seconds |' AI_TRAINING_CORE.md
+
+# Example: Adding new niche
+sed -i '/| Tools/a| NewNiche | Focus points |' AI_TRAINING_CORE.md
+
+# Example: Adding new Taglish phrase
+sed -i '/| Cheap but quality/a| New English | New Taglish |' AI_TRAINING_CORE.md
+
+## 🤖 15. AI Auto-Update Instructions
+
+### For Training Materials (AI_TRAINING_CORE.md)
+When AI detects new requirements, append to appropriate section:
+
+```bash
+# Example: Adding new duration
+sed -i '/| 60 seconds/a| 65 seconds | Exactly 22 shots | 3 seconds |' AI_TRAINING_CORE.md
+
+# Example: Adding new niche
+sed -i '/| Tools/a| NewNiche | Focus points |' AI_TRAINING_CORE.md
+
+# Example: Adding new Taglish phrase
+sed -i '/| Cheap but quality/a| New English | New Taglish |' AI_TRAINING_CORE.md
+
+For DNA.md
+
+When new features are deployed, append version history:
+
+# Example: Adding new version
+sed -i '/### v2.6.0/a\
+\
+### v2.7.0 (YYYY-MM-DD) - STABLE\
+- New feature description' DNA.md
+
+Verification After Update
+
+Always verify with:
+
+grep "^## [0-9]" AI_TRAINING_CORE.md | wc -l
+grep "^## " DNA.md | wc -l
+
+## 📚 13. AI Training Materials Responsibility
+
+### Purpose of AI_TRAINING_CORE.md
+This file serves as the **master training manual** for the TikTok-Prompt-Generator AI. It contains:
+
+| Section | Purpose |
+|---------|---------|
+| 1-3 | Visual pacing, niche framework, Taglish localization |
+| 4-5 | Output protocol, database column mapping |
+| 6-10 | Keyword library, anti-repetition, video directives |
+| 11-14 | Shot matching, Supabase integration, infinity loop, title rules |
+
+### Update Protocol for Training Materials
+When new features are added, the AI must:
+
+1. **APPEND** new sections to AI_TRAINING_CORE.md
+2. **NEVER** rewrite existing content
+3. **MAINTAIN** section numbering sequentially
+4. **DOCUMENT** all behavioral rules
+
+### Auto-Update Triggers
+The training materials auto-update when:
+- New niche categories are added
+- Duration options expand (15s, 30s, 45s, 55s, 60s)
+- Output format changes
+- Database schema evolves
+- New Taglish phrases are introduced
+
+
+## 📝 14. DNA Update Protocol
+
+### Purpose of DNA.md
+This file serves as the **master documentation** for:
+- Project architecture and deployment
+- Tool purposes and tech stack
+- Environment variables and secrets
+- CI/CD workflows
+- Version history tracking
+- File structure reference
+- API documentation
+
+### When to Update DNA.md
+| Trigger | Action |
+|---------|--------|
+| New version tag | Append to Version History (Section 9) |
+| New file added | Update File Structure (Section 11) |
+| New API method | Update API Reference (Section 12) |
+| Architecture change | Update Deployment Flow (Section 10) |
+| New secret/variable | Update Variables (Section 4) |
+
+### Update Rules (STRICT)
+1. **APPEND** new information - NEVER overwrite
+2. **PRESERVE** existing documentation
+3. **MAINTAIN** section numbering
+4. **KEEP** DNA-Signature at bottom
+
+
+## 🤖 15. AI Auto-Update Instructions
+
+### For Training Materials (AI_TRAINING_CORE.md)
+When AI detects new requirements, append to appropriate section:
+
+```bash
+# Example: Adding new duration
+sed -i '/| 60 seconds/a| 65 seconds | Exactly 22 shots | 3 seconds |' AI_TRAINING_CORE.md
+
+# Example: Adding new niche
+sed -i '/| Tools/a| NewNiche | Focus points |' AI_TRAINING_CORE.md
+
+# Example: Adding new Taglish phrase
+sed -i '/| Cheap but quality/a| New English | New Taglish |' AI_TRAINING_CORE.md
+
+For DNA.md
+
+When new features are deployed, append version history:
+
+# Example: Adding new version
+sed -i '/### v2.6.0/a\
+\
+### v2.7.0 (YYYY-MM-DD) - STABLE\
+- New feature description' DNA.md
+
+Verification After Update
+
+Always verify with:
+
+grep "^## [0-9]" AI_TRAINING_CORE.md | wc -l
+grep "^## " DNA.md | wc -l
+
+## 📚 13. AI Training Materials Responsibility
+
+### Purpose of AI_TRAINING_CORE.md
+This file serves as the **master training manual** for the TikTok-Prompt-Generator AI. It contains:
+
+| Section | Purpose |
+|---------|---------|
+| 1-3 | Visual pacing, niche framework, Taglish localization |
+| 4-5 | Output protocol, database column mapping |
+| 6-10 | Keyword library, anti-repetition, video directives |
+| 11-14 | Shot matching, Supabase integration, infinity loop, title rules |
+
+### Update Protocol for Training Materials
+When new features are added, the AI must:
+
+1. **APPEND** new sections to AI_TRAINING_CORE.md
+2. **NEVER** rewrite existing content
+3. **MAINTAIN** section numbering sequentially
+4. **DOCUMENT** all behavioral rules
+
+### Auto-Update Triggers
+The training materials auto-update when:
+- New niche categories are added
+- Duration options expand (15s, 30s, 45s, 55s, 60s)
+- Output format changes
+- Database schema evolves
+- New Taglish phrases are introduced
+
+
+## 📝 14. DNA Update Protocol
+
+### Purpose of DNA.md
+This file serves as the **master documentation** for:
+- Project architecture and deployment
+- Tool purposes and tech stack
+- Environment variables and secrets
+- CI/CD workflows
+- Version history tracking
+- File structure reference
+- API documentation
+
+### When to Update DNA.md
+| Trigger | Action |
+|---------|--------|
+| New version tag | Append to Version History (Section 9) |
+| New file added | Update File Structure (Section 11) |
+| New API method | Update API Reference (Section 12) |
+| Architecture change | Update Deployment Flow (Section 10) |
+| New secret/variable | Update Variables (Section 4) |
+
+### Update Rules (STRICT)
+1. **APPEND** new information - NEVER overwrite
+2. **PRESERVE** existing documentation
+3. **MAINTAIN** section numbering
+4. **KEEP** DNA-Signature at bottom
+
+
+## 🤖 15. AI Auto-Update Instructions
+
+### For Training Materials (AI_TRAINING_CORE.md)
+When AI detects new requirements, append to appropriate section:
+
+```bash
+# Example: Adding new duration
+sed -i '/| 60 seconds/a| 65 seconds | Exactly 22 shots | 3 seconds |' AI_TRAINING_CORE.md
+
+# Example: Adding new niche
+sed -i '/| Tools/a| NewNiche | Focus points |' AI_TRAINING_CORE.md
+
+# Example: Adding new Taglish phrase
+sed -i '/| Cheap but quality/a| New English | New Taglish |' AI_TRAINING_CORE.md
+
+For DNA.md
+
+When new features are deployed, append version history:
+
+# Example: Adding new version
+sed -i '/### v2.6.0/a\
+\
+### v2.7.0 (YYYY-MM-DD) - STABLE\
+- New feature description' DNA.md
+
+Verification After Update
+
+Always verify with:
+
+grep "^## [0-9]" AI_TRAINING_CORE.md | wc -l
+grep "^## " DNA.md | wc -l
+
+
+## 📚 13. AI Training Materials Responsibility
+
+### Purpose of AI_TRAINING_CORE.md
+This file serves as the **master training manual** for the TikTok-Prompt-Generator AI. It contains:
+
+| Section | Purpose |
+|---------|---------|
+| 1-3 | Visual pacing, niche framework, Taglish localization |
+| 4-5 | Output protocol, database column mapping |
+| 6-10 | Keyword library, anti-repetition, video directives |
+| 11-14 | Shot matching, Supabase integration, infinity loop, title rules |
+
+### Update Protocol for Training Materials
+When new features are added, the AI must:
+
+1. **APPEND** new sections to AI_TRAINING_CORE.md
+2. **NEVER** rewrite existing content
+3. **MAINTAIN** section numbering sequentially
+4. **DOCUMENT** all behavioral rules
+
+### Auto-Update Triggers
+The training materials auto-update when:
+- New niche categories are added
+- Duration options expand (15s, 30s, 45s, 55s, 60s)
+- Output format changes
+- Database schema evolves
+- New Taglish phrases are introduced
+
+
+## 📝 14. DNA Update Protocol
+
+### Purpose of DNA.md
+This file serves as the **master documentation** for:
+- Project architecture and deployment
+- Tool purposes and tech stack
+- Environment variables and secrets
+- CI/CD workflows
+- Version history tracking
+- File structure reference
+- API documentation
+
+### When to Update DNA.md
+| Trigger | Action |
+|---------|--------|
+| New version tag | Append to Version History (Section 9) |
+| New file added | Update File Structure (Section 11) |
+| New API method | Update API Reference (Section 12) |
+| Architecture change | Update Deployment Flow (Section 10) |
+| New secret/variable | Update Variables (Section 4) |
+
+### Update Rules (STRICT)
+1. **APPEND** new information - NEVER overwrite
+2. **PRESERVE** existing documentation
+3. **MAINTAIN** section numbering
+4. **KEEP** DNA-Signature at bottom
+
+
+## 🤖 15. AI Auto-Update Instructions
+
+### For Training Materials (AI_TRAINING_CORE.md)
+When AI detects new requirements, append to appropriate section:
+
+\`\`\`bash
+# Example: Adding new duration
+sed -i '/| 60 seconds/a| 65 seconds | Exactly 22 shots | 3 seconds |' AI_TRAINING_CORE.md
+
+# Example: Adding new niche
+sed -i '/| Tools/a| NewNiche | Focus points |' AI_TRAINING_CORE.md
+
+# Example: Adding new Taglish phrase
+sed -i '/| Cheap but quality/a| New English | New Taglish |' AI_TRAINING_CORE.md
+\`\`\`
+
+### For DNA.md
+When new features are deployed, append version history:
+
+\`\`\`bash
+# Example: Adding new version
+sed -i '/### v2.6.0/a\
+\
+### v2.7.0 (YYYY-MM-DD) - STABLE\
+- New feature description' DNA.md
+\`\`\`
+
+### Verification After Update
+Always verify with:
+
+\`\`\`bash
+grep "^## [0-9]" AI_TRAINING_CORE.md | wc -l
+grep "^## " DNA.md | wc -l
+\`\`\`
 
