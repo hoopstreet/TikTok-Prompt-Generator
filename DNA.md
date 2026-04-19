@@ -112,10 +112,12 @@ This project is designed for "Zero-Local-Load" development.
 - Mobile-Safe Code Delivery
 
 
-## ⌨️ 8. AI Developer Protocol (STRICT MODE)
+## 8. AI Developer Protocol (STRICT MODE)
 
 ### Rule 1: DNS FIRST
+```sh
 echo "nameserver 8.8.8.8" > /etc/resolv.conf
+```
 
 ### Rule 2: NO MANUAL EDITS
 - Never ask user to open nano/vi
@@ -126,14 +128,16 @@ echo "nameserver 8.8.8.8" > /etc/resolv.conf
 - MUST split into multiple cat EOF parts
 
 ### Rule 4: EOF SAFETY
-- Start: cat << 'EOF' > file
-- End: EOF
-- Never nest cat inside cat
+```sh
+# Start
+cat << 'EOF' > file
+EOF
+# Never nest cat inside cat
+```
 
 ### Rule 5: MOBILE-FIRST
 - Assume iPhone iSH environment
 - Break long strings into multiple lines
-
 
 ## 📌 9. Version History
 
