@@ -93,12 +93,12 @@ class TikTokProductGenerator:
             mov = movements[i % len(movements)]
             lit = lighting[i % len(lighting)]
             feature_text = product_features[i % len(product_features)] if product_features else "Product feature"
-            script = f"""Shot {i+1:02d} ({duration/shots:.1f}s): 4K vertical 9:16 aspect ratio, high-detail resolution.
-Camera Movement: {mov}
+            script = f"""Shot {i+1:02d} ({duration/shots:.1f}s): 4K vertical 9:16
+Camera: {mov}
 Lighting: {lit}
-Shot Framing: Medium Shot (MS) then zoom to Close-up (CU).
-Visual Description: Show {feature_text}. Product logo visible.
-Dialogue (Taglish): "{taglish}"
+Framing: Medium Shot then Close-up
+Visual: Show {feature_text}. Logo visible.
+Dialogue: "{taglish}"
 Background: Clean, uncluttered."""
             scripts.append(script)
         return scripts
@@ -108,7 +108,7 @@ Background: Clean, uncluttered."""
         movements = ["Cinematic Pan", "Dynamic Zoom-in", "Handheld POV shake", "Slow-motion reveal"]
         for i, script in enumerate(scripts):
             mov = movements[i % len(movements)]
-            negative = f"""Shot {i+1:02d} Negative: low quality, blurry, distorted, glitch, color bleed, deformed, watermark, text overlay, low resolution, pixelation, messy textures, robotic voice, unnatural speech, formal language, Taglish required, text overlap on product, logo position change, fabric color alteration, object morphing, inconsistent product appearance, background clutter, poor lighting, lens flare, excessive shadowing, frame tearing, stuttering playback."""
+            negative = f"""Shot {i+1:02d} Negative: low quality, blurry, distorted, glitch, color bleed, deformed, watermark, text overlay, low resolution, pixelation, messy textures, robotic voice, unnatural speech, formal language, Taglish required, text overlap, logo position change, fabric color alteration, object morphing, background clutter, poor lighting, lens flare, frame tearing."""
             if "Pan" in mov:
                 negative += " no motion blur, no frame tearing, smooth transition."
             elif "Zoom" in mov:
@@ -200,10 +200,8 @@ final_title
         history_entry = {
             "id": len(self.history) + 1,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "product_title": product_title[:50],
-            "niche": niche,
-            "positive_prompt": positives[:200] + "...",
-            "negative_prompt": negatives[:200] + "...",
+            "positive_prompt": positives[:300] + "...",
+            "negative_prompt": negatives[:300] + "...",
             "final_title": final_title,
             "full_output": output
         }
@@ -217,8 +215,6 @@ final_title
         df = pd.DataFrame([{
             "ID": h["id"],
             "Timestamp": h["timestamp"],
-            "Product Title": h["product_title"],
-            "Niche": h["niche"],
             "Positive Prompt": h["positive_prompt"],
             "Negative Prompt": h["negative_prompt"],
             "Final Title": h["final_title"]
@@ -233,8 +229,6 @@ final_title
         export_data = [{
             "id": h["id"],
             "timestamp": h["timestamp"],
-            "product_title": h["product_title"],
-            "niche": h["niche"],
             "positive_prompt": h["positive_prompt"],
             "negative_prompt": h["negative_prompt"],
             "final_title": h["final_title"]
@@ -246,8 +240,7 @@ final_title
             return "No history to export"
         md = "# TikTok Prompt Generator History\n\n"
         for h in history:
-            md += f"## {h['timestamp']} - {h['product_title']}\n"
-            md += f"**ID:** {h['id']} | **Niche:** {h['niche']}\n\n"
+            md += f"## {h['timestamp']} - ID: {h['id']}\n\n"
             md += f"### Positive Prompt\n```\n{h['positive_prompt']}\n```\n\n"
             md += f"### Negative Prompt\n```\n{h['negative_prompt']}\n```\n\n"
             md += f"### Final Title\n{h['final_title']}\n\n---\n\n"
@@ -259,12 +252,10 @@ final_title
     
     def get_history_dataframe(self, history):
         if not history:
-            return pd.DataFrame(columns=["ID", "Timestamp", "Product Title", "Niche", "Positive Prompt", "Negative Prompt", "Final Title"])
+            return pd.DataFrame(columns=["ID", "Timestamp", "Positive Prompt", "Negative Prompt", "Final Title"])
         return pd.DataFrame([{
             "ID": h["id"],
             "Timestamp": h["timestamp"],
-            "Product Title": h["product_title"],
-            "Niche": h["niche"],
             "Positive Prompt": h["positive_prompt"],
             "Negative Prompt": h["negative_prompt"],
             "Final Title": h["final_title"]
@@ -275,54 +266,41 @@ generator = TikTokProductGenerator()
 def copy_output(output_text):
     return output_text
 
-def view_full_entry(history, selected_id):
-    for h in history:
-        if h["id"] == selected_id:
-            return h.get("full_output", "No full output available")
-    return "Entry not found"
-
-with gr.Blocks(title="TikTok-Prompt-Generator", theme="soft", css=""" 
-    .copy-icon { cursor: pointer; font-size: 18px; }
-    .icon-button { background: none; border: none; cursor: pointer; font-size: 20px; }
-""") as demo:
-    gr.Markdown("# 🎬 TikTok-Prompt-Generator")
+with gr.Blocks(title="TikTok-Prompt-Generator", theme="soft") as demo:
+    gr.Markdown("# TikTok-Prompt-Generator")
     
     with gr.Row():
         with gr.Column(scale=1):
-            product_title = gr.Textbox(label="📝 Product Title", placeholder="Enter product name")
-            about_this_product = gr.Textbox(label="📋 About This Product", lines=2)
-            product_description = gr.Textbox(label="📄 Product Description", lines=3)
-            image_url = gr.Textbox(label="🖼️ Image URL", placeholder="https://...")
-            generate_btn = gr.Button("🚀 Generate", variant="primary", size="lg")
+            product_title = gr.Textbox(label="Product Title", placeholder="Enter product name")
+            about_this_product = gr.Textbox(label="About This Product", lines=2)
+            product_description = gr.Textbox(label="Product Description", lines=3)
+            image_url = gr.Textbox(label="Image URL", placeholder="https://...")
+            generate_btn = gr.Button("Generate", variant="primary")
     
     with gr.Row():
         with gr.Column(scale=1):
-            gr.Markdown("### 📤 Generated Output")
+            gr.Markdown("### Generated Output")
             with gr.Row():
-                output = gr.Textbox(label="", lines=25, scale=10)
-                copy_btn = gr.Button("📋", elem_classes="icon-button", scale=0)
+                output = gr.Textbox(label="", lines=20, scale=10)
+                copy_btn = gr.Button("Copy", scale=0, size="sm")
             copy_status = gr.Textbox(label="", visible=False)
     
     with gr.Row():
         with gr.Column(scale=1):
-            gr.Markdown("### 📊 Generation History")
+            gr.Markdown("### Generation History")
             with gr.Row():
-                refresh_btn = gr.Button("🔄", elem_classes="icon-button", scale=0)
-                clear_btn = gr.Button("🗑️", elem_classes="icon-button", scale=0)
-                gr.Markdown("&nbsp;" * 5)
-                format_dropdown = gr.Dropdown(label="📁", choices=["CSV", "JSON", "Markdown"], scale=1)
-                export_btn = gr.Button("📥", elem_classes="icon-button", scale=0)
-                view_btn = gr.Button("🔍", elem_classes="icon-button", scale=0)
+                clear_btn = gr.Button("Clear", scale=0, size="sm")
+                refresh_btn = gr.Button("Refresh", scale=0, size="sm")
+                format_dropdown = gr.Dropdown(label="Format", choices=["CSV", "JSON", "Markdown"], scale=1)
+                export_btn = gr.Button("Download", scale=0, size="sm")
             
             history_display = gr.Dataframe(
                 label="",
-                headers=["ID", "Timestamp", "Product Title", "Niche", "Positive Prompt", "Negative Prompt", "Final Title"],
-                interactive=True,
-                wrap=True
+                headers=["ID", "Timestamp", "Positive Prompt", "Negative Prompt", "Final Title"],
+                interactive=False,
+                wrap=True,
+                height=400
             )
-            
-            selected_id = gr.Number(label="Enter ID to view full output", visible=True)
-            full_output_display = gr.Textbox(label="Full Output", lines=15, visible=True)
     
     output_state = gr.State()
     history_state = gr.State([])
@@ -348,7 +326,7 @@ with gr.Blocks(title="TikTok-Prompt-Generator", theme="soft", css="""
         inputs=[],
         outputs=[copy_status, history_state]
     ).then(
-        fn=lambda: pd.DataFrame(columns=["ID", "Timestamp", "Product Title", "Niche", "Positive Prompt", "Negative Prompt", "Final Title"]),
+        fn=lambda: pd.DataFrame(columns=["ID", "Timestamp", "Positive Prompt", "Negative Prompt", "Final Title"]),
         inputs=[],
         outputs=[history_display]
     )
@@ -357,12 +335,6 @@ with gr.Blocks(title="TikTok-Prompt-Generator", theme="soft", css="""
         fn=copy_output,
         inputs=[output],
         outputs=[copy_status]
-    )
-    
-    export_btn.click(
-        fn=generator.export_to_csv,
-        inputs=[history_state],
-        outputs=[output]
     )
     
     def export_with_format(history, fmt):
@@ -374,16 +346,10 @@ with gr.Blocks(title="TikTok-Prompt-Generator", theme="soft", css="""
             return generator.export_to_markdown(history)
         return "Select format"
     
-    format_dropdown.change(
+    export_btn.click(
         fn=export_with_format,
         inputs=[history_state, format_dropdown],
         outputs=[output]
-    )
-    
-    view_btn.click(
-        fn=view_full_entry,
-        inputs=[history_state, selected_id],
-        outputs=[full_output_display]
     )
 
 if __name__ == "__main__":
