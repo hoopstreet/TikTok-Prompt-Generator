@@ -159,3 +159,11 @@ v1.0.8: [STABLE] Workflow syntax fix (Literal EOF protection).
 v1.0.9: [STABLE] Finalized Weightless Build: Strict version tagging, removed 'latest' bloat, and cleaned HF metadata.
 v1.1.0: [CURRENT] Scaling TikTok Automation: Multi-product batch processing logic.
 v1.1.3: [STABLE] Infrastructure Gold - Absolute Imports v1.1.3: [CURRENT] Torch 2.5.1 Deployment Global removal of relative imports to fix 'no known parent package' error.
+
+---
+
+### ⚠️ v1.1.3 RECOVERY FALLBACK
+- **Timestamp**: 2026-04-19 02:39
+- **Action**: Hard Reset to 43243d8
+- **Reason**: Stability recovery from v1.3.1 build failures.
+- **Status**: Infrastructure Gold restored.
