@@ -167,3 +167,23 @@ v1.1.3: [STABLE] Infrastructure Gold - Absolute Imports v1.1.3: [CURRENT] Torch 
 - **Action**: Hard Reset to 43243d8
 - **Reason**: Stability recovery from v1.3.1 build failures.
 - **Status**: Infrastructure Gold restored.
+
+### v1.3.2 [STABLE]
+- Timestamp: 2026-04-19
+- Source: iSH Mobile Deploy
+- Location: iPhone → GitHub → Docker Hub → HF Space
+- Execution: Manual Tag Push → Automated CI/CD
+
+#### 🧠 Release Notes:
+- Weightless deployment architecture confirmed
+- GitHub code → Docker Hub image (no model weights)
+- HF Space only contains Dockerfile pulling from Docker Hub
+- Model loaded at runtime from hoopstreet/moondream3-preview
+- Free T4 GPU compatible with FP8 quantization
+
+#### ✅ Architecture Validated:
+1. GitHub (Code only, ~200KB)
+2. Docker Hub (Prebuilt image, pulls model at startup)
+3. HF Space (Dockerfile only, pulls from Docker Hub)
+4. HF Model Hub (hoopstreet/moondream3-preview - weights only)
+
