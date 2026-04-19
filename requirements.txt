@@ -1,0 +1,8 @@
+torch>=2.1.0
+transformers>=4.36.0
+gradio>=4.0.0
+Pillow>=10.0.0
+requests>=2.31.0
+huggingface-hub>=0.20.0
+accelerate>=0.25.0
+safetensors>=0.4.0
