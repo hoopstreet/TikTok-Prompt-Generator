@@ -186,3 +186,90 @@ Supabase Cloud (generation_history, training_materials, chat_history, testing_ex
 **DNA-Signature: HOOPSTREET-AFFILIATE-LOGIC-2026**
 **Version: v2.5.0**
 
+
+### Supabase Connection Details (supabase_connection.py)
+
+The system uses a singleton pattern for database connections:
+
+```python
+class SupabaseConnection:
+    _instance = None
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+```
+
+Environment Variables Required:
+
+· SUPABASE_URL - Your Supabase project URL
+· SUPABASE_SERVICE_ROLE_KEY - Service role key for API access
+
+Database Tables Location:
+
+Table File Reference SQL File
+generation_history supabase_connection.py supabase_schema.sql
+training_materials supabase_connection.py supabase_schema.sql
+chat_history supabase_connection.py supabase_schema.sql
+testing_explorer supabase_connection.py supabase_testing_explorer.sql
+
+
+## 📁 11. Complete File Structure Reference
+
+```
+
+TikTok-Prompt-Generator/
+├── .github/workflows/
+│   ├── docker-publish.yml      # Builds Docker image on tags
+│   └── hf-sync.yml             # Syncs to Hugging Face Space
+├── app.py                      # Main Gradio UI (7 Textboxes, 3 Buttons, 1 Dataframe)
+├── Dockerfile                  # Docker build instructions (Python 3.10-slim)
+├── hf.Dockerfile               # HF Space redirect (pulls from Docker Hub)
+├── requirements.txt            # Python dependencies (torch, gradio, supabase, pandas)
+├── supabase_connection.py      # Supabase singleton connection class
+├── supabase_schema.sql         # Generation history, training materials, chat history tables
+├── supabase_testing_explorer.sql # Testing explorer table
+├── supabase_rls_public.sql     # Row Level Security policies
+├── AI_TRAINING_CORE.md         # Complete AI training manual (20 sections)
+├── DNA.md                      # Master documentation (this file)
+├── README.md                   # Public-facing documentation
+├── LICENSE.md                  # MIT License
+├── .env.template               # Environment variables template
+├── .gitignore                  # Ignores .env, pycache, *.pyc
+└── .gitattributes              # Git LFS configuration
+
+```
+
+
+## 🔌 12. API Reference (Supabase Methods)
+
+### Generation History Methods
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `save_generation()` | input_field, analyst_product, final_output | Boolean | Stores generated prompt |
+| `get_generation_history()` | limit=100 | Array | Retrieves recent generations |
+| `delete_generation()` | record_id | Boolean | Deletes specific record |
+
+### Training Materials Methods
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `save_training_material()` | topic, content | Boolean | Adds AI behavior rule |
+| `get_training_materials()` | topic=None | Array | Retrieves rules (filter by topic) |
+| `update_training_material()` | record_id, topic, content | Boolean | Updates existing rule |
+| `delete_training_material()` | record_id | Boolean | Deletes rule |
+
+### Chat History Methods (Memory)
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `save_chat_message()` | conversation_id, user_input, ai_response, niche | Boolean | Stores conversation |
+| `get_chat_history()` | conversation_id, limit=10 | Array | Retrieves conversation |
+| `get_last_n_messages()` | conversation_id, n=3 | Array | Gets last N messages |
+| `delete_old_chat_history()` | days=30 | Boolean | Auto-cleanup old records |
+
+### Testing Explorer Methods
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `save_test_result()` | test_name, test_input, test_output, status, duration_ms | Boolean | Stores test result |
+| `get_test_results()` | limit=50 | Array | Retrieves test history |
+| `get_test_stats()` | None | Dict | Returns pass/fail statistics |
+

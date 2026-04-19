@@ -15,6 +15,7 @@
 | 30 seconds | Exactly 10 shots | 3 seconds |
 | 45 seconds | Exactly 15 shots | 3 seconds |
 | 55 seconds | Exactly 18 shots | 3 seconds |
+| 60 seconds | Exactly 20 shots | 3 seconds |
 
 RULE: No exceptions. Every shot = 3 seconds exactly.
 
@@ -186,4 +187,126 @@ Valid Example:
 - No niche leakage
 - Title 80-100 chars with 5 hashtags
 - No store names mentioned
+
+
+# PHASE 6: APPEND SHOT MATCHING DETAILS TO AI TRAINING CORE
+cat << 'EOF' >> AI_TRAINING_CORE.md
+# PHASE 6: APPEND SHOT MATCHING DETAILS TO AI TRAINING CORE
+cat << 'EOF' >> AI_TRAINING_CORE.md
+
+---
+
+## 11. Shot Matching Rule (1-to-1 Mapping)
+
+### Rule Description:
+For every positive_prompt shot, there MUST be a corresponding negative_prompt shot.
+
+### Example 5-Shot Mapping:
+| Positive Shot | Negative Shot |
+|---------------|---------------|
+| Shot 01: Cinematic Pan | Shot 01 Negative: + no motion blur, no frame tearing |
+| Shot 02: Dynamic Zoom | Shot 02 Negative: + no pixelation, no quality loss |
+| Shot 03: Handheld POV | Shot 03 Negative: + no excessive shake, stable |
+| Shot 04: Slow-motion | Shot 04 Negative: + no frame skipping, fluid motion |
+| Shot 05: Cinematic Pan | Shot 05 Negative: + smooth transition |
+
+### Movement-Specific Anti-Glitch Keywords:
+
+| Camera Movement | Anti-Glitch Keywords |
+|----------------|---------------------|
+| Cinematic Pan | no motion blur, no frame tearing, smooth transition |
+| Dynamic Zoom-in | no pixelation, no quality loss, sharp focus |
+| Handheld POV | no excessive shake, no disorientation, stable |
+| Slow-motion reveal | no frame skipping, no ghosting, fluid motion |
+
+### Continuity Lock Keywords (All Shots):
+- do not change logo position
+- do not alter fabric color
+- maintain product orientation
+- consistent lighting throughout
+- no object morphing
+
+
+---
+
+## 12. Supabase Database Integration
+
+### Connection Configuration (supabase_connection.py)
+- Singleton pattern for single connection instance
+- Environment variables: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+- Automatic table existence checking
+
+### Data Flow:
+```
+
+User Input → app.py → supabase_connection.py → Supabase Cloud
+↓
+generation_history (save all prompts)
+training_materials (AI behavior rules)
+chat_history (conversation memory)
+testing_explorer (test results)
+
+```
+
+### Table Schemas Location:
+- `supabase_schema.sql` - Main tables (generation_history, training_materials, chat_history)
+- `supabase_testing_explorer.sql` - Testing table
+- `supabase_rls_public.sql` - Row Level Security policies
+
+
+---
+
+## 13. Infinity Loop Directive
+
+### Video Auto-Replay Feature:
+- Videos automatically replay from start to end seamlessly
+- Creates never-ending video effect for better engagement
+- Implemented in Card 3: Video Analysis Results
+
+### Implementation:
+```
+
+Infinity Loop: Enabled - video auto-replays seamlessly
+
+```
+
+### Technical Requirements:
+- Smooth transition from last frame to first frame
+- No visible jump or cut between replays
+- Consistent audio synchronization
+- Loop point should be natural (end of call-to-action)
+
+
+---
+
+## 14. Final Title Generation Rules (Strict 80-100 chars)
+
+### Title Structure:
+```
+
+[Emoji] [Hook Emotion] + [Core Benefit] + [Urgency] | [Product Name] [5 Hashtags]
+
+```
+
+### Character Enforcement:
+| Condition | Action |
+|-----------|--------|
+| >100 characters | Truncate product name by 5 chars |
+| >100 characters again | Remove benefit phrase |
+| <80 characters | Add "- Shop now!" suffix |
+| Exactly 80-100 | ACCEPT |
+
+### Valid Example (93 chars):
+```
+
+🔥 MUST-HAVE! Elite Athletic Shorts | APPAREL Finds #TikTokMadeMeBuyIt #BudolFinds #Sulit #Quality #Affiliate
+
+```
+
+### Hashtags (Always 5):
+1. #TikTokMadeMeBuyIt
+2. #BudolFinds
+3. #Sulit
+4. #Quality
+5. #Affiliate (or niche-specific: #Athletic, #Gaming, #Audio)
 
