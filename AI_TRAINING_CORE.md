@@ -17,7 +17,6 @@
 | 55 seconds | Exactly 18 shots | 3 seconds |
 | 60 seconds | Exactly 20 shots | 3 seconds |
 | 65 seconds | Exactly 22 shots | 3 seconds |
-| 65 seconds | Exactly 22 shots | 3 seconds |
 
 RULE: No exceptions. Every shot = 3 seconds exactly.
 
@@ -37,8 +36,7 @@ RULE: No exceptions. Every shot = 3 seconds exactly.
 | Gaming | No lag, RGB setup |
 | Sports | Full sublimation, custom IGN, sulit-tela |
 | Tools | Heavy-duty, rechargeable, handy |
-| Pet Supplies | Durable, safe, pet-friendly, chew-resistant |
-| Pet Supplies | Durable, safe, pet-friendly, chew-resistant |
+| Pet Supplies | Durable, safe, pet-friendly |
 | NewNiche | Focus points |
 
 
@@ -56,8 +54,6 @@ RULE: No exceptions. Every shot = 3 seconds exactly.
 | Trust me | Swerte niyo |
 | Amazing | Panalo |
 | Cheap but quality | Mura pero quality |
-| Hurry up | Bilisan niyo na |
-| Limited stock | Konti na lang natitira |
 | Hurry up | Bilisan niyo na |
 | Limited stock | Konti na lang natitira |
 | New English | New Taglish |

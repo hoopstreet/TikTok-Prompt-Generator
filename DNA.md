@@ -279,34 +279,6 @@ TikTok-Prompt-Generator/
 
 
 ## 📚 13. AI Training Materials Responsibility
-
-### Purpose of AI_TRAINING_CORE.md
-This file serves as the **master training manual** for the TikTok-Prompt-Generator AI. It contains:
-
-| Section | Purpose |
-|---------|---------|
-| 1-3 | Visual pacing, niche framework, Taglish localization |
-| 4-5 | Output protocol, database column mapping |
-| 6-10 | Keyword library, anti-repetition, video directives |
-| 11-14 | Shot matching, Supabase integration, infinity loop, title rules |
-
-### Update Protocol for Training Materials
-When new features are added, the AI must:
-
-1. **APPEND** new sections to AI_TRAINING_CORE.md
-2. **NEVER** rewrite existing content
-3. **MAINTAIN** section numbering sequentially
-4. **DOCUMENT** all behavioral rules
-
-### Auto-Update Triggers
-The training materials auto-update when:
-- New niche categories are added
-- Duration options expand (15s, 30s, 45s, 55s, 60s)
-- Output format changes
-- Database schema evolves
-- New Taglish phrases are introduced
-
-
 ## 📝 14. DNA Update Protocol
 
 ### Purpose of DNA.md
@@ -371,34 +343,6 @@ cat << 'EOF' >> DNA.md
 When AI detects new requirements, append to appropriate section:
 
 ## 📚 13. AI Training Materials Responsibility
-
-### Purpose of AI_TRAINING_CORE.md
-This file serves as the **master training manual** for the TikTok-Prompt-Generator AI. It contains:
-
-| Section | Purpose |
-|---------|---------|
-| 1-3 | Visual pacing, niche framework, Taglish localization |
-| 4-5 | Output protocol, database column mapping |
-| 6-10 | Keyword library, anti-repetition, video directives |
-| 11-14 | Shot matching, Supabase integration, infinity loop, title rules |
-
-### Update Protocol for Training Materials
-When new features are added, the AI must:
-
-1. **APPEND** new sections to AI_TRAINING_CORE.md
-2. **NEVER** rewrite existing content
-3. **MAINTAIN** section numbering sequentially
-4. **DOCUMENT** all behavioral rules
-
-### Auto-Update Triggers
-The training materials auto-update when:
-- New niche categories are added
-- Duration options expand (15s, 30s, 45s, 55s, 60s)
-- Output format changes
-- Database schema evolves
-- New Taglish phrases are introduced
-
-
 ## 📝 14. DNA Update Protocol
 
 ### Purpose of DNA.md
@@ -428,34 +372,6 @@ This file serves as the **master documentation** for:
 
 
 ## 📚 13. AI Training Materials Responsibility
-
-### Purpose of AI_TRAINING_CORE.md
-This file serves as the **master training manual** for the TikTok-Prompt-Generator AI. It contains:
-
-| Section | Purpose |
-|---------|---------|
-| 1-3 | Visual pacing, niche framework, Taglish localization |
-| 4-5 | Output protocol, database column mapping |
-| 6-10 | Keyword library, anti-repetition, video directives |
-| 11-14 | Shot matching, Supabase integration, infinity loop, title rules |
-
-### Update Protocol for Training Materials
-When new features are added, the AI must:
-
-1. **APPEND** new sections to AI_TRAINING_CORE.md
-2. **NEVER** rewrite existing content
-3. **MAINTAIN** section numbering sequentially
-4. **DOCUMENT** all behavioral rules
-
-### Auto-Update Triggers
-The training materials auto-update when:
-- New niche categories are added
-- Duration options expand (15s, 30s, 45s, 55s, 60s)
-- Output format changes
-- Database schema evolves
-- New Taglish phrases are introduced
-
-
 ## 📝 14. DNA Update Protocol
 
 ### Purpose of DNA.md
@@ -532,34 +448,6 @@ grep "^## [0-9]" AI_TRAINING_CORE.md | wc -l
 grep "^## " DNA.md | wc -l
 
 ## 📚 13. AI Training Materials Responsibility
-
-### Purpose of AI_TRAINING_CORE.md
-This file serves as the **master training manual** for the TikTok-Prompt-Generator AI. It contains:
-
-| Section | Purpose |
-|---------|---------|
-| 1-3 | Visual pacing, niche framework, Taglish localization |
-| 4-5 | Output protocol, database column mapping |
-| 6-10 | Keyword library, anti-repetition, video directives |
-| 11-14 | Shot matching, Supabase integration, infinity loop, title rules |
-
-### Update Protocol for Training Materials
-When new features are added, the AI must:
-
-1. **APPEND** new sections to AI_TRAINING_CORE.md
-2. **NEVER** rewrite existing content
-3. **MAINTAIN** section numbering sequentially
-4. **DOCUMENT** all behavioral rules
-
-### Auto-Update Triggers
-The training materials auto-update when:
-- New niche categories are added
-- Duration options expand (15s, 30s, 45s, 55s, 60s)
-- Output format changes
-- Database schema evolves
-- New Taglish phrases are introduced
-
-
 ## 📝 14. DNA Update Protocol
 
 ### Purpose of DNA.md
@@ -621,34 +509,6 @@ grep "^## [0-9]" AI_TRAINING_CORE.md | wc -l
 grep "^## " DNA.md | wc -l
 
 ## 📚 13. AI Training Materials Responsibility
-
-### Purpose of AI_TRAINING_CORE.md
-This file serves as the **master training manual** for the TikTok-Prompt-Generator AI. It contains:
-
-| Section | Purpose |
-|---------|---------|
-| 1-3 | Visual pacing, niche framework, Taglish localization |
-| 4-5 | Output protocol, database column mapping |
-| 6-10 | Keyword library, anti-repetition, video directives |
-| 11-14 | Shot matching, Supabase integration, infinity loop, title rules |
-
-### Update Protocol for Training Materials
-When new features are added, the AI must:
-
-1. **APPEND** new sections to AI_TRAINING_CORE.md
-2. **NEVER** rewrite existing content
-3. **MAINTAIN** section numbering sequentially
-4. **DOCUMENT** all behavioral rules
-
-### Auto-Update Triggers
-The training materials auto-update when:
-- New niche categories are added
-- Duration options expand (15s, 30s, 45s, 55s, 60s)
-- Output format changes
-- Database schema evolves
-- New Taglish phrases are introduced
-
-
 ## 📝 14. DNA Update Protocol
 
 ### Purpose of DNA.md
@@ -711,34 +571,6 @@ grep "^## " DNA.md | wc -l
 
 
 ## 📚 13. AI Training Materials Responsibility
-
-### Purpose of AI_TRAINING_CORE.md
-This file serves as the **master training manual** for the TikTok-Prompt-Generator AI. It contains:
-
-| Section | Purpose |
-|---------|---------|
-| 1-3 | Visual pacing, niche framework, Taglish localization |
-| 4-5 | Output protocol, database column mapping |
-| 6-10 | Keyword library, anti-repetition, video directives |
-| 11-14 | Shot matching, Supabase integration, infinity loop, title rules |
-
-### Update Protocol for Training Materials
-When new features are added, the AI must:
-
-1. **APPEND** new sections to AI_TRAINING_CORE.md
-2. **NEVER** rewrite existing content
-3. **MAINTAIN** section numbering sequentially
-4. **DOCUMENT** all behavioral rules
-
-### Auto-Update Triggers
-The training materials auto-update when:
-- New niche categories are added
-- Duration options expand (15s, 30s, 45s, 55s, 60s)
-- Output format changes
-- Database schema evolves
-- New Taglish phrases are introduced
-
-
 ## 📝 14. DNA Update Protocol
 
 ### Purpose of DNA.md
