@@ -1,19 +1,14 @@
-import json
 import re
 
 class TikTokOutputParser:
     @staticmethod
     def parse(model_response):
-        """Converts raw model output to your desired format"""
-        
-        # Extract sections using regex
         hook_match = re.search(r"Hook:\s*(.+?)(?=\n|$)", model_response)
         problem_match = re.search(r"Problem Solved:\s*(.+?)(?=\n|$)", model_response)
         emotional_match = re.search(r"Emotional Angle:\s*(.+?)(?=\n|$)", model_response)
         cta_match = re.search(r"Call to Action:\s*(.+?)(?=\n|$)", model_response)
         hashtags_match = re.search(r"Hashtags:\s*(.+?)(?=\n|$)", model_response)
         
-        # Format as clean output
         formatted = f"""
 ═══════════════════════════════════════
 📱 TIKTOK PROMPT GENERATED
@@ -37,9 +32,3 @@ class TikTokOutputParser:
 ═══════════════════════════════════════
 """
         return formatted
-    
-    @staticmethod
-    def as_json(model_response):
-        """Returns JSON format for API integration"""
-        # Extract and return as JSON
-        return {"raw_response": model_response, "parsed": "..."}

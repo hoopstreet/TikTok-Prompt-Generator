@@ -1,5 +1,6 @@
-# Auto detect text files and perform LF normalization
 * text=auto
-
-# Keep LFS only for files we actually have (none now)
-# DNA.md is text, no LFS needed
+*.py text
+*.md text
+*.yml text
+*.txt text
+Dockerfile text

@@ -9,30 +9,18 @@ class MoondreamLoader:
         self.model_id = model_id
         self.cache_dir = cache_dir
         self.model = None
-        self.processor = None
     
     def load_model(self):
-        """Downloads model from HF Hub (only once) and loads into memory"""
-        # Download weights from your model repo
+        print("Downloading model from Hugging Face...")
         local_path = snapshot_download(
             repo_id=self.model_id,
             cache_dir=self.cache_dir,
-            local_files_only=False  # Downloads from HF
+            local_files_only=False
         )
-        
-        # Import moondream (your custom version or original)
-        from moondream import MoondreamModel, VisionEncoder
-        
-        # Load with FP8 for memory efficiency on free GPU
-        self.model = MoondreamModel.from_pretrained(
-            local_path,
-            torch_dtype=torch.float8_e4m3fn,  # FP8 for memory
-            device_map="auto"
-        )
-        return self.model
+        print(f"Model downloaded to {local_path}")
+        return local_path
     
     def load_image_from_url(self, url):
-        """Downloads image from URL and processes it"""
-        response = requests.get(url)
+        response = requests.get(url, timeout=30)
         img = Image.open(BytesIO(response.content)).convert("RGB")
         return img
