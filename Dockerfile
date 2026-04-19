@@ -1,30 +1,24 @@
-FROM python:3.11-slim
+FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install system dependencies for GPU and Git
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git \
-    libgl1 \
+    libgl1-mesa-glx \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# FORCE INSTALL: PyTorch 2.5.1 (Extra stable for Flex Attention)
-RUN pip install --no-cache-dir torch==2.5.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+# Copy requirements first (for caching)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install AI/Gradio stack
-RUN pip install --no-cache-dir \
-    gradio \
-    transformers>=4.46.0 \
-    pillow \
-    einops \
-    accelerate
-
+# Copy application code
 COPY . .
 
-# Set Path to ensure local imports work
-ENV PYTHONPATH="/app"
+# Model will be downloaded at runtime to /tmp/model_cache
+ENV HF_HOME=/tmp/hf_cache
+ENV TRANSFORMERS_CACHE=/tmp/hf_cache
 
 EXPOSE 7860
 
-CMD ["python", "hf_moondream.py"]
+CMD ["python", "app.py"]
