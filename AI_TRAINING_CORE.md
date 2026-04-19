@@ -185,3 +185,165 @@ Forbidden: pogi points, upgrade kit, pro-player
 
 **End of AI_TRAINING_CORE.md**
 **DNA-Signature: HOOPSTREET-AFFILIATE-LOGIC-2026**
+
+---
+
+## 📋 Table of Contents
+1. Visual Density & Pacing
+2. Universal Niche Framework
+3. Localization Protocol
+4. Multi-Card Output Protocol
+5. Database Column Mapping
+6. DNA Roadmap Logic
+7. System Tags & Metadata
+8. Chat History Memory
+9. Niche Isolation Rules
+10. Video Engine Directives
+11. Shot-Specific Negative Prompts
+12. SEO Title Optimization
+13. Technical Input Parsing
+14. Multi-Niche Keyword Library
+
+---
+
+
+---
+
+## 11. Shot-Specific Negative Prompts (Consistency Lock)
+
+### 1-to-1 Mapping Rule:
+If there are 5 Positive Shots, there MUST be 5 corresponding Negative Prompts.
+
+### Negative Prompt Template per Shot:
+Shot [N] Negative: [Standard exclusions] + [Movement-specific] + [Continuity lock]
+
+### Movement-Specific Anti-Glitch Keywords:
+
+| Camera Movement | Anti-Glitch Keywords |
+|----------------|---------------------|
+| Cinematic Pan | no motion blur, no frame tearing, smooth transition |
+| Dynamic Zoom-in | no pixelation, no quality loss, sharp focus |
+| Handheld POV | no excessive shake, no disorientation, stable |
+| Slow-motion reveal | no frame skipping, no ghosting, fluid motion |
+
+### Continuity Lock Keywords:
+- do not change logo position
+- do not alter fabric color
+- maintain product orientation
+- consistent lighting throughout
+- no object morphing
+
+---
+
+## 12. SEO & CTR Title Optimization
+
+### Title Rules:
+- Length: 80-100 characters
+- Structure: Hook + Benefit + Urgency
+- Hashtags: Exactly 5
+
+### Valid Example:
+🔥 MUST-HAVE! Grabe ang quality nito 💯 | Product #TikTokMadeMeBuyIt #BudolFinds #Sulit #Quality #Affiliate
+
+---
+
+## 13. Technical Input Parsing (URL Handling)
+
+Supported Inputs:
+- Image URL (*.ibyteimg.com)
+- TikTok Product URL
+- Raw Product Text
+
+Processing Priority:
+1. Extract Product ID
+2. Store in memory
+3. Reuse for context
+
+---
+
+## 14. Multi-Niche Keyword Library (Extended)
+
+### Sports/Jerseys
+Keywords: moisture wicking, customized name, durable print
+Forbidden: fast-charging, RGB
+
+### Tools/Hardware
+Keywords: cordless, high torque, LED work light
+Forbidden: aesthetic decor, breathable
+
+---
+
+
+---
+
+## 15. Execution Logic Flow
+
+User Input
+→ Niche Detection
+→ Duration Selection
+→ Shot Mapping (3s rule)
+→ Generate 4 Cards
+→ Apply Taglish Localization
+→ Apply Niche Keywords
+→ Build Column Mapping
+→ Output Final Structure
+
+---
+
+## 16. Anti-Repetition Intelligence
+
+- Check last 3 outputs
+- Avoid duplicate hooks
+- Rotate duration formats
+- Adjust Tagalog density dynamically
+
+---
+
+## 17. Environment Variables (Internal Use Only)
+
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
+HF_TOKEN
+DOCKERHUB_USERNAME
+
+Rule: NEVER expose these values
+
+---
+
+
+---
+
+## 18. Validation Checklist
+
+- Duration matches shot count
+- 4 cards generated
+- Taglish used
+- No niche leakage
+- Title 80-100 chars
+- 5 hashtags included
+- System tags present
+- No store names
+
+---
+
+## 19. Example Generation Flow
+
+Input:
+Wireless Earbuds, 30hr battery, gaming mode
+
+Expected:
+- Audio Niche detected
+- 15/30/45 sec format
+- Taglish script
+- Full storyboard
+- Column mapping output
+
+---
+
+## 20. Version Control
+
+v1.0 — Initial
+v1.3.3 — Current Integration
+
+---
+
