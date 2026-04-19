@@ -263,9 +263,6 @@ final_title
 
 generator = TikTokProductGenerator()
 
-def copy_output(output_text):
-    return output_text
-
 with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
     gr.Markdown("# TikTok-Prompt-Generator")
     
@@ -280,17 +277,12 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
     with gr.Row():
         with gr.Column(scale=1):
             gr.Markdown("### Generated Output")
-            with gr.Row():
-                output = gr.Textbox(label="", lines=20, scale=10)
-                copy_btn = gr.Button("Copy", scale=0, size="sm")
-            copy_status = gr.Textbox(label="", visible=False)
+            output = gr.Textbox(label="", lines=20)
     
     with gr.Row():
         with gr.Column(scale=1):
             gr.Markdown("### Generation History")
             with gr.Row():
-                clear_btn = gr.Button("Clear", scale=0, size="sm")
-                refresh_btn = gr.Button("Refresh", scale=0, size="sm")
                 format_dropdown = gr.Dropdown(label="Format", choices=["CSV", "JSON", "Markdown"], scale=1)
                 export_btn = gr.Button("Download", scale=0, size="sm")
             
@@ -301,7 +293,6 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
                 wrap=True
             )
     
-    output_state = gr.State()
     history_state = gr.State([])
     
     generate_btn.click(
@@ -312,28 +303,6 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
         fn=generator.get_history_dataframe,
         inputs=[history_state],
         outputs=[history_display]
-    )
-    
-    refresh_btn.click(
-        fn=generator.get_history_dataframe,
-        inputs=[history_state],
-        outputs=[history_display]
-    )
-    
-    clear_btn.click(
-        fn=generator.clear_history,
-        inputs=[],
-        outputs=[copy_status, history_state]
-    ).then(
-        fn=lambda: pd.DataFrame(columns=["ID", "Timestamp", "Positive Prompt", "Negative Prompt", "Final Title"]),
-        inputs=[],
-        outputs=[history_display]
-    )
-    
-    copy_btn.click(
-        fn=copy_output,
-        inputs=[output],
-        outputs=[copy_status]
     )
     
     def export_with_format(history, fmt):
