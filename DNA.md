@@ -187,3 +187,24 @@ v1.1.3: [STABLE] Infrastructure Gold - Absolute Imports v1.1.3: [CURRENT] Torch 
 3. HF Space (Dockerfile only, pulls from Docker Hub)
 4. HF Model Hub (hoopstreet/moondream3-preview - weights only)
 
+
+### v1.3.3 [STABLE] - Dockerfile Fixed
+- Timestamp: 2026-04-19
+- Source: iSH Mobile Deploy
+- Location: iPhone → GitHub → Docker Hub → HF Space
+- Execution: Manual Tag Push → Automated CI/CD
+
+#### 🐛 Fixed in v1.3.3:
+- Dockerfile: Replaced `libgl1-mesa-glx` with `libgl1-mesa-dri` + `libgl1`
+- Build error: Package not found in Debian Trixie repository resolved
+
+#### ✅ Architecture Confirmed Working:
+1. GitHub (Code only, ~200KB)
+2. Docker Hub (Prebuilt image, pulls model at startup)
+3. HF Space (Dockerfile only, pulls from Docker Hub)
+4. HF Model Hub (hoopstreet/moondream3-preview - weights only)
+
+#### 📦 Latest Image:
+- Docker Hub: `hoopstreet/tiktok-prompt-generator:v1.3.3`
+- HF Space: Pulls v1.3.3 automatically on sync
+
