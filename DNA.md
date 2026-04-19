@@ -135,6 +135,32 @@ EOF
 # Never nest cat inside cat
 ```
 
+✅ OPTION 1 (SAFE — recommended)
+
+Pull first, then push:
+
+git pull origin main --rebase
+git push origin main
+
+Why this is better:
+
+* Keeps remote commits
+* Applies your changes on top
+* No history loss
+
+⸻
+
+⚠️ OPTION 2 (FORCE PUSH — overwrite remote)
+
+If you’re sure your version is the correct one:
+
+git push origin main --force
+
+Warning:
+
+* This will overwrite remote history
+* Can delete others’ commits
+
 ### Rule 5: MOBILE-FIRST
 - Assume iPhone iSH environment
 - Break long strings into multiple lines
