@@ -1,7 +1,7 @@
 # TikTok Affiliate AI Training Core
 ## Philippines Market - Moondream 3 Integration
 
-### Version: v1.6.0
+### Version: v2.5.0
 ### DNA-Signature: HOOPSTREET-AFFILIATE-LOGIC-2026
 ### Region: PH-LOCALIZED
 
@@ -14,6 +14,7 @@
 | 15 seconds | Exactly 5 shots | 3 seconds |
 | 30 seconds | Exactly 10 shots | 3 seconds |
 | 45 seconds | Exactly 15 shots | 3 seconds |
+| 55 seconds | Exactly 18 shots | 3 seconds |
 
 RULE: No exceptions. Every shot = 3 seconds exactly.
 
@@ -31,6 +32,8 @@ RULE: No exceptions. Every shot = 3 seconds exactly.
 | Motor/Car | Pogi points, upgrade |
 | Audio | Crystal clear, bass-heavy |
 | Gaming | No lag, RGB setup |
+| Sports | Full sublimation, custom IGN, sulit-tela |
+| Tools | Heavy-duty, rechargeable, handy |
 
 
 ## 3. Localization: Taglish Protocol
@@ -75,6 +78,7 @@ Shot Count: [5/10/15] shots
 Total Shots: [number]
 Audio Style: Taglish voiceover
 Resolution: 4K Vertical 9:16
+Infinity Loop: Enabled - video auto-replays seamlessly
 
 ### Card 4: Video Storyboard Card
 [VIDEO STORYBOARD CARD]
@@ -92,6 +96,11 @@ Column: negative_prompt
 low quality, blurry, distorted, glitch, watermark
 
 Column: final_title
+
+### Shot Matching Rule:
+- Each positive_prompt shot MUST have matching negative_prompt shot
+- 1-to-1 Mapping: 5 positive shots = 5 negative shots
+- Movement-specific anti-glitch keywords per shot
 🔥 MUST-HAVE! [Product] #Hashtag1 #Hashtag2 #Hashtag3
 
 
@@ -114,6 +123,14 @@ Keywords: PD fast charge, compact, LED indicator
 Forbidden: stretch test, double-lined
 
 ### Motor/Car
+
+### Sports/Jerseys
+Keywords: moisture wicking, customized name, durable print, full sublimation
+Forbidden: fast-charging, RGB, noise cancellation
+
+### Tools/Hardware
+Keywords: cordless, high torque, multi-bit, compact storage, LED work light
+Forbidden: oversized fit, breathable, aesthetic decor
 Keywords: upgradable, porma, DIY installation
 Forbidden: soft fabric, aesthetic decor
 
@@ -154,6 +171,7 @@ Forbidden: soft fabric, aesthetic decor
 | Length | 80-100 characters |
 | Structure | Hook + Benefit + Urgency |
 | Hashtags | Exactly 5 |
+| Length Enforcement | 80-100 characters strict |
 
 Valid Example:
 🔥 MUST-HAVE! Grabe ang quality nito | Product #BudolFinds

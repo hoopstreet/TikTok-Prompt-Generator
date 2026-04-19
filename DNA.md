@@ -75,6 +75,14 @@ This project is designed for "Zero-Local-Load" development.
 
 ### Output Fields (Database Column Mapping)
 
+### Supabase Backend Tables
+| Table | Purpose | Methods |
+|-------|---------|---------|
+| generation_history | Stores all generated prompts | save, get, delete |
+| training_materials | AI behavior rules | save, get, update, delete |
+| chat_history | Conversation memory | save, get, delete old |
+| testing_explorer | Test results tracking | save, get, stats |
+
 | Column | Format | Description |
 |--------|--------|-------------|
 | positive_prompt | Shot-by-shot visual + dialogue | Video prompt |
@@ -83,7 +91,7 @@ This project is designed for "Zero-Local-Load" development.
 
 ---
 
-## 📦 7. Current Version: v1.6.0
+## 📦 7. Current Version: v2.5.0
 
 ### Features Implemented
 
@@ -93,6 +101,14 @@ This project is designed for "Zero-Local-Load" development.
 - Image URL Analyzer (ByteDance CDN)
 - Shot-Based Script Generation
 - Database Column Mapping
+
+### Supabase Backend Tables
+| Table | Purpose | Methods |
+|-------|---------|---------|
+| generation_history | Stores all generated prompts | save, get, delete |
+| training_materials | AI behavior rules | save, get, update, delete |
+| chat_history | Conversation memory | save, get, delete old |
+| testing_explorer | Test results tracking | save, get, stats |
 - Mobile-Safe Code Delivery
 
 
@@ -122,6 +138,17 @@ echo "nameserver 8.8.8.8" > /etc/resolv.conf
 ## 📌 9. Version History
 
 ### v1.6.0 (2026-04-19) - STABLE
+
+### v2.5.0 (2026-04-19) - STABLE
+- Full Supabase integration (4 tables)
+- testing_explorer table for test results
+- Singleton connection pattern
+- Environment variables with .env.template
+- Selectable history rows with export
+- 55s duration (18 shots) added
+- Sports and Tools niches added
+- Infinity loop enabled
+- Shot matching rule enforced
 - 4-card output protocol
 - Full AI_TRAINING_CORE.md integration
 - Matched input fields
@@ -151,9 +178,11 @@ GitHub Actions (hf-sync.yml)
 Hugging Face Space (pulls image)
     ↓
 Model loaded from HF Model Hub at runtime
+    ↓
+Supabase Cloud (generation_history, training_materials, chat_history, testing_explorer)
 
 ---
 
 **DNA-Signature: HOOPSTREET-AFFILIATE-LOGIC-2026**
-**Version: v1.6.0**
+**Version: v2.5.0**
 
