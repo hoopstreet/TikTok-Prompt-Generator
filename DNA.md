@@ -208,3 +208,44 @@ v1.1.3: [STABLE] Infrastructure Gold - Absolute Imports v1.1.3: [CURRENT] Torch 
 - Docker Hub: `hoopstreet/tiktok-prompt-generator:v1.3.3`
 - HF Space: Pulls v1.3.3 automatically on sync
 
+
+---
+
+## 🚨 v1.4.1 [CRITICAL PROTOCOL UPDATE - MOBILE SAFE MODE]
+
+### 🔥 Problem Fixed
+- iSH terminal freezing due to long code blocks
+- Nested bash corruption (`cat <<EOF inside EOF`)
+- Missing EOF termination
+- Clipboard overflow on iPhone
+
+---
+
+### ✅ NEW MANDATORY RULES (STRICT)
+
+#### 1. HARD LENGTH LIMIT
+- ❌ Any block >150 characters WITHOUT split = INVALID
+- ✅ MUST split into multiple `cat <<EOF` parts
+
+---
+
+#### 2. EOF SAFETY RULE
+Every block MUST:
+- Start with:
+  cat << 'EOF' > file
+  OR
+  cat << 'EOF' >> file
+
+- End with:
+  EOF
+
+- ❌ NEVER nest another `cat <<EOF` inside
+
+---
+
+#### 3. FRAGMENTATION FORMAT (ENFORCED)
+
+Correct pattern:
+
+cat << 'EOF' > file
+[PART 1]
