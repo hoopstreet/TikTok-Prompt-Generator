@@ -135,6 +135,10 @@ EOF
 # Never nest cat inside cat
 ```
 
+### Rule 5: MOBILE-FIRST
+- Assume iPhone iSH environment
+- Break long strings into multiple lines
+
 ✅ OPTION 1 (SAFE — recommended)
 
 Pull first, then push:
@@ -160,10 +164,6 @@ Warning:
 
 * This will overwrite remote history
 * Can delete others’ commits
-
-### Rule 5: MOBILE-FIRST
-- Assume iPhone iSH environment
-- Break long strings into multiple lines
 
 ## 📌 9. Version History
 
