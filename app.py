@@ -120,18 +120,20 @@ Background: Clean, uncluttered."""
             negatives.append(negative)
         return negatives
 
-    def generate_final_title(self, product_title, niche):
+    def generate_final_title(self, product_title, about, description, niche):
         hashtags = " #TikTokMadeMeBuyIt #BudolFinds #Sulit #Quality #Affiliate"
-        base_title = f"🔥 MUST-HAVE! {product_title[:40]} | {niche.upper()} Finds"
+        text_source = (product_title + " " + about + " " + description)[:60]
+        base_title = f"🔥 MUST-HAVE! {text_source} | {niche.upper()}"
         final_title = base_title + hashtags
         if len(final_title) > 100:
-            base_title = f"🔥 {product_title[:35]} | {niche.upper()}"
+            base_title = f"🔥 {text_source[:50]} | {niche.upper()}"
             final_title = base_title + hashtags
         if len(final_title) > 100:
-            base_title = f"🔥 {product_title[:30]}"
+            base_title = f"🔥 {product_title[:40]}"
             final_title = base_title + hashtags
         if len(final_title) < 80:
-            final_title = f"🔥 MUST-HAVE! {product_title[:45]} | Shop now!{hashtags}"
+            extra = description[:30] if description else "Shop now"
+            final_title = f"🔥 {product_title[:40]} - {extra}{hashtags}"
         return final_title[:100]
 
     def save_to_supabase(self, input_data, analyst_data, final_output):
@@ -166,7 +168,7 @@ Background: Clean, uncluttered."""
         positives = "\n\n".join(scripts)
         negatives_list = self.generate_negative_prompt(scripts)
         negatives = "\n\n".join(negatives_list)
-        final_title = self.generate_final_title(product_title, niche)
+        final_title = self.generate_final_title(product_title, about_this_product, product_description, niche)
         
         output = f"""positive_prompt
 
@@ -282,16 +284,15 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
     with gr.Row():
         with gr.Column(scale=1):
             gr.Markdown("### Generation History")
-            with gr.Row():
-                format_dropdown = gr.Dropdown(label="Format", choices=["CSV", "JSON", "Markdown"], scale=1)
-                export_btn = gr.Button("Download", scale=0, size="sm")
-            
             history_display = gr.Dataframe(
                 label="",
                 headers=["ID", "Timestamp", "Positive Prompt", "Negative Prompt", "Final Title"],
-                interactive=False,
+                interactive=True,
                 wrap=True
             )
+            with gr.Row():
+                download_btn = gr.Button("Download", variant="secondary", size="sm")
+                download_status = gr.Textbox(label="", visible=False)
     
     history_state = gr.State([])
     
@@ -305,19 +306,74 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
         outputs=[history_display]
     )
     
-    def export_with_format(history, fmt):
-        if fmt == "CSV":
-            return generator.export_to_csv(history)
-        elif fmt == "JSON":
-            return generator.export_to_json(history)
-        elif fmt == "Markdown":
-            return generator.export_to_markdown(history)
-        return "Select format"
+    def get_selected_rows(history, evt: gr.SelectData):
+        selected_indices = evt.index
+        if isinstance(selected_indices, (int, list)):
+            if isinstance(selected_indices, int):
+                selected_indices = [selected_indices]
+            selected = [history[i] for i in selected_indices if i < len(history)]
+            return selected
+        return []
     
-    export_btn.click(
+    selected_history = gr.State([])
+    
+    history_display.select(
+        fn=get_selected_rows,
+        inputs=[history_state],
+        outputs=[selected_history]
+    )
+    
+    def export_with_format(history, selected, fmt):
+        export_data = selected if selected else history
+        if not export_data:
+            return "No data selected"
+        if fmt == "CSV":
+            df = pd.DataFrame([{
+                "ID": h["id"],
+                "Timestamp": h["timestamp"],
+                "Positive Prompt": h["positive_prompt"],
+                "Negative Prompt": h["negative_prompt"],
+                "Final Title": h["final_title"]
+            } for h in export_data])
+            return df.to_csv(index=False)
+        elif fmt == "JSON":
+            return json.dumps([{
+                "id": h["id"],
+                "timestamp": h["timestamp"],
+                "positive_prompt": h["positive_prompt"],
+                "negative_prompt": h["negative_prompt"],
+                "final_title": h["final_title"]
+            } for h in export_data], indent=2)
+        elif fmt == "Markdown":
+            md = "# Selected History\n\n"
+            for h in export_data:
+                md += f"## {h['timestamp']} - ID: {h['id']}\n\n"
+                md += f"**Positive Prompt:**\n{h['positive_prompt']}\n\n"
+                md += f"**Negative Prompt:**\n{h['negative_prompt']}\n\n"
+                md += f"**Final Title:**\n{h['final_title']}\n\n---\n\n"
+            return md
+        return "Invalid format"
+    
+    with gr.Row():
+        with gr.Column(scale=1):
+            format_radio = gr.Radio(choices=["CSV", "JSON", "Markdown"], label="Export Format", value="CSV")
+            download_confirm_btn = gr.Button("Confirm Download", variant="primary", size="sm")
+            download_output = gr.Textbox(label="Export Data", lines=10, visible=False)
+    
+    download_btn.click(
+        fn=lambda: gr.update(visible=True),
+        inputs=[],
+        outputs=[format_radio]
+    )
+    
+    download_confirm_btn.click(
         fn=export_with_format,
-        inputs=[history_state, format_dropdown],
-        outputs=[output]
+        inputs=[history_state, selected_history, format_radio],
+        outputs=[download_output]
+    ).then(
+        fn=lambda: gr.update(visible=False),
+        inputs=[],
+        outputs=[format_radio]
     )
 
 if __name__ == "__main__":
