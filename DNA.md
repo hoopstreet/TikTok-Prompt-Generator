@@ -249,3 +249,73 @@ Correct pattern:
 
 cat << 'EOF' > file
 [PART 1]
+
+---
+
+## 🚨 v1.4.1 [CRITICAL PROTOCOL UPDATE - MOBILE SAFE MODE]
+
+### 🔥 Problem Fixed
+- iSH terminal freezing due to long code blocks
+- Nested bash corruption (cat <<EOF inside EOF)
+- Missing EOF termination
+- Clipboard overflow on iPhone
+
+---
+
+### ✅ NEW MANDATORY RULES (STRICT)
+
+#### 1. HARD LENGTH LIMIT
+- ❌ Any block >150 characters WITHOUT split = INVALID
+- ✅ MUST split into multiple cat <<EOF parts
+
+#### 2. EOF SAFETY RULE
+Every block MUST:
+- Start with: cat << 'EOF' > file OR cat << 'EOF' >> file
+- End with: EOF
+- ❌ NEVER nest another cat <<EOF inside
+
+#### 3. FRAGMENTATION FORMAT (ENFORCED)
+Correct pattern:
+cat << 'EOF' > file
+[PART 1]
+
+## v1.4.1 PROTOCOL UPDATE - MOBILE SAFE MODE
+
+### Fixed Issues:
+- iSH terminal freezing from long code blocks
+- Nested bash corruption
+- Missing EOF termination
+- Clipboard overflow on iPhone
+
+
+### NEW RULES:
+
+1. HARD LENGTH LIMIT:
+   - Blocks >150 chars MUST be split
+   - Use multiple cat EOF parts
+
+2. EOF SAFETY:
+   - Start: cat << 'EOF' > file
+   - End: EOF
+   - Never nest cat inside cat
+
+
+3. FRAGMENTATION FORMAT:
+   cat << 'EOF' > file
+   [PART 1]
+   EOF
+   cat << 'EOF' >> file
+   [PART 2]
+   EOF
+
+4. MOBILE FIRST:
+   - Assume iPhone iSH
+   - Break long strings
+   - Clean separation only
+
+
+### VERSION STATUS:
+- Previous: v1.4.0
+- Current: v1.4.1
+- Status: STABLE
+
