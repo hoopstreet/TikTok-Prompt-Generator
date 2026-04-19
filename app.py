@@ -4,9 +4,10 @@ import re
 import requests
 import json
 import uuid
+import pandas as pd
 from datetime import datetime
 from PIL import Image
-from io import BytesIO
+from io import BytesIO, StringIO
 
 class TikTokProductGenerator:
     def __init__(self):
@@ -120,8 +121,8 @@ Background: Clean, uncluttered background that does not distract from the produc
         return negatives
 
     def generate_final_title(self, product_title, niche):
-        base_title = f"🔥 MUST-HAVE! {product_title[:40]} | {niche.upper()} Finds"
         hashtags = " #TikTokMadeMeBuyIt #BudolFinds #Sulit #Quality #Affiliate"
+        base_title = f"🔥 MUST-HAVE! {product_title[:40]} | {niche.upper()} Finds"
         final_title = base_title + hashtags
         if len(final_title) > 100:
             base_title = f"🔥 {product_title[:35]} | {niche.upper()}"
@@ -133,7 +134,7 @@ Background: Clean, uncluttered background that does not distract from the produc
             final_title = f"🔥 MUST-HAVE! {product_title[:45]} | Shop now!{hashtags}"
         return final_title[:100]
 
-    def save_analyst_to_supabase(self, input_data, analyst_data):
+    def save_to_supabase(self, input_data, analyst_data, final_output):
         try:
             import supabase
             from supabase import create_client
@@ -146,9 +147,10 @@ Background: Clean, uncluttered background that does not distract from the produc
                     "id": str(uuid.uuid4()),
                     "input_field": input_data,
                     "analyst_product": analyst_data,
+                    "final_output": final_output,
                     "created_at": datetime.now().isoformat()
                 }
-                client.table("analyst_history").insert(data).execute()
+                client.table("generation_history").insert(data).execute()
                 return True
         except:
             return False
@@ -160,13 +162,7 @@ Background: Clean, uncluttered background that does not distract from the produc
         shots = self.shot_counts[duration]
         features = analyst_data["detected_features"]
         image_status = analyst_data["image_status"]
-        input_data = {
-            "product_title": product_title,
-            "about_this_product": about_this_product,
-            "product_description": product_description,
-            "image_url": image_url
-        }
-        self.save_analyst_to_supabase(input_data, analyst_data)
+        
         scripts = self.generate_positive_prompt(niche, duration, product_title, shots, features)
         positives = "\n\n".join(scripts)
         negatives_list = self.generate_negative_prompt(scripts)
@@ -188,9 +184,72 @@ negative_prompt
 final_title
 
 {final_title}"""
-        return output
+        
+        input_data = {
+            "product_title": product_title,
+            "about_this_product": about_this_product,
+            "product_description": product_description,
+            "image_url": image_url
+        }
+        final_output_data = {
+            "positive_prompt": positives,
+            "negative_prompt": negatives,
+            "final_title": final_title
+        }
+        self.save_to_supabase(input_data, analyst_data, final_output_data)
+        
+        history_entry = {
+            "id": len(self.history) + 1,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "product_title": product_title[:50],
+            "niche": niche,
+            "output": output
+        }
+        self.history.append(history_entry)
+        
+        return output, self.history
+
+    def export_to_csv(self, history):
+        if not history:
+            return "No history to export"
+        df = pd.DataFrame(history)
+        csv_buffer = StringIO()
+        df.to_csv(csv_buffer, index=False)
+        return csv_buffer.getvalue()
+    
+    def export_to_json(self, history):
+        if not history:
+            return "No history to export"
+        return json.dumps(history, indent=2)
+    
+    def export_to_markdown(self, history):
+        if not history:
+            return "No history to export"
+        md = "# Generated Output History\n\n"
+        for entry in history:
+            md += f"## {entry['timestamp']} - {entry['product_title']}\n"
+            md += f"**Niche:** {entry['niche']}\n\n"
+            md += f"```\n{entry['output'][:500]}...\n```\n\n---\n\n"
+        return md
+    
+    def clear_history(self):
+        self.history = []
+        return "History cleared", []
 
 generator = TikTokProductGenerator()
+
+def copy_output(output_text):
+    return output_text
+
+def export_selected_format(history, format_type):
+    if format_type == "CSV":
+        return generator.export_to_csv(history)
+    elif format_type == "JSON":
+        return generator.export_to_json(history)
+    elif format_type == "Markdown":
+        return generator.export_to_markdown(history)
+    else:
+        return "Invalid format"
 
 with gr.Blocks(title="TikTok-Prompt-Generator", theme="soft") as demo:
     gr.Markdown("# TikTok-Prompt-Generator")
@@ -204,12 +263,89 @@ with gr.Blocks(title="TikTok-Prompt-Generator", theme="soft") as demo:
             submit = gr.Button("Generate", variant="primary")
         
         with gr.Column(scale=1):
-            output = gr.Textbox(label="Generated Output", lines=45)
+            output = gr.Textbox(label="Generated Output", lines=35)
+            copy_btn = gr.Button("📋 Copy to Clipboard")
+            copy_status = gr.Textbox(label="Copy Status", visible=False)
+    
+    with gr.Row():
+        with gr.Column(scale=1):
+            gr.Markdown("### History Management")
+            refresh_btn = gr.Button("🔄 Refresh History")
+            clear_btn = gr.Button("🗑️ Clear History")
+            history_display = gr.Dataframe(label="Generation History", headers=["ID", "Timestamp", "Product", "Niche"])
+    
+    with gr.Row():
+        with gr.Column(scale=1):
+            gr.Markdown("### Export Options")
+            format_dropdown = gr.Dropdown(label="Export Format", choices=["CSV", "JSON", "Markdown"])
+            export_btn = gr.Button("📥 Export History")
+            export_output = gr.Textbox(label="Export Data", lines=10)
+    
+    with gr.Row():
+        with gr.Column(scale=1):
+            gr.Markdown("### Bulk Download")
+            bulk_csv_btn = gr.Button("📊 Download CSV")
+            bulk_json_btn = gr.Button("📄 Download JSON")
+            bulk_md_btn = gr.Button("📝 Download Markdown")
+            download_status = gr.Textbox(label="Download Status", visible=False)
+    
+    output_state = gr.State()
+    history_state = gr.State([])
     
     submit.click(
         fn=generator.generate,
         inputs=[product_title, about_this_product, product_description, image_url],
-        outputs=output
+        outputs=[output, history_state]
+    ).then(
+        fn=lambda h: [(i+1, h[i]['timestamp'], h[i]['product_title'], h[i]['niche']) for i in range(len(h))],
+        inputs=[history_state],
+        outputs=[history_display]
+    )
+    
+    refresh_btn.click(
+        fn=lambda h: [(i+1, h[i]['timestamp'], h[i]['product_title'], h[i]['niche']) for i in range(len(h))],
+        inputs=[history_state],
+        outputs=[history_display]
+    )
+    
+    clear_btn.click(
+        fn=generator.clear_history,
+        inputs=[],
+        outputs=[download_status, history_state]
+    ).then(
+        fn=lambda: [],
+        inputs=[],
+        outputs=[history_display]
+    )
+    
+    copy_btn.click(
+        fn=copy_output,
+        inputs=[output],
+        outputs=[copy_status]
+    )
+    
+    export_btn.click(
+        fn=export_selected_format,
+        inputs=[history_state, format_dropdown],
+        outputs=[export_output]
+    )
+    
+    bulk_csv_btn.click(
+        fn=lambda h: (generator.export_to_csv(h), "CSV exported"),
+        inputs=[history_state],
+        outputs=[export_output, download_status]
+    )
+    
+    bulk_json_btn.click(
+        fn=lambda h: (generator.export_to_json(h), "JSON exported"),
+        inputs=[history_state],
+        outputs=[export_output, download_status]
+    )
+    
+    bulk_md_btn.click(
+        fn=lambda h: (generator.export_to_markdown(h), "Markdown exported"),
+        inputs=[history_state],
+        outputs=[export_output, download_status]
     )
 
 if __name__ == "__main__":

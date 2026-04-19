@@ -7,3 +7,4 @@ huggingface-hub>=0.20.0
 accelerate>=0.25.0
 safetensors>=0.4.0
 supabase>=2.0.0
+pandas>=2.0.0
