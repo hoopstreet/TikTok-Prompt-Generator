@@ -266,7 +266,7 @@ generator = TikTokProductGenerator()
 def copy_output(output_text):
     return output_text
 
-with gr.Blocks(title="TikTok-Prompt-Generator", theme="soft") as demo:
+with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
     gr.Markdown("# TikTok-Prompt-Generator")
     
     with gr.Row():
@@ -298,8 +298,7 @@ with gr.Blocks(title="TikTok-Prompt-Generator", theme="soft") as demo:
                 label="",
                 headers=["ID", "Timestamp", "Positive Prompt", "Negative Prompt", "Final Title"],
                 interactive=False,
-                wrap=True,
-                height=400
+                wrap=True
             )
     
     output_state = gr.State()
