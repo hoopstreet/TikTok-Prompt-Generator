@@ -4,3 +4,4 @@
 *.yml text
 *.txt text
 Dockerfile text
+hf.Dockerfile text
