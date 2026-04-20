@@ -1,172 +1,286 @@
 import gradio as gr
 import random
+import re
+import requests
 import json
 import uuid
 import pandas as pd
 from datetime import datetime
-from io import StringIO
+from PIL import Image
+from io import BytesIO, StringIO
 
 class TikTokProductGenerator:
     def __init__(self):
+        self.durations = [15, 30, 45, 55]
+        self.shot_counts = {15: 5, 30: 10, 45: 15, 55: 18}
         self.history = []
-        self.selected_ids = []
+        self.selected_rows = []
+        self.conversation_id = str(uuid.uuid4())
+        
+    def detect_niche(self, title, about, description):
+        text = (title + " " + about + " " + description).lower()
+        niches = {
+            "apparel": ["shirt", "pants", "hoodie", "dress", "fabric", "shorts", "athletic", "varsity"],
+            "audio": ["earbuds", "headphones", "speaker", "bass", "wireless"],
+            "gaming": ["gaming", "mouse", "keyboard", "rgb", "controller"],
+            "tech": ["charger", "powerbank", "cable", "adapter", "usb"],
+            "motor": ["car", "motorcycle", "helmet", "tire", "oil"],
+            "home": ["lamp", "organizer", "storage", "kitchen", "furniture"],
+            "beauty": ["skincare", "makeup", "cream", "lotions", "serum"],
+            "sports": ["basketball", "mesh", "jersey", "sports"],
+            "tools": ["heavy-duty", "rechargeable", "cordless", "handy"],
+            "pets": ["dog", "cat", "pet", "chew", "toy"]
+        }
+        for niche, keywords in niches.items():
+            if any(k in text for k in keywords):
+                return niche
+        return "general"
 
-    def generate_positive_prompt(self, title, niche):
-        taglish_lines = [
-            "Grabe ang ganda nito! Sulit na sulit sa unang kita pa lang.",
-            "Solid ang quality mga idol! Ang tela presko at komportable.",
-            "Sulit na sulit sa presyo! Quality na quality hindi ka magsisisi.",
-            "Kunin niyo na yung sa'yo! Bilis ubos na ang stock.",
-            "Kailangan niyo to sa araw-araw! Sobrang useful at praktikal."
+    def analyze_image_url(self, image_url):
+        if not image_url:
+            return "No image provided"
+        try:
+            if "ibyteimg.com" in image_url or "tos-alisg" in image_url:
+                return "ByteDance CDN valid"
+            if "resize-webp" in image_url:
+                return "WebP format optimized"
+            response = requests.head(image_url, timeout=5)
+            if response.status_code == 200:
+                return "Image URL valid"
+            else:
+                return "Image URL may be invalid"
+        except:
+            return "Cannot verify - will process"
+
+    def analyze_product(self, title, about, description, image_url):
+        niche = self.detect_niche(title, about, description)
+        image_status = self.analyze_image_url(image_url)
+        text = (title + " " + about + " " + description).lower()
+        features = []
+        if "stretchy" in text or "stretch" in text:
+            features.append("Stretchy fabric")
+        if "lightweight" in text:
+            features.append("Lightweight material")
+        if "pocket" in text:
+            features.append("Side pockets")
+        if "elastic" in text:
+            features.append("Elastic waistband")
+        if "breathable" in text:
+            features.append("Breathable fabric")
+        if not features:
+            features = ["Premium quality", "Comfortable fit"]
+        return {
+            "niche": niche,
+            "image_status": image_status,
+            "detected_features": features,
+            "product_text_analysis": text[:200]
+        }
+
+    def generate_positive_prompt(self, niche, duration, product_name, shots, product_features):
+        scripts = []
+        taglish_dialogues = [
+            ("Grabe ang ganda nito! Sulit na sulit sa unang kita pa lang.", "Close-up product display"),
+            ("Solid ang quality mga idol! Ang tela presko at komportable.", "Fabric texture and feel"),
+            ("Sulit na sulit sa presyo! Quality na quality hindi ka magsisisi.", "Price and value reveal"),
+            ("Kunin niyo na yung sa'yo! Bilis ubos na ang stock.", "Call to action with basket"),
+            ("Kailangan niyo to sa araw-araw! Sobrang useful at praktikal.", "Daily use demonstration"),
+            ("Swerte niyo mga idol! Limited edition ito kaya grab na.", "Excitement and urgency"),
+            ("Panalo to mga boss! Best investment para sa inyo.", "Winner celebration"),
+            ("Mura pero quality! Budget-friendly na hindi tinipid sa tela.", "Price comparison")
         ]
         movements = ["Cinematic Pan", "Dynamic Zoom-in", "Handheld POV shake", "Slow-motion reveal"]
-        lighting = ["Soft Studio Lighting", "Natural Sunlight", "Neon Glow"]
-        shots = []
-        for i in range(5):
-            taglish = taglish_lines[i % len(taglish_lines)]
+        lighting = ["Soft Studio Lighting", "Natural Sunlight", "Neon Glow", "Warm Golden Hour"]
+        for i in range(shots):
+            taglish, action = taglish_dialogues[i % len(taglish_dialogues)]
             mov = movements[i % len(movements)]
             lit = lighting[i % len(lighting)]
-            shot = f"Shot {i+1:02d} (3.0s): 4K vertical 9:16 [{mov}] [{lit}] {taglish}"
-            shots.append(shot)
-        return "\n\n".join(shots)
-    
-    def generate_negative_prompt(self, shots_count=5):
+            feature_text = product_features[i % len(product_features)] if product_features else "Product feature"
+            script = f"""Shot {i+1:02d} ({duration/shots:.1f}s): 4K vertical 9:16
+Camera: {mov}
+Lighting: {lit}
+Framing: Medium Shot then Close-up
+Visual: Show {feature_text}. Logo visible.
+Dialogue: "{taglish}"
+Background: Clean, uncluttered."""
+            scripts.append(script)
+        return scripts
+
+    def generate_negative_prompt(self, scripts):
         negatives = []
-        for i in range(shots_count):
-            neg = f"Shot {i+1:02d} Negative: low quality, blurry, distorted, glitch, color bleed, deformed, watermark, low resolution, messy textures, robotic voice, formal language, text overlap, do not change logo position, do not alter fabric color"
-            negatives.append(neg)
-        return "\n\n".join(negatives)
-    
-    def generate_final_title(self, title, niche):
+        movements = ["Cinematic Pan", "Dynamic Zoom-in", "Handheld POV shake", "Slow-motion reveal"]
+        for i, script in enumerate(scripts):
+            mov = movements[i % len(movements)]
+            negative = f"""Shot {i+1:02d} Negative: low quality, blurry, distorted, glitch, color bleed, deformed, watermark, text overlay, low resolution, pixelation, messy textures, robotic voice, unnatural speech, formal language, Taglish required, text overlap, logo position change, fabric color alteration, object morphing, background clutter, poor lighting, lens flare, frame tearing."""
+            if "Pan" in mov:
+                negative += " no motion blur, no frame tearing, smooth transition."
+            elif "Zoom" in mov:
+                negative += " no pixelation, no quality loss, sharp focus."
+            elif "POV" in mov:
+                negative += " no excessive shake, no disorientation, stable."
+            elif "Slow" in mov:
+                negative += " no frame skipping, no ghosting, fluid motion."
+            negatives.append(negative)
+        return negatives
+
+    def generate_final_title(self, product_title, about, description, niche):
         hashtags = " #TikTokMadeMeBuyIt #BudolFinds #Sulit #Quality #Affiliate"
-        base = f"🔥 MUST-HAVE! {title[:40]} | {niche.upper()} Finds"
-        final = base + hashtags
-        if len(final) > 100:
-            final = f"🔥 {title[:35]} | {niche.upper()}{hashtags}"
-        if len(final) > 100:
-            final = f"🔥 {title[:30]}{hashtags}"
-        return final[:100]
+        text_source = (product_title + " " + about + " " + description)[:60]
+        base_title = f"🔥 MUST-HAVE! {text_source} | {niche.upper()}"
+        final_title = base_title + hashtags
+        if len(final_title) > 100:
+            base_title = f"🔥 {text_source[:50]} | {niche.upper()}"
+            final_title = base_title + hashtags
+        if len(final_title) > 100:
+            base_title = f"🔥 {product_title[:40]}"
+            final_title = base_title + hashtags
+        if len(final_title) < 80:
+            extra = description[:30] if description else "Shop now"
+            final_title = f"🔥 {product_title[:40]} - {extra}{hashtags}"
+        return final_title[:100]
 
-    def generate(self, title, about, desc, img):
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        new_id = len(self.history) + 1
+    def save_to_supabase(self, input_data, analyst_data, final_output):
+        try:
+            import supabase
+            from supabase import create_client
+            import os
+            url = os.environ.get("SUPABASE_URL")
+            key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+            if url and key:
+                client = create_client(url, key)
+                data = {
+                    "id": str(uuid.uuid4()),
+                    "input_field": input_data,
+                    "analyst_product": analyst_data,
+                    "final_output": final_output,
+                    "created_at": datetime.now().isoformat()
+                }
+                client.table("generation_history").insert(data).execute()
+                return True
+        except:
+            return False
+    def generate(self, product_title, about_this_product, product_description, image_url):
+        analyst_data = self.analyze_product(product_title, about_this_product, product_description, image_url)
+        niche = analyst_data["niche"]
+        duration = random.choice(self.durations)
+        shots = self.shot_counts[duration]
+        features = analyst_data["detected_features"]
         
-        # Detect niche
-        text = (title + " " + about + " " + desc).lower()
-        niches = {"apparel": ["shirt", "pants", "hoodie", "dress", "fabric", "shorts"], "audio": ["earbuds", "headphones", "speaker"], "gaming": ["gaming", "mouse", "keyboard"], "tech": ["charger", "powerbank", "cable"]}
-        niche = "general"
-        for n, keywords in niches.items():
-            if any(k in text for k in keywords):
-                niche = n
-                break
+        scripts = self.generate_positive_prompt(niche, duration, product_title, shots, features)
+        positives = "\n\n".join(scripts)
+        negatives_list = self.generate_negative_prompt(scripts)
+        negatives = "\n\n".join(negatives_list)
+        final_title = self.generate_final_title(product_title, about_this_product, product_description, niche)
         
-        pos = self.generate_positive_prompt(title, niche)
-        neg = self.generate_negative_prompt(5)
-        final_t = self.generate_final_title(title, niche)
+        output = f"""positive_prompt
+
+{positives}
+
+---
+
+negative_prompt
+
+{negatives}
+
+---
+
+final_title
+
+{final_title}"""
         
-        full_out = f"positive_prompt\n\n{pos}\n\n---\n\nnegative_prompt\n\n{neg}\n\n---\n\nfinal_title\n\n{final_t}"
-        
-        entry = {
-            "id": new_id,
-            "timestamp": timestamp,
-            "positive_prompt": pos[:200] + "..." if len(pos) > 200 else pos,
-            "negative_prompt": neg[:200] + "..." if len(neg) > 200 else neg,
-            "final_title": final_t,
-            "full_output": full_out
+        input_data = {
+            "product_title": product_title,
+            "about_this_product": about_this_product,
+            "product_description": product_description,
+            "image_url": image_url
         }
-        self.history.append(entry)
-        return full_out, self.history
+        final_output_data = {
+            "positive_prompt": positives,
+            "negative_prompt": negatives,
+            "final_title": final_title
+        }
+        self.save_to_supabase(input_data, analyst_data, final_output_data)
+        
+        history_entry = {
+            "id": len(self.history) + 1,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "positive_prompt": positives[:300] + "...",
+            "negative_prompt": negatives[:300] + "...",
+            "final_title": final_title,
+            "full_output": output
+        }
+        self.history.append(history_entry)
+        
+        return output, self.history
+    def export_to_csv(self, selected_data):
+        if not selected_data:
+            return "No data selected"
+        df = pd.DataFrame([{
+            "ID": h["id"],
+            "Timestamp": h["timestamp"],
+            "Positive Prompt": h["positive_prompt"],
+            "Negative Prompt": h["negative_prompt"],
+            "Final Title": h["final_title"]
+        } for h in selected_data])
+        csv_buffer = StringIO()
+        df.to_csv(csv_buffer, index=False)
+        return csv_buffer.getvalue()
+    
+    def export_to_json(self, selected_data):
+        if not selected_data:
+            return "No data selected"
+        export_data = [{
+            "id": h["id"],
+            "timestamp": h["timestamp"],
+            "positive_prompt": h["positive_prompt"],
+            "negative_prompt": h["negative_prompt"],
+            "final_title": h["final_title"]
+        } for h in selected_data]
+        return json.dumps(export_data, indent=2)
+    
+    def export_to_markdown(self, selected_data):
+        if not selected_data:
+            return "No data selected"
+        md = "# Selected Generation History\n\n"
+        md += "| ID | Timestamp | Positive Prompt | Negative Prompt | Final Title |\n"
+        md += "|----|-----------|-----------------|-----------------|-------------|\n"
+        for h in selected_data:
+            pos_short = h["positive_prompt"][:50] + "..." if len(h["positive_prompt"]) > 50 else h["positive_prompt"]
+            neg_short = h["negative_prompt"][:50] + "..." if len(h["negative_prompt"]) > 50 else h["negative_prompt"]
+            md += f"| {h['id']} | {h['timestamp']} | {pos_short} | {neg_short} | {h['final_title']} |\n"
+        return md
+    
+    def get_selected_data(self, history, selected_indices):
+        if not selected_indices:
+            return []
+        return [history[i-1] for i in selected_indices if i-1 < len(history)]
 
-gen = TikTokProductGenerator()
+generator = TikTokProductGenerator()
+
+def toggle_select_all(select_all, history):
+    if select_all:
+        return list(range(1, len(history) + 1))
+    return []
+
+def export_with_format(history, selected_ids, format_type):
+    selected_data = [h for h in history if h["id"] in selected_ids]
+    if format_type == "CSV":
+        return generator.export_to_csv(selected_data)
+    elif format_type == "JSON":
+        return generator.export_to_json(selected_data)
+    elif format_type == "Markdown":
+        return generator.export_to_markdown(selected_data)
+    return "Select format"
 
 custom_css = """
 body, .gradio-container { background-color: #1b1b1f !important; }
 .gr-button-primary { background-color: #FF6600 !important; border-color: #FF6600 !important; }
 .gr-button-primary:hover { background-color: #FF5500 !important; }
-/* Hide default copy button on textbox */
-.gr-textbox button.gr-button { display: none !important; }
-/* Table styling */
-.history-table { width: 100%; border-collapse: collapse; background: #2a2a2e; color: #e0e0e0; border-radius: 8px; font-family: monospace; font-size: 13px; }
-.history-table th { background: #1f1f23; color: #FF6600; padding: 12px 8px; border-bottom: 2px solid #FF6600; text-align: left; }
-.history-table td { padding: 10px 8px; border-bottom: 1px solid #3a3a3e; vertical-align: middle; }
-.history-table tr:hover { background-color: #3a3a3e; }
-/* Checkbox alignment */
-.history-table th:first-child, .history-table td:first-child { text-align: center; width: 40px; }
-.history-table th:nth-child(2), .history-table td:nth-child(2) { width: 60px; }
-.history-table th:nth-child(3), .history-table td:nth-child(3) { width: 160px; }
-.history-table th:last-child, .history-table td:last-child { width: 50px; text-align: center; }
-input[type="checkbox"] { accent-color: #FF6600; width: 18px; height: 18px; cursor: pointer; margin: 0; }
-/* Cell copy icons */
-.cell-copy { cursor: pointer; color: #FF6600; margin-left: 8px; font-size: 12px; opacity: 0.7; display: inline-block; background: transparent; border: none; }
-.cell-copy:hover { opacity: 1; color: #FF8844; }
-/* Download icon */
-.download-icon { cursor: pointer; color: #FF6600; font-size: 18px; background: transparent; border: none; }
-.download-icon:hover { color: #FF8844; }
-/* Dropdown menu */
-.dropdown-content { display: none; position: absolute; background: #2a2a2e; border: 1px solid #FF6600; min-width: 100px; border-radius: 4px; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-.dropdown-content a { color: white; padding: 8px 12px; text-decoration: none; display: block; cursor: pointer; font-size: 14px; }
-.dropdown-content a:hover { background: #FF6600; color: #1b1b1f; }
-.show { display: block; }
+input[type="checkbox"] { accent-color: #FF6600 !important; }
+.gr-dataframe { background-color: #2a2a2e !important; color: #FFFFFF !important; }
 footer { visibility: hidden; }
 """
 
-def get_table_html(history, selected_ids):
-    if not history:
-        return '<div style="padding: 40px; text-align: center; color: #888;">No history yet. Generate some prompts!</div>'
-    
-    html = '''
-    <table class="history-table">
-        <thead>
-            <tr>
-                <th><input type="checkbox" id="master_check" onchange="toggleAll(this)"></th>
-                <th>ID</th>
-                <th>Timestamp</th>
-                <th>Positive Prompt</th>
-                <th>Negative Prompt</th>
-                <th>Final Title</th>
-                <th><span class="download-icon" onclick="showBulkDrop(event)">⬇️</span></th>
-            </tr>
-        </thead>
-        <tbody>
-    '''
-    
-    for h in history:
-        checked = 'checked' if h['id'] in selected_ids else ''
-        pos_short = h['positive_prompt'][:80] + '...' if len(h['positive_prompt']) > 80 else h['positive_prompt']
-        neg_short = h['negative_prompt'][:80] + '...' if len(h['negative_prompt']) > 80 else h['negative_prompt']
-        title_short = h['final_title'][:80] + '...' if len(h['final_title']) > 80 else h['final_title']
-        
-        html += f'''
-            <tr>
-                <td style="text-align:center;"><input type="checkbox" class="row-check" data-id="{h['id']}" {checked} onchange="updateSelection()"></td>
-                <td>{h['id']}<button class="cell-copy" onclick="copyText('{h['id']}')">📋</button></td>
-                <td>{h['timestamp']}<button class="cell-copy" onclick="copyText('{h['timestamp']}')">📋</button></td>
-                <td>{pos_short}<button class="cell-copy" onclick="copyText(`{h['positive_prompt']}`)">📋</button></td>
-                <td>{neg_short}<button class="cell-copy" onclick="copyText(`{h['negative_prompt']}`)">📋</button></td>
-                <td>{title_short}<button class="cell-copy" onclick="copyText('{h['final_title']}')">📋</button></td>
-                <td style="text-align:center;"><button class="download-icon" onclick="showRowDrop(event, {h['id']})">⬇️</button></td>
-            </tr>
-        '''
-    
-    html += '''
-        </tbody>
-    </table>
-    <div id="bulkDrop" class="dropdown-content"><a onclick="doExport('bulk', 'CSV')">CSV</a><a onclick="doExport('bulk', 'JSON')">JSON</a><a onclick="doExport('bulk', 'Markdown')">Markdown</a></div>
-    <div id="rowDrop" class="dropdown-content"><a onclick="doExport('row', 'CSV')">CSV</a><a onclick="doExport('row', 'JSON')">JSON</a><a onclick="doExport('row', 'Markdown')">Markdown</a></div>
-    <script>
-        function copyText(text) { navigator.clipboard.writeText(text); }
-        function toggleAll(source) { document.querySelectorAll('.row-check').forEach(cb => cb.checked = source.checked); updateSelection(); }
-        function updateSelection() { let ids = Array.from(document.querySelectorAll('.row-check:checked')).map(cb => parseInt(cb.dataset.id)); let inp = document.querySelector('#selected_ids_input'); if(inp) { inp.value = JSON.stringify(ids); inp.dispatchEvent(new Event('change')); } }
-        function showBulkDrop(e) { e.stopPropagation(); let menu = document.getElementById('bulkDrop'); menu.classList.toggle('show'); let rect = e.target.getBoundingClientRect(); menu.style.top = (rect.bottom + window.scrollY) + 'px'; menu.style.left = (rect.left + window.scrollX - 80) + 'px'; }
-        function showRowDrop(e, rowId) { e.stopPropagation(); let menu = document.getElementById('rowDrop'); menu.classList.toggle('show'); menu.dataset.rowId = rowId; let rect = e.target.getBoundingClientRect(); menu.style.top = (rect.bottom + window.scrollY) + 'px'; menu.style.left = (rect.left + window.scrollX - 80) + 'px'; }
-        function doExport(type, format) { let ids = []; if(type === 'bulk') { ids = Array.from(document.querySelectorAll('.row-check:checked')).map(cb => parseInt(cb.dataset.id)); } else { ids = [parseInt(document.getElementById('rowDrop').dataset.rowId)]; } let trigger = document.querySelector('#export_trigger'); if(trigger) { trigger.value = JSON.stringify({ids: ids, format: format}); trigger.dispatchEvent(new Event('input', {bubbles: true})); } document.getElementById('bulkDrop').classList.remove('show'); document.getElementById('rowDrop').classList.remove('show'); }
-        document.addEventListener('click', function() { document.getElementById('bulkDrop').classList.remove('show'); document.getElementById('rowDrop').classList.remove('show'); });
-        window.copyText = copyText; window.toggleAll = toggleAll; window.updateSelection = updateSelection; window.showBulkDrop = showBulkDrop; window.showRowDrop = showRowDrop; window.doExport = doExport;
-    </script>
-    '''
-    return html
-
-with gr.Blocks(title="TikTok-Prompt-Generator", css=custom_css, theme="dark") as demo:
+with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
     gr.Markdown("# 🎬 TikTok-Prompt-Generator")
     
     with gr.Row():
@@ -179,60 +293,57 @@ with gr.Blocks(title="TikTok-Prompt-Generator", css=custom_css, theme="dark") as
     
     with gr.Row():
         with gr.Column(scale=1):
-            output = gr.Textbox(label="Generated Output", lines=20, show_copy_button=False)
+            output = gr.Textbox(label="Generated Output", lines=20)
     
     with gr.Row():
         with gr.Column(scale=1):
             gr.Markdown("### Generation History")
-            history_display = gr.HTML()
+            with gr.Row():
+                select_all_checkbox = gr.Checkbox(label="Select All", scale=0)
+                format_dropdown = gr.Dropdown(label="Format", choices=["CSV", "JSON", "Markdown"], scale=1)
+                export_btn = gr.Button("Download", scale=0, size="sm")
+            
+            history_display = gr.Dataframe(
+                label="",
+                headers=["ID", "Timestamp", "Positive Prompt", "Negative Prompt", "Final Title"],
+                interactive=False,
+                wrap=True
+            )
     
     history_state = gr.State([])
-    selected_ids_input = gr.Textbox(visible=False, elem_id="selected_ids_input")
-    export_trigger = gr.Textbox(visible=False, elem_id="export_trigger")
-    download_file = gr.File(label="Download", visible=False)
+    selected_ids_state = gr.State([])
     
     generate_btn.click(
-        fn=gen.generate,
+        fn=generator.generate,
         inputs=[product_title, about_this_product, product_description, image_url],
         outputs=[output, history_state]
     ).then(
-        fn=get_table_html,
-        inputs=[history_state, gr.State([])],
+        fn=lambda h: [[h[i]["id"], h[i]["timestamp"], h[i]["positive_prompt"], h[i]["negative_prompt"], h[i]["final_title"]] for i in range(len(h))],
+        inputs=[history_state],
         outputs=[history_display]
     )
     
-    selected_ids_input.change(
-        fn=lambda x: json.loads(x) if x else [],
-        inputs=[selected_ids_input],
-        outputs=[gr.State([])]
-    ).then(
-        fn=get_table_html,
-        inputs=[history_state, gr.State([])],
-        outputs=[history_display]
+    select_all_checkbox.change(
+        fn=toggle_select_all,
+        inputs=[select_all_checkbox, history_state],
+        outputs=[selected_ids_state]
     )
     
-    def do_export(export_data, history):
-        if not export_data:
-            return None
-        data = json.loads(export_data)
-        ids = data.get("ids", [])
-        fmt = data.get("format", "CSV")
-        selected = [h for h in history if h["id"] in ids]
-        if not selected:
-            return None
-        df = pd.DataFrame([{
-            "ID": h["id"],
-            "Timestamp": h["timestamp"],
-            "Positive Prompt": h["positive_prompt"],
-            "Negative Prompt": h["negative_prompt"],
-            "Final Title": h["final_title"]
-        } for h in selected])
-        ext = "csv" if fmt == "CSV" else "json" if fmt == "JSON" else "md"
-        content = df.to_csv(index=False) if fmt == "CSV" else df.to_json(orient="records") if fmt == "JSON" else df.to_markdown(index=False)
-        filename = f"export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{ext}"
-        return gr.File(value=(content, filename), visible=True)
+    def get_selected_from_table(evt: gr.SelectData, history):
+        if evt.index:
+            return [history[i]["id"] for i in evt.index if i < len(history)]
+        return []
     
-    export_trigger.change(do_export, [export_trigger, history_state], [download_file])
+    history_display.select(
+        fn=get_selected_from_table,
+        inputs=[history_state],
+        outputs=[selected_ids_state]
+    )
+    
+    export_btn.click(
+        fn=export_with_format,
+        inputs=[history_state, selected_ids_state, format_dropdown],
+        outputs=[output]
+    )
 
-if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=7860)
+demo.launch(server_name="0.0.0.0", server_port=7860, css=custom_css)
