@@ -213,49 +213,6 @@ final_title
         
         return output, self.history
 
-    def export_to_csv(self, selected_data):
-        if not selected_data:
-            return "No data selected"
-        df = pd.DataFrame([{
-            "ID": h["id"],
-            "Timestamp": h["timestamp"],
-            "Positive Prompt": h["positive_prompt"],
-            "Negative Prompt": h["negative_prompt"],
-            "Final Title": h["final_title"]
-        } for h in selected_data])
-        csv_buffer = StringIO()
-        df.to_csv(csv_buffer, index=False)
-        return csv_buffer.getvalue()
-    
-    def export_to_json(self, selected_data):
-        if not selected_data:
-            return "No data selected"
-        export_data = [{
-            "id": h["id"],
-            "timestamp": h["timestamp"],
-            "positive_prompt": h["positive_prompt"],
-            "negative_prompt": h["negative_prompt"],
-            "final_title": h["final_title"]
-        } for h in selected_data]
-        return json.dumps(export_data, indent=2)
-    
-    def export_to_markdown(self, selected_data):
-        if not selected_data:
-            return "No data selected"
-        md = "# Selected Generation History\n\n"
-        md += "| ID | Timestamp | Positive Prompt | Negative Prompt | Final Title |\n"
-        md += "|----|-----------|-----------------|-----------------|-------------|\n"
-        for h in selected_data:
-            pos_short = h["positive_prompt"][:50] + "..." if len(h["positive_prompt"]) > 50 else h["positive_prompt"]
-            neg_short = h["negative_prompt"][:50] + "..." if len(h["negative_prompt"]) > 50 else h["negative_prompt"]
-            md += f"| {h['id']} | {h['timestamp']} | {pos_short} | {neg_short} | {h['final_title']} |\n"
-        return md
-    
-    def get_selected_data(self, history, selected_indices):
-        if not selected_indices:
-            return []
-        return [history[i-1] for i in selected_indices if i-1 < len(history)]
-
 generator = TikTokProductGenerator()
 
 def toggle_select_all(select_all, history):
@@ -263,46 +220,210 @@ def toggle_select_all(select_all, history):
         return list(range(1, len(history) + 1))
     return []
 
+def export_to_csv(selected_data):
+    if not selected_data:
+        return "No data selected"
+    df = pd.DataFrame([{
+        "ID": h["id"],
+        "Timestamp": h["timestamp"],
+        "Positive Prompt": h["positive_prompt"],
+        "Negative Prompt": h["negative_prompt"],
+        "Final Title": h["final_title"]
+    } for h in selected_data])
+    csv_buffer = StringIO()
+    df.to_csv(csv_buffer, index=False)
+    return csv_buffer.getvalue()
+
+def export_to_json(selected_data):
+    if not selected_data:
+        return "No data selected"
+    export_data = [{
+        "id": h["id"],
+        "timestamp": h["timestamp"],
+        "positive_prompt": h["positive_prompt"],
+        "negative_prompt": h["negative_prompt"],
+        "final_title": h["final_title"]
+    } for h in selected_data]
+    return json.dumps(export_data, indent=2)
+
+def export_to_markdown(selected_data):
+    if not selected_data:
+        return "No data selected"
+    md = "# Selected Generation History\n\n"
+    md += "| ID | Timestamp | Positive Prompt | Negative Prompt | Final Title |\n"
+    md += "|----|-----------|-----------------|-----------------|-------------|\n"
+    for h in selected_data:
+        pos_short = h["positive_prompt"][:50] + "..." if len(h["positive_prompt"]) > 50 else h["positive_prompt"]
+        neg_short = h["negative_prompt"][:50] + "..." if len(h["negative_prompt"]) > 50 else h["negative_prompt"]
+        md += f"| {h['id']} | {h['timestamp']} | {pos_short} | {neg_short} | {h['final_title']} |\n"
+    return md
+
+def get_selected_data(history, selected_ids):
+    return [h for h in history if h["id"] in selected_ids]
+
 def export_with_format(history, selected_ids, format_type):
-    selected_data = [h for h in history if h["id"] in selected_ids]
+    selected_data = get_selected_data(history, selected_ids)
     if format_type == "CSV":
-        return generator.export_to_csv(selected_data)
+        return export_to_csv(selected_data)
     elif format_type == "JSON":
-        return generator.export_to_json(selected_data)
+        return export_to_json(selected_data)
     elif format_type == "Markdown":
-        return generator.export_to_markdown(selected_data)
+        return export_to_markdown(selected_data)
     return "Select format"
 
 custom_css = """
 body, .gradio-container { background-color: #1b1b1f !important; }
 .gr-button-primary { background-color: #FF6600 !important; border-color: #FF6600 !important; }
 .gr-button-primary:hover { background-color: #FF5500 !important; }
-input[type="checkbox"] { accent-color: #FF6600 !important; }
-.gr-dataframe { background-color: #2a2a2e !important; color: #FFFFFF !important; }
-.gr-dataframe table { width: 100%; border-collapse: collapse; }
-.gr-dataframe th, .gr-dataframe td { padding: 12px; text-align: left; border-bottom: 1px solid #3a3a3e; }
-.gr-dataframe th { background-color: #1f1f23; color: #FF6600; }
-.copy-icon { cursor: pointer; color: #FF6600; margin-left: 8px; font-size: 14px; display: inline-block; }
+input[type="checkbox"] { accent-color: #FF6600 !important; width: 18px; height: 18px; cursor: pointer; }
+.history-table { width: 100%; border-collapse: collapse; background-color: #2a2a2e; border-radius: 8px; overflow: hidden; }
+.history-table th { background-color: #1f1f23; color: #FF6600; padding: 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #FF6600; }
+.history-table td { padding: 12px; text-align: left; border-bottom: 1px solid #3a3a3e; color: #e0e0e0; vertical-align: middle; }
+.history-table tr:hover { background-color: #3a3a3e; }
+.copy-icon { cursor: pointer; color: #FF6600; margin-left: 8px; font-size: 14px; display: inline-block; background: transparent; border: none; }
 .copy-icon:hover { color: #FF8844; }
-.download-icon { cursor: pointer; color: #FF6600; font-size: 18px; }
+.download-icon { cursor: pointer; color: #FF6600; font-size: 18px; background: transparent; border: none; }
 .download-icon:hover { color: #FF8844; }
-.dropdown-menu { background-color: #2a2a2e; border: 1px solid #FF6600; border-radius: 4px; }
-.dropdown-item { padding: 8px 16px; cursor: pointer; color: white; }
-.dropdown-item:hover { background-color: #FF6600; }
+.dropdown { position: relative; display: inline-block; }
+.dropdown-content { display: none; position: absolute; right: 0; background-color: #2a2a2e; min-width: 120px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1000; border: 1px solid #FF6600; border-radius: 4px; }
+.dropdown-content a { color: white; padding: 10px 16px; text-decoration: none; display: block; cursor: pointer; }
+.dropdown-content a:hover { background-color: #FF6600; color: #1b1b1f; }
+.show { display: block; }
 footer { visibility: hidden; }
 """
 
-def create_table_with_copy_icons(history):
+def generate_history_html(history, selected_ids):
     if not history:
-        return []
-    table_data = []
+        return '<div style="padding: 20px; text-align: center; color: #888;">No history yet. Generate some prompts!</div>'
+    
+    html = '''
+    <table class="history-table">
+        <thead>
+            <tr>
+                <th style="width: 40px;"><input type="checkbox" id="select_all_checkbox" onchange="toggleAllCheckboxes(this)"></th>
+                <th style="width: 60px;">ID</th>
+                <th style="width: 160px;">Timestamp</th>
+                <th>Positive Prompt</th>
+                <th>Negative Prompt</th>
+                <th style="width: 100px;">Final Title</th>
+                <th style="width: 60px;"><span class="download-icon" onclick="showBulkDropdown(event)">⬇️</span></th>
+            </tr>
+        </thead>
+        <tbody>
+    '''
+    
     for h in history:
-        pos_cell = f'<span>{h["positive_prompt"]}</span><span class="copy-icon" onclick="copyToClipboard(`{h["positive_prompt"]}`)">📋</span>'
-        neg_cell = f'<span>{h["negative_prompt"]}</span><span class="copy-icon" onclick="copyToClipboard(`{h["negative_prompt"]}`)">📋</span>'
-        title_cell = f'<span>{h["final_title"]}</span><span class="copy-icon" onclick="copyToClipboard(`{h["final_title"]}`)">📋</span>'
-        action_cell = '<span class="download-icon" onclick="showExportDropdown(this)">⬇️</span>'
-        table_data.append(["", h["id"], h["timestamp"], pos_cell, neg_cell, title_cell, action_cell])
-    return table_data
+        is_checked = 'checked' if h["id"] in selected_ids else ''
+        pos_short = h["positive_prompt"][:100] + "..." if len(h["positive_prompt"]) > 100 else h["positive_prompt"]
+        neg_short = h["negative_prompt"][:100] + "..." if len(h["negative_prompt"]) > 100 else h["negative_prompt"]
+        title_short = h["final_title"][:80] + "..." if len(h["final_title"]) > 80 else h["final_title"]
+        
+        html += f'''
+            <tr>
+                <td style="text-align: center;"><input type="checkbox" class="row_checkbox" data-id="{h["id"]}" {is_checked} onchange="updateSelectedIds()"></td>
+                <td>{h["id"]}<span class="copy-icon" onclick="copyToClipboard('{h["id"]}')">📋</span></td>
+                <td>{h["timestamp"]}<span class="copy-icon" onclick="copyToClipboard('{h["timestamp"]}')">📋</span></td>
+                <td>{pos_short}<span class="copy-icon" onclick="copyToClipboard(`{h["positive_prompt"]}`)">📋</span></td>
+                <td>{neg_short}<span class="copy-icon" onclick="copyToClipboard(`{h["negative_prompt"]}`)">📋</span></td>
+                <td>{title_short}<span class="copy-icon" onclick="copyToClipboard('{h["final_title"]}')">📋</span></td>
+                <td><span class="download-icon" onclick="showRowDropdown(event, {h["id"]})">⬇️</span></td>
+            </tr>
+        '''
+    
+    html += '''
+        </tbody>
+    </table>
+    <div id="bulkDropdown" class="dropdown-content" style="position: absolute;">
+        <a onclick="exportFormat('CSV', true)">CSV</a>
+        <a onclick="exportFormat('JSON', true)">JSON</a>
+        <a onclick="exportFormat('Markdown', true)">Markdown</a>
+    </div>
+    <div id="rowDropdown" class="dropdown-content" style="position: absolute;">
+        <a onclick="exportFormat('CSV', false)">CSV</a>
+        <a onclick="exportFormat('JSON', false)">JSON</a>
+        <a onclick="exportFormat('Markdown', false)">Markdown</a>
+    </div>
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+        }
+        
+        function toggleAllCheckboxes(source) {
+            const checkboxes = document.querySelectorAll('.row_checkbox');
+            for (let i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = source.checked;
+            }
+            updateSelectedIds();
+        }
+        
+        function updateSelectedIds() {
+            const checkboxes = document.querySelectorAll('.row_checkbox:checked');
+            const ids = Array.from(checkboxes).map(cb => parseInt(cb.dataset.id));
+            const selectedIdsInput = document.querySelector('#selected_ids_input');
+            if (selectedIdsInput) {
+                selectedIdsInput.value = JSON.stringify(ids);
+                selectedIdsInput.dispatchEvent(new Event('change'));
+            }
+        }
+        
+        function showBulkDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('bulkDropdown');
+            dropdown.classList.toggle('show');
+            const rect = event.target.getBoundingClientRect();
+            dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
+            dropdown.style.left = (rect.left + window.scrollX - 100) + 'px';
+        }
+        
+        function showRowDropdown(event, rowId) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('rowDropdown');
+            dropdown.classList.toggle('show');
+            dropdown.dataset.rowId = rowId;
+            const rect = event.target.getBoundingClientRect();
+            dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
+            dropdown.style.left = (rect.left + window.scrollX - 100) + 'px';
+        }
+        
+        function exportFormat(format, isBulk) {
+            let selectedIds = [];
+            if (isBulk) {
+                const checkboxes = document.querySelectorAll('.row_checkbox:checked');
+                selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.dataset.id));
+            } else {
+                const rowId = parseInt(document.getElementById('rowDropdown').dataset.rowId);
+                selectedIds = [rowId];
+            }
+            
+            const exportData = {
+                ids: selectedIds,
+                format: format
+            };
+            
+            const exportInput = document.querySelector('#export_trigger_input');
+            if (exportInput) {
+                exportInput.value = JSON.stringify(exportData);
+                exportInput.dispatchEvent(new Event('change'));
+            }
+            
+            document.getElementById('bulkDropdown').classList.remove('show');
+            document.getElementById('rowDropdown').classList.remove('show');
+        }
+        
+        document.addEventListener('click', function() {
+            document.getElementById('bulkDropdown').classList.remove('show');
+            document.getElementById('rowDropdown').classList.remove('show');
+        });
+        
+        window.updateSelectedIds = updateSelectedIds;
+        window.copyToClipboard = copyToClipboard;
+        window.toggleAllCheckboxes = toggleAllCheckboxes;
+        window.showBulkDropdown = showBulkDropdown;
+        window.showRowDropdown = showRowDropdown;
+        window.exportFormat = exportFormat;
+    </script>
+    '''
+    return html
 
 with gr.Blocks(title="TikTok-Prompt-Generator", theme="dark", css=custom_css) as demo:
     gr.Markdown("# 🎬 TikTok-Prompt-Generator")
@@ -317,35 +438,54 @@ with gr.Blocks(title="TikTok-Prompt-Generator", theme="dark", css=custom_css) as
     
     with gr.Row():
         with gr.Column(scale=1):
-            output = gr.Textbox(label="Generated Output", lines=20)
+            output = gr.Textbox(label="Generated Output", lines=20, show_copy_button=False)
     
     with gr.Row():
         with gr.Column(scale=1):
             gr.Markdown("### Generation History")
-            with gr.Row():
-                select_all_checkbox = gr.Checkbox(label="[X] Select All", scale=0)
-                gr.HTML('<div style="flex:1"></div>')
-            
             history_display = gr.HTML(label="")
-            selected_ids = gr.State([])
-            export_output = gr.Textbox(label="Export Data", lines=10, visible=False)
+            selected_ids_input = gr.Textbox(visible=False, elem_id="selected_ids_input")
+            export_trigger_input = gr.Textbox(visible=False, elem_id="export_trigger_input")
+            download_file = gr.File(label="Download", visible=False)
     
     history_state = gr.State([])
+    selected_ids_state = gr.State([])
     
     generate_btn.click(
         fn=generator.generate,
         inputs=[product_title, about_this_product, product_description, image_url],
         outputs=[output, history_state]
     ).then(
-        fn=create_table_with_copy_icons,
-        inputs=[history_state],
+        fn=generate_history_html,
+        inputs=[history_state, selected_ids_state],
         outputs=[history_display]
     )
     
-    select_all_checkbox.change(
-        fn=toggle_select_all,
-        inputs=[select_all_checkbox, history_state],
-        outputs=[selected_ids]
+    selected_ids_input.change(
+        fn=lambda x: json.loads(x) if x else [],
+        inputs=[selected_ids_input],
+        outputs=[selected_ids_state]
+    ).then(
+        fn=generate_history_html,
+        inputs=[history_state, selected_ids_state],
+        outputs=[history_display]
+    )
+    
+    def handle_export(export_data, history):
+        if not export_data:
+            return None
+        data = json.loads(export_data)
+        selected_ids = data.get("ids", [])
+        format_type = data.get("format", "CSV")
+        export_content = export_with_format(history, selected_ids, format_type)
+        ext = "csv" if format_type == "CSV" else "json" if format_type == "JSON" else "md"
+        filename = f"export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{ext}"
+        return gr.File(value=(export_content, filename), visible=True)
+    
+    export_trigger_input.change(
+        fn=handle_export,
+        inputs=[export_trigger_input, history_state],
+        outputs=[download_file]
     )
 
 if __name__ == "__main__":
