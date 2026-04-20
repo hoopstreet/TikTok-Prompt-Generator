@@ -304,8 +304,6 @@ TikTok-Prompt-Generator/
 | `get_test_stats()` | None | Dict | Returns pass/fail statistics |
 
 
-## 📚 13. AI Training Materials Responsibility
-## 📝 14. DNA Update Protocol
 
 ### Purpose of DNA.md
 This file serves as the **master documentation** for:
@@ -333,7 +331,6 @@ This file serves as the **master documentation** for:
 4. **KEEP** DNA-Signature at bottom
 
 
-## 🤖 15. AI Auto-Update Instructions
 
 ### For Training Materials (AI_TRAINING_CORE.md)
 When AI detects new requirements, append to appropriate section:
@@ -355,7 +352,6 @@ sed -i '/### v2.6.0/a\
 # PHASE 5: APPEND AUTO-UPDATE INSTRUCTIONS FOR AI
 cat << 'EOF' >> DNA.md
 
-## 🤖 15. AI Auto-Update Instructions
 
 ### For Training Materials (AI_TRAINING_CORE.md)
 When AI detects new requirements, append to appropriate section:
@@ -363,13 +359,10 @@ When AI detects new requirements, append to appropriate section:
 # PHASE 5: APPEND AUTO-UPDATE INSTRUCTIONS FOR AI
 cat << 'EOF' >> DNA.md
 
-## 🤖 15. AI Auto-Update Instructions
 
 ### For Training Materials (AI_TRAINING_CORE.md)
 When AI detects new requirements, append to appropriate section:
 
-## 📚 13. AI Training Materials Responsibility
-## 📝 14. DNA Update Protocol
 
 ### Purpose of DNA.md
 This file serves as the **master documentation** for:
@@ -397,8 +390,6 @@ This file serves as the **master documentation** for:
 4. **KEEP** DNA-Signature at bottom
 
 
-## 📚 13. AI Training Materials Responsibility
-## 📝 14. DNA Update Protocol
 
 ### Purpose of DNA.md
 This file serves as the **master documentation** for:
@@ -426,7 +417,6 @@ This file serves as the **master documentation** for:
 4. **KEEP** DNA-Signature at bottom
 
 
-## 🤖 15. AI Auto-Update Instructions
 
 ### For Training Materials (AI_TRAINING_CORE.md)
 When AI detects new requirements, append to appropriate section:
@@ -441,129 +431,6 @@ sed -i '/| Tools/a| NewNiche | Focus points |' AI_TRAINING_CORE.md
 # Example: Adding new Taglish phrase
 sed -i '/| Cheap but quality/a| New English | New Taglish |' AI_TRAINING_CORE.md
 
-## 🤖 15. AI Auto-Update Instructions
-
-### For Training Materials (AI_TRAINING_CORE.md)
-When AI detects new requirements, append to appropriate section:
-
-```bash
-# Example: Adding new duration
-sed -i '/| 60 seconds/a| 65 seconds | Exactly 22 shots | 3 seconds |' AI_TRAINING_CORE.md
-
-# Example: Adding new niche
-sed -i '/| Tools/a| NewNiche | Focus points |' AI_TRAINING_CORE.md
-
-# Example: Adding new Taglish phrase
-sed -i '/| Cheap but quality/a| New English | New Taglish |' AI_TRAINING_CORE.md
-
-For DNA.md
-
-When new features are deployed, append version history:
-
-# Example: Adding new version
-sed -i '/### v2.6.0/a\
-\
-### v2.7.0 (YYYY-MM-DD) - STABLE\
-- New feature description' DNA.md
-
-Verification After Update
-
-Always verify with:
-
-grep "^## [0-9]" AI_TRAINING_CORE.md | wc -l
-grep "^## " DNA.md | wc -l
-
-## 📚 13. AI Training Materials Responsibility
-## 📝 14. DNA Update Protocol
-
-### Purpose of DNA.md
-This file serves as the **master documentation** for:
-- Project architecture and deployment
-- Tool purposes and tech stack
-- Environment variables and secrets
-- CI/CD workflows
-- Version history tracking
-- File structure reference
-- API documentation
-
-### When to Update DNA.md
-| Trigger | Action |
-|---------|--------|
-| New version tag | Append to Version History (Section 9) |
-| New file added | Update File Structure (Section 11) |
-| New API method | Update API Reference (Section 12) |
-| Architecture change | Update Deployment Flow (Section 10) |
-| New secret/variable | Update Variables (Section 4) |
-
-### Update Rules (STRICT)
-1. **APPEND** new information - NEVER overwrite
-2. **PRESERVE** existing documentation
-3. **MAINTAIN** section numbering
-4. **KEEP** DNA-Signature at bottom
-
-
-## 🤖 15. AI Auto-Update Instructions
-
-### For Training Materials (AI_TRAINING_CORE.md)
-When AI detects new requirements, append to appropriate section:
-
-```bash
-# Example: Adding new duration
-sed -i '/| 60 seconds/a| 65 seconds | Exactly 22 shots | 3 seconds |' AI_TRAINING_CORE.md
-
-# Example: Adding new niche
-sed -i '/| Tools/a| NewNiche | Focus points |' AI_TRAINING_CORE.md
-
-# Example: Adding new Taglish phrase
-sed -i '/| Cheap but quality/a| New English | New Taglish |' AI_TRAINING_CORE.md
-
-For DNA.md
-
-When new features are deployed, append version history:
-
-# Example: Adding new version
-sed -i '/### v2.6.0/a\
-\
-### v2.7.0 (YYYY-MM-DD) - STABLE\
-- New feature description' DNA.md
-
-Verification After Update
-
-Always verify with:
-
-grep "^## [0-9]" AI_TRAINING_CORE.md | wc -l
-grep "^## " DNA.md | wc -l
-
-## 📚 13. AI Training Materials Responsibility
-## 📝 14. DNA Update Protocol
-
-### Purpose of DNA.md
-This file serves as the **master documentation** for:
-- Project architecture and deployment
-- Tool purposes and tech stack
-- Environment variables and secrets
-- CI/CD workflows
-- Version history tracking
-- File structure reference
-- API documentation
-
-### When to Update DNA.md
-| Trigger | Action |
-|---------|--------|
-| New version tag | Append to Version History (Section 9) |
-| New file added | Update File Structure (Section 11) |
-| New API method | Update API Reference (Section 12) |
-| Architecture change | Update Deployment Flow (Section 10) |
-| New secret/variable | Update Variables (Section 4) |
-
-### Update Rules (STRICT)
-1. **APPEND** new information - NEVER overwrite
-2. **PRESERVE** existing documentation
-3. **MAINTAIN** section numbering
-4. **KEEP** DNA-Signature at bottom
-
-
-## 🤖 15. AI Auto-Update Instructions
 
 ### For Training Materials (AI_TRAINING_CORE.md)
 When AI detects new requirements, append to appropriate section:
@@ -596,8 +463,63 @@ grep "^## [0-9]" AI_TRAINING_CORE.md | wc -l
 grep "^## " DNA.md | wc -l
 
 
-## 📚 13. AI Training Materials Responsibility
-## 📝 14. DNA Update Protocol
+### Purpose of DNA.md
+This file serves as the **master documentation** for:
+- Project architecture and deployment
+- Tool purposes and tech stack
+- Environment variables and secrets
+- CI/CD workflows
+- Version history tracking
+- File structure reference
+- API documentation
+
+### When to Update DNA.md
+| Trigger | Action |
+|---------|--------|
+| New version tag | Append to Version History (Section 9) |
+| New file added | Update File Structure (Section 11) |
+| New API method | Update API Reference (Section 12) |
+| Architecture change | Update Deployment Flow (Section 10) |
+| New secret/variable | Update Variables (Section 4) |
+
+### Update Rules (STRICT)
+1. **APPEND** new information - NEVER overwrite
+2. **PRESERVE** existing documentation
+3. **MAINTAIN** section numbering
+4. **KEEP** DNA-Signature at bottom
+
+
+
+### For Training Materials (AI_TRAINING_CORE.md)
+When AI detects new requirements, append to appropriate section:
+
+```bash
+# Example: Adding new duration
+sed -i '/| 60 seconds/a| 65 seconds | Exactly 22 shots | 3 seconds |' AI_TRAINING_CORE.md
+
+# Example: Adding new niche
+sed -i '/| Tools/a| NewNiche | Focus points |' AI_TRAINING_CORE.md
+
+# Example: Adding new Taglish phrase
+sed -i '/| Cheap but quality/a| New English | New Taglish |' AI_TRAINING_CORE.md
+
+For DNA.md
+
+When new features are deployed, append version history:
+
+# Example: Adding new version
+sed -i '/### v2.6.0/a\
+\
+### v2.7.0 (YYYY-MM-DD) - STABLE\
+- New feature description' DNA.md
+
+Verification After Update
+
+Always verify with:
+
+grep "^## [0-9]" AI_TRAINING_CORE.md | wc -l
+grep "^## " DNA.md | wc -l
+
 
 ### Purpose of DNA.md
 This file serves as the **master documentation** for:
@@ -625,7 +547,65 @@ This file serves as the **master documentation** for:
 4. **KEEP** DNA-Signature at bottom
 
 
-## 🤖 15. AI Auto-Update Instructions
+
+### For Training Materials (AI_TRAINING_CORE.md)
+When AI detects new requirements, append to appropriate section:
+
+```bash
+# Example: Adding new duration
+sed -i '/| 60 seconds/a| 65 seconds | Exactly 22 shots | 3 seconds |' AI_TRAINING_CORE.md
+
+# Example: Adding new niche
+sed -i '/| Tools/a| NewNiche | Focus points |' AI_TRAINING_CORE.md
+
+# Example: Adding new Taglish phrase
+sed -i '/| Cheap but quality/a| New English | New Taglish |' AI_TRAINING_CORE.md
+
+For DNA.md
+
+When new features are deployed, append version history:
+
+# Example: Adding new version
+sed -i '/### v2.6.0/a\
+\
+### v2.7.0 (YYYY-MM-DD) - STABLE\
+- New feature description' DNA.md
+
+Verification After Update
+
+Always verify with:
+
+grep "^## [0-9]" AI_TRAINING_CORE.md | wc -l
+grep "^## " DNA.md | wc -l
+
+
+
+### Purpose of DNA.md
+This file serves as the **master documentation** for:
+- Project architecture and deployment
+- Tool purposes and tech stack
+- Environment variables and secrets
+- CI/CD workflows
+- Version history tracking
+- File structure reference
+- API documentation
+
+### When to Update DNA.md
+| Trigger | Action |
+|---------|--------|
+| New version tag | Append to Version History (Section 9) |
+| New file added | Update File Structure (Section 11) |
+| New API method | Update API Reference (Section 12) |
+| Architecture change | Update Deployment Flow (Section 10) |
+| New secret/variable | Update Variables (Section 4) |
+
+### Update Rules (STRICT)
+1. **APPEND** new information - NEVER overwrite
+2. **PRESERVE** existing documentation
+3. **MAINTAIN** section numbering
+4. **KEEP** DNA-Signature at bottom
+
+
 
 ### For Training Materials (AI_TRAINING_CORE.md)
 When AI detects new requirements, append to appropriate section:
@@ -659,4 +639,41 @@ Always verify with:
 grep "^## [0-9]" AI_TRAINING_CORE.md | wc -l
 grep "^## " DNA.md | wc -l
 \`\`\`
+
+
+## 📊 16. Database Maintenance & Supabase Integration
+
+### Connection Configuration (supabase_connection.py):
+- Singleton pattern for single connection instance
+- Environment variables: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+- Automatic table existence checking
+
+### Data Flow:
+```
+
+User Input → app.py → supabase_connection.py → Supabase Cloud
+↓
+generation_history  (save all prompts)
+training_materials  (AI behavior rules)
+chat_history        (conversation memory)
+testing_explorer    (test results)
+
+```
+
+### Table Schema Files:
+- `supabase_schema.sql` — Main tables
+- `supabase_testing_explorer.sql` — Testing table
+- `supabase_rls_public.sql` — Row Level Security policies
+
+### Auto-Cleanup:
+- Supabase Edge Function deletes chat_history older than 30 days
+- Runs via pg_cron every 24 hours
+
+### Storage Optimization:
+| Table | Purpose | Retention |
+|-------|---------|-----------|
+| generation_history | Stores all generated prompts | Permanent |
+| training_materials | AI behavior rules | Permanent |
+| chat_history | Conversation memory | 30 days |
+| testing_explorer | Test results tracking | Permanent |
 
