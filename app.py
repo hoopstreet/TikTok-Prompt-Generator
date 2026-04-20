@@ -274,17 +274,38 @@ def export_with_format(history, selected_ids, format_type):
     return "Select format"
 
 custom_css = """
-body, .gradio-container { background-color: #121212 !important; }
+body, .gradio-container { background-color: #1b1b1f !important; }
 .gr-button-primary { background-color: #FF6600 !important; border-color: #FF6600 !important; }
 .gr-button-primary:hover { background-color: #FF5500 !important; }
-input:checked { accent-color: #FF6600 !important; }
-.gr-dataframe { background-color: #1E1E1E !important; color: #FFFFFF !important; }
+input[type="checkbox"] { accent-color: #FF6600 !important; }
+.gr-dataframe { background-color: #2a2a2e !important; color: #FFFFFF !important; }
+.gr-dataframe table { width: 100%; border-collapse: collapse; }
+.gr-dataframe th, .gr-dataframe td { padding: 12px; text-align: left; border-bottom: 1px solid #3a3a3e; }
+.gr-dataframe th { background-color: #1f1f23; color: #FF6600; }
+.copy-icon { cursor: pointer; color: #FF6600; margin-left: 8px; font-size: 14px; display: inline-block; }
+.copy-icon:hover { color: #FF8844; }
+.download-icon { cursor: pointer; color: #FF6600; font-size: 18px; }
+.download-icon:hover { color: #FF8844; }
+.dropdown-menu { background-color: #2a2a2e; border: 1px solid #FF6600; border-radius: 4px; }
+.dropdown-item { padding: 8px 16px; cursor: pointer; color: white; }
+.dropdown-item:hover { background-color: #FF6600; }
 footer { visibility: hidden; }
 """
 
+def create_table_with_copy_icons(history):
+    if not history:
+        return []
+    table_data = []
+    for h in history:
+        pos_cell = f'<span>{h["positive_prompt"]}</span><span class="copy-icon" onclick="copyToClipboard(`{h["positive_prompt"]}`)">📋</span>'
+        neg_cell = f'<span>{h["negative_prompt"]}</span><span class="copy-icon" onclick="copyToClipboard(`{h["negative_prompt"]}`)">📋</span>'
+        title_cell = f'<span>{h["final_title"]}</span><span class="copy-icon" onclick="copyToClipboard(`{h["final_title"]}`)">📋</span>'
+        action_cell = '<span class="download-icon" onclick="showExportDropdown(this)">⬇️</span>'
+        table_data.append(["", h["id"], h["timestamp"], pos_cell, neg_cell, title_cell, action_cell])
+    return table_data
+
 with gr.Blocks(title="TikTok-Prompt-Generator", theme="dark", css=custom_css) as demo:
     gr.Markdown("# 🎬 TikTok-Prompt-Generator")
-    gr.Markdown("Generate TikTok affiliate content - Philippines Market")
     
     with gr.Row():
         with gr.Column(scale=1):
@@ -296,44 +317,27 @@ with gr.Blocks(title="TikTok-Prompt-Generator", theme="dark", css=custom_css) as
     
     with gr.Row():
         with gr.Column(scale=1):
-            gr.Markdown("### Generated Output")
-            output = gr.Textbox(label="", lines=20)
+            output = gr.Textbox(label="Generated Output", lines=20)
     
     with gr.Row():
         with gr.Column(scale=1):
             gr.Markdown("### Generation History")
             with gr.Row():
-                select_all_checkbox = gr.Checkbox(label="Select All", scale=0)
-                gr.Markdown("&nbsp;" * 10)
-                download_btn = gr.Button("⬇️", scale=0, elem_id="download_btn")
+                select_all_checkbox = gr.Checkbox(label="[X] Select All", scale=0)
+                gr.HTML('<div style="flex:1"></div>')
             
-            history_display = gr.Dataframe(
-                label="",
-                headers=["ID", "Timestamp", "Positive Prompt", "Negative Prompt", "Final Title"],
-                interactive=True,
-                wrap=True,
-                elem_id="history_table"
-            )
-            
+            history_display = gr.HTML(label="")
             selected_ids = gr.State([])
             export_output = gr.Textbox(label="Export Data", lines=10, visible=False)
     
-    with gr.Row(visible=False) as export_overlay:
-        with gr.Column(scale=1):
-            gr.Markdown("### Export Format")
-            format_radio = gr.Radio(choices=["CSV", "JSON", "Markdown"], label="Format", value="CSV")
-            confirm_btn = gr.Button("Confirm Download", variant="primary")
-            close_btn = gr.Button("Cancel")
-    
     history_state = gr.State([])
-    overlay_visible = gr.State(False)
     
     generate_btn.click(
         fn=generator.generate,
         inputs=[product_title, about_this_product, product_description, image_url],
         outputs=[output, history_state]
     ).then(
-        fn=lambda h: [[h[i]["id"], h[i]["timestamp"], h[i]["positive_prompt"], h[i]["negative_prompt"], h[i]["final_title"]] for i in range(len(h))],
+        fn=create_table_with_copy_icons,
         inputs=[history_state],
         outputs=[history_display]
     )
@@ -342,40 +346,6 @@ with gr.Blocks(title="TikTok-Prompt-Generator", theme="dark", css=custom_css) as
         fn=toggle_select_all,
         inputs=[select_all_checkbox, history_state],
         outputs=[selected_ids]
-    )
-    
-    def get_selected_ids(evt: gr.SelectData, history):
-        if evt.index:
-            selected = [history[i]["id"] for i in evt.index if i < len(history)]
-            return selected
-        return []
-    
-    history_display.select(
-        fn=get_selected_ids,
-        inputs=[history_state],
-        outputs=[selected_ids]
-    )
-    
-    download_btn.click(
-        fn=lambda: gr.update(visible=True),
-        inputs=[],
-        outputs=[export_overlay]
-    )
-    
-    confirm_btn.click(
-        fn=export_with_format,
-        inputs=[history_state, selected_ids, format_radio],
-        outputs=[export_output]
-    ).then(
-        fn=lambda: gr.update(visible=False),
-        inputs=[],
-        outputs=[export_overlay]
-    )
-    
-    close_btn.click(
-        fn=lambda: gr.update(visible=False),
-        inputs=[],
-        outputs=[export_overlay]
     )
 
 if __name__ == "__main__":
