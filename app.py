@@ -158,6 +158,7 @@ Background: Clean, uncluttered."""
                 return True
         except:
             return False
+
     def generate(self, product_title, about_this_product, product_description, image_url):
         analyst_data = self.analyze_product(product_title, about_this_product, product_description, image_url)
         niche = analyst_data["niche"]
@@ -203,14 +204,15 @@ final_title
         history_entry = {
             "id": len(self.history) + 1,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "positive_prompt": positives[:300] + "...",
-            "negative_prompt": negatives[:300] + "...",
+            "positive_prompt": positives[:500] + "..." if len(positives) > 500 else positives,
+            "negative_prompt": negatives[:500] + "..." if len(negatives) > 500 else negatives,
             "final_title": final_title,
             "full_output": output
         }
         self.history.append(history_entry)
         
         return output, self.history
+
     def export_to_csv(self, selected_data):
         if not selected_data:
             return "No data selected"
@@ -244,15 +246,10 @@ final_title
         md += "| ID | Timestamp | Positive Prompt | Negative Prompt | Final Title |\n"
         md += "|----|-----------|-----------------|-----------------|-------------|\n"
         for h in selected_data:
-            pos_short = h["positive_prompt"][:50] + "..." if len(h["positive_prompt"]) > 50 else h["positive_prompt"]
-            neg_short = h["negative_prompt"][:50] + "..." if len(h["negative_prompt"]) > 50 else h["negative_prompt"]
+            pos_short = h["positive_prompt"][:80] + "..." if len(h["positive_prompt"]) > 80 else h["positive_prompt"]
+            neg_short = h["negative_prompt"][:80] + "..." if len(h["negative_prompt"]) > 80 else h["negative_prompt"]
             md += f"| {h['id']} | {h['timestamp']} | {pos_short} | {neg_short} | {h['final_title']} |\n"
         return md
-    
-    def get_selected_data(self, history, selected_indices):
-        if not selected_indices:
-            return []
-        return [history[i-1] for i in selected_indices if i-1 < len(history)]
 
 generator = TikTokProductGenerator()
 
@@ -277,7 +274,12 @@ body, .gradio-container { background-color: #1b1b1f !important; }
 .gr-button-primary:hover { background-color: #FF5500 !important; }
 input[type="checkbox"] { accent-color: #FF6600 !important; }
 .gr-dataframe { background-color: #2a2a2e !important; color: #FFFFFF !important; }
+.gr-dataframe table { width: 100%; border-collapse: collapse; }
+.gr-dataframe th, .gr-dataframe td { padding: 12px; text-align: left; border-bottom: 1px solid #3a3a3e; }
+.gr-dataframe th { background-color: #1f1f23; color: #FF6600; }
 footer { visibility: hidden; }
+/* Remove copy and expand icons from table header */
+.gr-dataframe .gr-button { display: none !important; }
 """
 
 with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
@@ -301,11 +303,11 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
             with gr.Row():
                 select_all_checkbox = gr.Checkbox(label="Select All", scale=0)
                 format_dropdown = gr.Dropdown(label="Format", choices=["CSV", "JSON", "Markdown"], scale=1)
-                export_btn = gr.Button("Download", scale=0, size="sm")
+                download_btn = gr.Button("Download", scale=0, size="sm")
             
             history_display = gr.Dataframe(
                 label="",
-                headers=["ID", "Timestamp", "Positive Prompt", "Negative Prompt", "Final Title"],
+                headers=["ID", "Timestamp", "Positive Prompt", "Negative Prompt", "Final Title", "Actions"],
                 interactive=False,
                 wrap=True
             )
@@ -318,7 +320,7 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
         inputs=[product_title, about_this_product, product_description, image_url],
         outputs=[output, history_state]
     ).then(
-        fn=lambda h: [[h[i]["id"], h[i]["timestamp"], h[i]["positive_prompt"], h[i]["negative_prompt"], h[i]["final_title"]] for i in range(len(h))],
+        fn=lambda h: [[h[i]["id"], h[i]["timestamp"], h[i]["positive_prompt"], h[i]["negative_prompt"], h[i]["final_title"], "⬇️"] for i in range(len(h))],
         inputs=[history_state],
         outputs=[history_display]
     )
@@ -331,6 +333,8 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
     
     def get_selected_from_table(evt: gr.SelectData, history):
         if evt.index:
+            if evt.index[1] == 5:
+                return [history[evt.index[0]]["id"]]
             return [history[i]["id"] for i in evt.index if i < len(history)]
         return []
     
@@ -340,7 +344,7 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
         outputs=[selected_ids_state]
     )
     
-    export_btn.click(
+    download_btn.click(
         fn=export_with_format,
         inputs=[history_state, selected_ids_state, format_dropdown],
         outputs=[output]
