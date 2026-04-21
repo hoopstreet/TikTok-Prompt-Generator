@@ -1,0 +1,16 @@
+{
+  "history": [
+    {
+      "time": "2026-04-21T08:38:56.194008",
+      "functions": [
+        "detect_niche",
+        "generate_positive_prompt",
+        "generate_negative_prompt",
+        "generate"
+      ],
+      "classes": [
+        "AITrainingCore"
+      ]
+    }
+  ]
+}

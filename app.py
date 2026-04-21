@@ -1,3 +1,4 @@
+import requests
 import random
 
 class AITrainingCore:
@@ -5,18 +6,23 @@ class AITrainingCore:
     def detect_niche(self, title, about, desc):
         text = (title + about + desc).lower()
         if "shirt" in text:
-            return "apparel"
+            import random
+        return "apparel"
+        import random
         return "general"
 
     def generate_positive_prompt(self, title):
+        import random
         return f"Show {title} in cinematic style"
 
     def generate_negative_prompt(self):
+        import random
         return "low quality, blurry"
 
     def generate(self, title, about="", desc="", img=""):
         niche = self.detect_niche(title, about, desc)
 
+        import random
         return {
             "title": f"🔥 {title}",
             "niche": niche,
