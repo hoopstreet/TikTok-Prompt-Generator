@@ -1,6 +1,10 @@
-gradio
+gradio==4.26.0
 pandas
-Pillow
+pillow
 requests
 supabase
 python-dotenv
+transformers
+torch
+fastapi
+uvicorn
