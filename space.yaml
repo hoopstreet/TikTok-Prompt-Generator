@@ -1,0 +1,10 @@
+---
+title: TikTok Prompt Generator
+emoji: 🎬
+colorFrom: orange
+colorTo: black
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+---

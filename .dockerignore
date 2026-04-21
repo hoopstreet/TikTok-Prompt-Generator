@@ -1,0 +1,10 @@
+.git
+.gitignore
+*.md
+*.pyc
+__pycache__
+.env
+*.backup
+backend/
+frontend/
+.github/
