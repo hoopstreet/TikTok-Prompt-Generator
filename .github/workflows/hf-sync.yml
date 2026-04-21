@@ -1,44 +1,102 @@
 name: Sync to Hugging Face Space
-
-      
-      - name: Prepare HF Space deployment
+on:
+  workflow_run:
+    workflows: ["Build and Push to Docker Hub"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      tag_version:
+        description: 'Tag version'
+        required: true
+        default: 'v4.2.2'
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Get tag version
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag_version }}"
+          else
+            RUN_ID=${{ github.event.workflow_run.id }}
+            gh run download $RUN_ID -n tag-info
+            if [ -f "tag_info.txt" ]; then
+              TAG=$(grep "^TAG=" tag_info.txt | cut -d'=' -f2)
+            else
+              TAG="${{ github.ref_name }}"
+            fi
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update hf.Dockerfile
+        run: |
+          TAG="${{ steps.tag.outputs.tag }}"
+          cat > hf.Dockerfile << 'DOCKER'
+# Hugging Face Space Dockerfile
+ARG TAG_VERSION=REPLACE_TAG
+FROM hoopstreet/tiktok-prompt-generator:${TAG_VERSION}
+LABEL name="TikTok Prompt Generator"
+LABEL version="${TAG_VERSION}"
+EXPOSE 7860
+CMD ["python", "app.py"]
+DOCKER
+          sed -i "s/REPLACE_TAG/$TAG/g" hf.Dockerfile
+          echo "✅ Updated to tag: $TAG"
+          cat hf.Dockerfile
+      - name: Create HF README
+        run: |
+          TAG="${{ steps.tag.outputs.tag }}"
+          DATE=$(date '+%Y-%m-%d')
+          cat > README_HF.md << 'README'
+---
+title: TikTok Prompt Generator
+emoji: 🎬
+colorFrom: orange
+colorTo: black
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+---
+# TikTok Prompt Generator vREPLACE_TAG
+Version: REPLACE_TAG
+Updated: REPLACE_DATE
+GitHub: https://github.com/hoopstreet/TikTok-Prompt-Generator
+Docker Hub: https://hub.docker.com/r/hoopstreet/tiktok-prompt-generator
+README
+          sed -i "s/REPLACE_TAG/$TAG/g" README_HF.md
+          sed -i "s/REPLACE_DATE/$DATE/g" README_HF.md
+      - name: Deploy to HF Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           if [ -z "$HF_TOKEN" ]; then
-            echo "❌ HF_TOKEN not set - skipping deployment"
+            echo "❌ HF_TOKEN not set"
             exit 1
           fi
-          
           TAG="${{ steps.tag.outputs.tag }}"
-          
-          # Create deployment directory
-          mkdir -p deploy_dir
-          
-          # Copy only the files needed for HF Space
-          cp hf.Dockerfile deploy_dir/Dockerfile
-          cp README_HF.md deploy_dir/README.md
-          
-          cd deploy_dir
-          
-          # Initialize git repo for HF Space
+          mkdir -p deploy_hf
+          cp hf.Dockerfile deploy_hf/Dockerfile
+          cp README_HF.md deploy_hf/README.md
+          cd deploy_hf
           git init
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "actions@github.com"
-          
+          git config --global user.name "HF Bot"
+          git config --global user.email "bot@hf.space"
           git add .
           git commit -m "deploy: $TAG"
-          
-          # Push to Hugging Face Space
           git remote add hf https://hoopstreet:${HF_TOKEN}@huggingface.co/spaces/hoopstreet/TikTok-Prompt-Generator
-          git push hf main --force
-          
-          echo "✅ Deployed to Hugging Face Space with tag: $TAG"
-      
-      - name: Commit updated hf.Dockerfile back to repo
+          git push hf master:main --force
+          echo "✅ Deployed to HF Space"
+      - name: Commit back to GitHub
         run: |
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "actions@github.com"
+          git config --global user.name "HF Bot"
+          git config --global user.email "bot@github.com"
           git add hf.Dockerfile README_HF.md
-          git commit -m "chore: update hf.Dockerfile to tag ${{ steps.tag.outputs.tag }}" || echo "No changes to commit"
-          git push origin main || echo "Push skipped - may be in different branch"
+          git commit -m "chore: update hf.Dockerfile to ${{ steps.tag.outputs.tag }}" || echo "No changes"
+          git push origin main || echo "Push skipped"

@@ -1,40 +1,22 @@
 name: Complete Deployment Pipeline
-
 on:
   push:
-    tags:
-      - 'v*'
+    tags: [ 'v*' ]
   workflow_dispatch:
     inputs:
       tag_version:
-        description: 'Tag version to deploy'
+        description: 'Tag version'
         required: true
-        default: 'v4.0.2'
-
+        default: 'v4.2.2'
 jobs:
-  docker-build:
+  docker:
     uses: ./.github/workflows/docker-publish.yml
     secrets: inherit
-  
+    with:
+      tag_version: ${{ github.event.inputs.tag_version || github.ref_name }}
   hf-sync:
-    needs: docker-build
+    needs: docker
     uses: ./.github/workflows/hf-sync.yml
     secrets: inherit
     with:
-      tag_version: ${{ github.ref_name }}
-  
-  notify:
-    needs: [docker-build, hf-sync]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deployment Status
-        run: |
-          echo "## 🚀 Deployment Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Docker Hub | ✅ Built and pushed |" >> $GITHUB_STEP_SUMMARY
-          echo "| Hugging Face Space | ✅ Synced |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**HF Space:** https://huggingface.co/spaces/hoopstreet/TikTok-Prompt-Generator" >> $GITHUB_STEP_SUMMARY
+      tag_version: ${{ github.event.inputs.tag_version || github.ref_name }}
