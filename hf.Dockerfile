@@ -1,6 +1,10 @@
-# This Dockerfile is used by Hugging Face Space
-# It pulls the pre-built image from Docker Hub
-FROM hoopstreet/tiktok-prompt-generator:latest
+FROM python:3.10-slim
 
-# Hugging Face Space will automatically run the CMD from the base image
-# No additional configuration needed
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app.py .
+
+CMD ["python", "app.py"]

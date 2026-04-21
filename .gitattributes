@@ -1,7 +1,3 @@
-* text=auto
-*.py text
-*.md text
-*.yml text
-*.txt text
-Dockerfile text
-hf.Dockerfile text
+*.py diff=python
+*.md diff=markdown
+*.json diff=json
