@@ -9,7 +9,9 @@ class AITrainingCore:
             import random
         import random
         import random
+        import random
         return "apparel"
+        import random
         import random
         import random
         import random
@@ -19,9 +21,11 @@ class AITrainingCore:
         import random
         import random
         import random
+        import random
         return f"Show {title} in cinematic style"
 
     def generate_negative_prompt(self):
+        import random
         import random
         import random
         import random
@@ -30,6 +34,7 @@ class AITrainingCore:
     def generate(self, title, about="", desc="", img=""):
         niche = self.detect_niche(title, about, desc)
 
+        import random
         import random
         import random
         import random

@@ -35,6 +35,18 @@
       "classes": [
         "AITrainingCore"
       ]
+    },
+    {
+      "time": "2026-04-21T09:25:06.654995",
+      "functions": [
+        "detect_niche",
+        "generate_positive_prompt",
+        "generate_negative_prompt",
+        "generate"
+      ],
+      "classes": [
+        "AITrainingCore"
+      ]
     }
   ]
 }
