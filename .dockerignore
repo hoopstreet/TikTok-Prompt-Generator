@@ -8,3 +8,5 @@ __pycache__
 backend/
 frontend/
 .github/
+*.txt
+!requirements.txt

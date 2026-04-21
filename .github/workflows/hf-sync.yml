@@ -1,48 +1,23 @@
-name: Sync to Hugging Face
+name: Sync to Hugging Face Space
 
 on:
-  workflow_run:
-    workflows: ["Build and Push to Docker Hub"]
-    types:
-      - completed
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  sync:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Prepare Clean HF Files
+      
+      - name: Push to HF Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          BRANCH_OR_TAG=${{ github.event.workflow_run.head_branch }}
-          
-          # Update hf.Dockerfile with the built image tag
-          sed -i "s|FROM .*|FROM ${{ secrets.DOCKERHUB_USERNAME }}/tiktok-prompt-generator:$BRANCH_OR_TAG|g" hf.Dockerfile
-          
-          # Build README with HF Metadata
-          echo "---" > hf_readme.md
-          echo "title: TikTok Prompt Generator" >> hf_readme.md
-          echo "emoji: ⚡" >> hf_readme.md
-          echo "colorFrom: red" >> hf_readme.md
-          echo "colorTo: gray" >> hf_readme.md
-          echo "sdk: docker" >> hf_readme.md
-          echo "pinned: false" >> hf_readme.md
-          echo "---" >> hf_readme.md
-          cat README.md >> hf_readme.md
-          
-          mkdir deploy_dir
-          cp hf.Dockerfile deploy_dir/Dockerfile
-          cp hf_readme.md deploy_dir/README.md
-          
-          cd deploy_dir
-          git init
-          git config --global user.email "bot@hoopstreet.com"
-          git config --global user.name "Hoopstreet Bot"
-          git add .
-          git commit -m "deploy: update to $BRANCH_OR_TAG"
-          git remote add hf https://hoopstreet:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/hoopstreet/TikTok-Prompt-Generator
-          git push hf master:main --force
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git remote add space https://hoopstreet:${HF_TOKEN}@huggingface.co/spaces/hoopstreet/TikTok-Prompt-Generator
+          git push space main --force

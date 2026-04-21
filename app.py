@@ -18,36 +18,16 @@ class AITrainingCore:
     }
     
     NICHES = {
-        "apparel": {"keywords": ["shirt","pants","hoodie","dress","fabric","shorts","athletic"],
-                    "focus": ["Oversized Fit","Presko","breathable","aesthetic"],
-                    "hashtag": "#ApparelFinds"},
-        "audio": {"keywords": ["earbuds","headphones","speaker","bass","wireless"],
-                  "focus": ["Crystal Clear","Bass-heavy","Cyberpunk","noise cancel"],
-                  "hashtag": "#AudioGear"},
-        "gaming": {"keywords": ["gaming","mouse","keyboard","rgb","controller"],
-                   "focus": ["No Lag","RGB Setup","Pro-Player","mechanical"],
-                   "hashtag": "#GamingSetup"},
-        "tech": {"keywords": ["charger","powerbank","cable","adapter","usb"],
-                 "focus": ["PD fast charge","Compact","LED indicator"],
-                 "hashtag": "#TechLife"},
-        "home": {"keywords": ["lamp","organizer","storage","kitchen","furniture"],
-                 "focus": ["Aesthetic","space saver","organization"],
-                 "hashtag": "#HomeOrganizer"},
-        "beauty": {"keywords": ["skincare","makeup","cream","lotion","serum"],
-                   "focus": ["Real skin results","texture swatches"],
-                   "hashtag": "#SkincarePH"},
-        "motor": {"keywords": ["car","motorcycle","helmet","tire","oil"],
-                  "focus": ["Pogi Points","Upgrade","Easy DIY","porma"],
-                  "hashtag": "#CarAccessories"},
-        "sports": {"keywords": ["basketball","mesh","jersey","sports"],
-                   "focus": ["Full Sublimation","moisture wicking","custom IGN"],
-                   "hashtag": "#SportsGear"},
-        "tools": {"keywords": ["heavy-duty","rechargeable","cordless","handy"],
-                  "focus": ["Heavy-duty","High torque","multi-bit"],
-                  "hashtag": "#ToolTime"},
-        "pets": {"keywords": ["dog","cat","pet","chew","toy"],
-                 "focus": ["Durable","Chew-resistant","non-toxic"],
-                 "hashtag": "#PetLife"}
+        "apparel": {"keywords": ["shirt","pants","hoodie","dress","fabric","shorts","athletic"], "focus": ["Oversized Fit","Presko","breathable","aesthetic"], "hashtag": "#ApparelFinds"},
+        "audio": {"keywords": ["earbuds","headphones","speaker","bass","wireless"], "focus": ["Crystal Clear","Bass-heavy","Cyberpunk","noise cancel"], "hashtag": "#AudioGear"},
+        "gaming": {"keywords": ["gaming","mouse","keyboard","rgb","controller"], "focus": ["No Lag","RGB Setup","Pro-Player","mechanical"], "hashtag": "#GamingSetup"},
+        "tech": {"keywords": ["charger","powerbank","cable","adapter","usb"], "focus": ["PD fast charge","Compact","LED indicator"], "hashtag": "#TechLife"},
+        "home": {"keywords": ["lamp","organizer","storage","kitchen","furniture"], "focus": ["Aesthetic","space saver","organization"], "hashtag": "#HomeOrganizer"},
+        "beauty": {"keywords": ["skincare","makeup","cream","lotion","serum"], "focus": ["Real skin results","texture swatches"], "hashtag": "#SkincarePH"},
+        "motor": {"keywords": ["car","motorcycle","helmet","tire","oil"], "focus": ["Pogi Points","Upgrade","Easy DIY","porma"], "hashtag": "#CarAccessories"},
+        "sports": {"keywords": ["basketball","mesh","jersey","sports"], "focus": ["Full Sublimation","moisture wicking","custom IGN"], "hashtag": "#SportsGear"},
+        "tools": {"keywords": ["heavy-duty","rechargeable","cordless","handy"], "focus": ["Heavy-duty","High torque","multi-bit"], "hashtag": "#ToolTime"},
+        "pets": {"keywords": ["dog","cat","pet","chew","toy"], "focus": ["Durable","Chew-resistant","non-toxic"], "hashtag": "#PetLife"}
     }
     TAGLISH_PHRASES = [
         ("Grabe ang ganda nito! Sulit na sulit!", "Close-up product display"),
@@ -76,6 +56,7 @@ class AITrainingCore:
             if any(keyword in text for keyword in data["keywords"]):
                 return niche
         return "general"
+    
     def generate_shot_timings(self, duration, shots):
         timings = []
         remaining = duration
@@ -86,88 +67,61 @@ class AITrainingCore:
             remaining -= t
         timings.append(round(remaining, 1))
         return timings
-    
-    def generate_positive_prompt(self, niche, duration, product_name, shots, timings):
-        niche_data = self.NICHES.get(niche, self.NICHES["apparel"])
+    def generate_positive_prompt(self, niche, shots, timings):
+        n_data = self.NICHES.get(niche, self.NICHES["apparel"])
         scripts = []
         for i in range(shots):
-            taglish, action = self.TAGLISH_PHRASES[i % len(self.TAGLISH_PHRASES)]
-            script = f"""Shot {i+1:02d} ({timings[i]}s): 4K vertical 9:16 aspect ratio, high-detail [{self.CAMERAS[i%4]}] [{self.LIGHTING[i%4]}] [{self.FRAMING[i%4]}] Show {niche_data["focus"][i%len(niche_data["focus"])]}. {action}.
-Dialogue (Taglish): "{taglish}\""""
-            scripts.append(script)
+            tag, act = self.TAGLISH_PHRASES[i % len(self.TAGLISH_PHRASES)]
+            scripts.append(f"Shot {i+1:02d} ({timings[i]}s): 4K vertical [{self.CAMERAS[i%4]}] [{self.LIGHTING[i%4]}] [{self.FRAMING[i%4]}] Show {n_data['focus'][i%len(n_data['focus'])]}. {act}.\nDialogue: \"{tag}\"")
         return "\n\n".join(scripts)
-    
+
     def generate_negative_prompt(self, shots):
-        negatives = []
-        anti_map = {"Cinematic Pan": "no motion blur", "Dynamic Zoom-in": "no pixelation", "Handheld POV": "stable", "Slow-motion": "fluid"}
+        negs = []
         for i in range(shots):
-            cam = self.CAMERAS[i % 4]
-            neg = f"Shot {i+1:02d} Negative: low quality, blurry, distorted, glitch, watermark, {anti_map.get(cam, '')}"
-            negatives.append(neg)
-        return "\n\n".join(negatives)
+            negs.append(f"Shot {i+1:02d} Negative: low quality, blurry, distorted, glitch, watermark, robotic voice, formal language")
+        return "\n\n".join(negs)
+
     def generate_final_title(self, product_title, niche):
-        niche_data = self.NICHES.get(niche, self.NICHES["apparel"])
-        hashtags = ["#TikTokMadeMeBuyIt", "#BudolFinds", "#Sulit", "#Quality", niche_data["hashtag"]]
-        base = f"🔥 MUST-HAVE! {product_title[:40]} | {niche.upper()} Finds"
-        final_title = f"{base} {' '.join(hashtags)}"
-        return final_title[:100]
-    
-    def generate_4_cards(self, product_name, niche, duration, shots, timings):
-        niche_data = self.NICHES.get(niche, self.NICHES["apparel"])
-        return {
-            "card1_product_info": {"product_name": product_name, "category": niche.upper()},
-            "card2_video_brief": {"duration": duration, "shot_count": shots, "shot_timing": timings},
-            "card3_analysis": {"resolution": "4K Vertical 9:16", "audio": "Taglish VO"},
-            "card4_storyboard": {"shots": [{"shot": i+1, "move": self.CAMERAS[i%4], "text": self.TAGLISH_PHRASES[i%len(self.TAGLISH_PHRASES)][0]} for i in range(shots)]}
-        }
-    def generate(self, product_title, about, desc, image_url=""):
-        niche = self.detect_niche(product_title, about, desc)
+        n_data = self.NICHES.get(niche, self.NICHES["apparel"])
+        hashtags = "#TikTokMadeMeBuyIt #BudolFinds #Sulit #Quality " + n_data["hashtag"]
+        return f"🔥 MUST-HAVE! {product_title[:40]} | {niche.upper()} {hashtags}"[:100]
+
+    def generate(self, title, about, desc, image_url=""):
+        niche = self.detect_niche(title, about, desc)
         duration = random.choice(list(self.DURATIONS.keys()))
         shots = self.DURATIONS[duration]
         timings = self.generate_shot_timings(duration, shots)
-        
-        pos = self.generate_positive_prompt(niche, duration, product_title, shots, timings)
+        pos = self.generate_positive_prompt(niche, shots, timings)
         neg = self.generate_negative_prompt(shots)
-        title = self.generate_final_title(product_title, niche)
-        cards = self.generate_4_cards(product_title, niche, duration, shots, timings)
-        
-        output = f"COLUMN: positive_prompt\n\n{pos}\n\nCOLUMN: negative_prompt\n\n{neg}\n\nCOLUMN: final_title\n\n{title}\n\nCARDS:\n{json.dumps(cards, indent=2)}"
-        entry = {"id": len(self.history)+1, "timestamp": datetime.now().strftime("%H:%M:%S"), "product_title": product_title, "final_title": title, "positive_preview": pos[:100], "full_output": output}
+        f_title = self.generate_final_title(title, niche)
+        output = f"FINAL TITLE:\n{f_title}\n\nPOSITIVE PROMPT:\n{pos}\n\nNEGATIVE PROMPT:\n{neg}"
+        entry = {"id": len(self.history)+1, "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"), "product_title": title, "final_title": f_title, "positive_preview": pos[:150], "full_output": output}
         self.history.append(entry)
         return output, self.history
-
 ai_core = AITrainingCore()
+custom_css = "body, .gradio-container { background-color: #1b1b1f !important; } .gr-button-primary { background-color: #FF6600 !important; }"
 
-def update_table(history):
-    return [[h["id"], h["timestamp"], h["product_title"], h["final_title"], h["positive_preview"]] for h in history]
-
-def generate_and_update(t, a, d, i):
-    o, h = ai_core.generate(t, a, d, i)
-    return o, h, update_table(h)
-
-def delete_history():
-    ai_core.history = []
-    return [], []
-custom_css = "body, .gradio-container { background-color: #1b1b1f !important; color: white !important; }"
+def gen_and_up(t, a, d, i):
+    out, hist = ai_core.generate(t, a, d, i)
+    table = [[h["id"], h["timestamp"], h["product_title"], h["final_title"], h["positive_preview"]] for h in hist]
+    return out, hist, table
 
 with gr.Blocks(title="TikTok Prompt Generator v4.0", css=custom_css) as demo:
     gr.Markdown("# 🎬 TikTok Prompt Generator v4.0\n**Philippines Market Edition**")
     with gr.Row():
-        with gr.Column(scale=1):
-            t = gr.Textbox(label="Product Title")
-            a = gr.Textbox(label="About Product", lines=2)
-            d = gr.Textbox(label="Description", lines=4)
-            i = gr.Textbox(label="Image URL (Optional)")
+        with gr.Column():
+            title_in = gr.Textbox(label="Product Title")
+            about_in = gr.Textbox(label="About", lines=2)
+            desc_in = gr.Textbox(label="Description", lines=4)
+            img_in = gr.Textbox(label="Image URL (Optional)")
             gen_btn = gr.Button("🚀 Generate Prompt", variant="primary")
-            clear_btn = gr.Button("🗑️ Clear History")
-        with gr.Column(scale=2):
-            out = gr.Textbox(label="Generated Output", lines=20)
+        with gr.Column():
+            out_box = gr.Textbox(label="Output", lines=20)
     
-    history_table = gr.Dataframe(headers=["ID", "Time", "Product", "Title", "Preview"], label="History")
+    hist_table = gr.Dataframe(headers=["ID", "Time", "Product", "Title", "Preview"], label="History")
     h_state = gr.State([])
 
-    gen_btn.click(generate_and_update, [t, a, d, i], [out, h_state, history_table])
-    clear_btn.click(delete_history, None, [h_state, history_table])
+    gen_btn.click(gen_and_up, [title_in, about_in, desc_in, img_in], [out_box, h_state, hist_table])
 
 if __name__ == "__main__":
     demo.launch(server_name="0.0.0.0", server_port=7860)
