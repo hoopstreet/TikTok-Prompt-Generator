@@ -253,11 +253,6 @@ final_title
 
 generator = TikTokProductGenerator()
 
-def toggle_select_all(select_all, history):
-    if select_all:
-        return list(range(1, len(history) + 1))
-    return []
-
 def export_with_format(history, selected_ids, format_type):
     selected_data = [h for h in history if h["id"] in selected_ids]
     if format_type == "CSV":
@@ -272,13 +267,11 @@ custom_css = """
 body, .gradio-container { background-color: #1b1b1f !important; }
 .gr-button-primary { background-color: #FF6600 !important; border-color: #FF6600 !important; }
 .gr-button-primary:hover { background-color: #FF5500 !important; }
-input[type="checkbox"] { accent-color: #FF6600 !important; width: 18px; height: 18px; cursor: pointer; }
 .gr-dataframe { background-color: #2a2a2e !important; color: #FFFFFF !important; }
 .gr-dataframe table { width: 100%; border-collapse: collapse; }
-.gr-dataframe th, .gr-dataframe td { padding: 12px; text-align: left; border-bottom: 1px solid #3a3a3e; }
+.gr-dataframe th, .gr-dataframe td { padding: 10px; text-align: left; border-bottom: 1px solid #3a3a3e; }
 .gr-dataframe th { background-color: #000000; color: #FF6600; font-weight: 600; }
-.gr-dataframe td:first-child { text-align: center; width: 40px; }
-/* Remove copy and expand icons from table header */
+.gr-dataframe td:first-child { width: 40px; text-align: center; }
 .gr-dataframe .gr-button { display: none !important; }
 footer { visibility: hidden; }
 """
@@ -302,14 +295,13 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
         with gr.Column(scale=1):
             gr.Markdown("### Generation History")
             with gr.Row():
-                download_btn = gr.Button("Download", scale=0, size="sm")
-                gr.Markdown("&nbsp;&nbsp;|&nbsp;&nbsp;")
                 format_dropdown = gr.Dropdown(label="Format", choices=["CSV", "JSON", "Markdown"], scale=1)
+                download_btn = gr.Button("Download", scale=0, size="sm")
             
             history_display = gr.Dataframe(
                 label="",
                 headers=["[x]", "ID", "Positive Prompt", "Negative Prompt", "Final Title"],
-                interactive=False,
+                interactive=True,
                 wrap=True
             )
     
@@ -321,9 +313,21 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
         inputs=[product_title, about_this_product, product_description, image_url],
         outputs=[output, history_state]
     ).then(
-        fn=lambda h: [["⬜" if i+1 not in [] else "✅", h[i]["id"], h[i]["positive_prompt"], h[i]["negative_prompt"], h[i]["final_title"]] for i in range(len(h))],
+        fn=lambda h: [["", h[i]["id"], h[i]["positive_prompt"], h[i]["negative_prompt"], h[i]["final_title"]] for i in range(len(h))],
         inputs=[history_state],
         outputs=[history_display]
+    )
+    
+    def get_selected_ids(evt: gr.SelectData, history):
+        if evt.index:
+            if evt.index[1] == 0:
+                return [history[evt.index[0]]["id"]]
+        return []
+    
+    history_display.select(
+        fn=get_selected_ids,
+        inputs=[history_state],
+        outputs=[selected_ids_state]
     )
     
     download_btn.click(
