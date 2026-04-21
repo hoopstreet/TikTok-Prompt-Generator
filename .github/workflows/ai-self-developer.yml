@@ -1,0 +1,109 @@
+name: AI Self-Developer - Full Pipeline
+on:
+  push:
+    tags: ['v*']
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+    branches: [main, stable-v3]
+  workflow_dispatch:
+    inputs:
+      target_version: { default: 'v4.0.2' }
+      force_upgrade: { type: boolean, default: false }
+
+jobs:
+  validate-analyze:
+    runs-on: ubuntu-latest
+    outputs:
+      current_version: ${{ steps.version.outputs.current }}
+      needs_upgrade: ${{ steps.upgrade.outputs.needs }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: version
+        run: echo "current=$(git describe --tags --abbrev=0 2>/dev/null || echo 'v1.0.0')" >> $GITHUB_OUTPUT
+      - id: upgrade
+        run: |
+          NEEDS="false"
+          if [ ! -d "frontend" ] || [ "${{ github.event.inputs.force_upgrade }}" = "true" ]; then NEEDS="true"; fi
+          echo "needs=$NEEDS" >> $GITHUB_OUTPUT
+
+  self-test:
+    needs: validate-analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          pip install flake8
+          python -m py_compile app.py
+          flake8 app.py --max-line-length=150 --ignore=E501,W503 || echo "Lint warnings"
+  vite-fastapi-upgrade:
+    needs: [validate-analyze, self-test]
+    runs-on: ubuntu-latest
+    if: needs.validate-analyze.outputs.needs_upgrade == 'true'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+        with: { node-version: '18' }
+      - run: |
+          mkdir -p frontend/src
+          cat > frontend/package.json << 'PKG'
+          { "name": "tiktok-ui", "type": "module", "scripts": { "build": "vite build" },
+            "dependencies": { "react": "^18.2.0", "react-dom": "^18.2.0", "axios": "^1.6.0", "lucide-react": "^0.292.0", "react-hot-toast": "^2.4.1" },
+            "devDependencies": { "@vitejs/plugin-react": "^4.0.0", "vite": "^4.4.0", "tailwindcss": "^3.3.0", "autoprefixer": "^10.4.0", "postcss": "^8.4.0" } }
+          PKG
+          cat > frontend/src/App.tsx << 'APP'
+          import React, { useState } from 'react';
+          import { Trash2, Download, CheckSquare, Square } from 'lucide-react';
+          export default function App() {
+            const [selected, setSelected] = useState(new Set());
+            const history = [{id: '1', title: 'Sample Product'}]; 
+            const toggleAll = () => setSelected(selected.size === history.length ? new Set() : new Set(history.map(h => h.id)));
+            return (
+              <div className="bg-slate-900 text-white min-h-screen p-8">
+                <h1 className="text-orange-500 text-2xl font-bold">TikTok Prompt v4</h1>
+                <div className="mt-4 bg-slate-800 p-4 rounded-lg">
+                  <table className="w-full text-left">
+                    <thead><tr className="border-b border-slate-700">
+                      <th className="p-2"><button onClick={toggleAll}>{selected.size > 0 ? <CheckSquare/> : <Square/>}</button></th>
+                      <th className="p-2">Title</th><th className="p-2">Actions</th>
+                    </tr></thead>
+                    <tbody>{history.map(h => (<tr key={h.id}><td><Square/></td><td>{h.title}</td><td><Trash2/></td></tr>))}</tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          }
+          APP
+          cd frontend && npm install && npm run build
+      - run: |
+          mkdir -p backend
+          cat > backend/main.py << 'PY'
+          from fastapi import FastAPI
+          from fastapi.middleware.cors import CORSMiddleware
+          app = FastAPI()
+          app.add_middleware(CORSMiddleware, allow_origins=["*"])
+          @app.get("/api/history")
+          async def get_history(): return {"history": []}
+          @app.post("/api/generate")
+          async def generate(data: dict): return {"status": "success"}
+          PY
+          cat > Dockerfile << 'DF'
+          FROM node:18-alpine AS builder
+          WORKDIR /app/frontend
+          COPY frontend/ ./
+          RUN npm install && npm run build
+          FROM python:3.10-slim
+          WORKDIR /app
+          COPY --from=builder /app/frontend/dist ./static
+          RUN pip install fastapi uvicorn
+          COPY backend/ ./backend/
+          CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+          DF
+  deploy:
+    needs: [vite-fastapi-upgrade]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy to HF
+        run: |
+          git remote add hf https://hoopstreet:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/hoopstreet/TikTok-Prompt-Generator
+          git push hf master:main --force
