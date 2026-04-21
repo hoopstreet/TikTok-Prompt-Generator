@@ -405,3 +405,17 @@ grep "^## " DNA.md | wc -l
 
 **DNA-Signature: HOOPSTREET-AFFILIATE-LOGIC-2026**
 **Version: v2.6.0**
+
+### v4.0.0 (2026-04-21) - CURRENT
+- Full AI_TRAINING_CORE.md implementation (Sections 1-16)
+- HF Space deployment ready
+- Gradio UI with 4-card output protocol
+- Taglish localization with 10+ phrases
+- Niche detection for 11 categories
+- 1-to-1 positive/negative prompt mapping
+- Random shot timings from 2.1s-5.0s pool
+- 15-55s duration support
+- SEO titles with 80-100 chars, 5 hashtags
+- Infinity loop directive in Card 3
+- Mobile-first design for iSH compatibility
+
