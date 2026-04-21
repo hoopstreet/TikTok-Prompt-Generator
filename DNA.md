@@ -229,3 +229,8 @@ cat << 'EOF' >> CHANGELOG.md
 - AI_TRAINING_CORE compliant
 - All tests passing
 
+
+### Multi-Model AI Status (v4.2.1)
+- DeepSeek API: ✅ Active
+- Auto-fallback: Enabled (5 models)
+- Last check: 2026-04-21 12:22:03
