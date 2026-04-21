@@ -1,1 +1,10 @@
 gradio==4.26.0
+pandas
+pillow
+requests
+supabase
+python-dotenv
+transformers
+torch
+fastapi
+uvicorn

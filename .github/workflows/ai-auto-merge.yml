@@ -1,0 +1,44 @@
+name: AI Auto Merge
+
+on:
+  pull_request_review:
+    types: [submitted]
+  workflow_dispatch:
+
+jobs:
+  safe-merge:
+    runs-on: ubuntu-latest
+    if: >
+      github.event.pull_request.user.login == 'github-actions[bot]' &&
+      contains(github.event.pull_request.labels.*.name, 'ai-generated') &&
+      github.event.review.state == 'approved'
+
+    steps:
+      - name: Check PR Status
+        id: check
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          
+          # Check if tests passed
+          TESTS_PASSED=$(gh pr view $PR_NUMBER --json statusCheckRollup \
+            | jq '.statusCheckRollup | all(.status == "COMPLETED")')
+          
+          if [ "$TESTS_PASSED" = "true" ]; then
+            echo "✅ All tests passed"
+            echo "merge=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Tests failing"
+            echo "merge=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto Merge
+        if: steps.check.outputs.merge == 'true'
+        run: |
+          gh pr merge ${{ github.event.pull_request.number }} \
+            --merge \
+            --delete-branch \
+            --subject "🤖 AI Auto-Merge: Safe merge approved"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

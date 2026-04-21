@@ -1,0 +1,45 @@
+name: AI Training Core Priority Setup
+on:
+  push:
+    branches: [ main, stable-v3 ]
+    paths: [ 'AI_TRAINING_CORE.md', 'app.py' ]
+  workflow_dispatch:
+jobs:
+  validate-training-core:
+    runs-on: ubuntu-latest
+    outputs:
+      sections_complete: ${{ steps.validate.outputs.complete }}
+      missing_sections: ${{ steps.validate.outputs.missing }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Validate AI_TRAINING_CORE sections
+        id: validate
+        run: |
+          echo "# AI_TRAINING_CORE Validation Report" >> $GITHUB_STEP_SUMMARY
+          echo "| Section | Status | Implementation |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|----------------|" >> $GITHUB_STEP_SUMMARY
+          COMPLETE=0; MISSING=""
+          if grep -q "product_title\|about_this_product" app.py; then echo "| 1-2 | ✅ | Input parsing |" >> $GITHUB_STEP_SUMMARY; COMPLETE=$((COMPLETE+1)); else MISSING="$MISSING 1-2"; fi
+          if grep -q "def detect_niche\|NICHES" app.py; then echo "| 3 | ✅ | Niche detection |" >> $GITHUB_STEP_SUMMARY; COMPLETE=$((COMPLETE+1)); fi
+          if grep -q "forbidden\|keywords\|focus" app.py; then echo "| 4 | ✅ | Core Intelligence |" >> $GITHUB_STEP_SUMMARY; COMPLETE=$((COMPLETE+1)); fi
+          if grep -q "history\|conversation_id" app.py; then echo "| 5 | ✅ | Memory retention |" >> $GITHUB_STEP_SUMMARY; COMPLETE=$((COMPLETE+1)); fi
+          if grep -q "CAMERAS\|LIGHTING\|4K vertical" app.py; then echo "| 6 | ✅ | Video directives |" >> $GITHUB_STEP_SUMMARY; COMPLETE=$((COMPLETE+1)); fi
+          if grep -q "SHOT_TIMINGS\|DURATIONS" app.py; then echo "| 7 | ✅ | Shot timing pool |" >> $GITHUB_STEP_SUMMARY; COMPLETE=$((COMPLETE+1)); fi
+          if grep -q "TAGLISH_PHRASES" app.py; then echo "| 9 | ✅ | Taglish phrases |" >> $GITHUB_STEP_SUMMARY; COMPLETE=$((COMPLETE+1)); fi
+          if grep -q "4-cards\|card1_product_info" app.py; then echo "| 10 | ✅ | 4-card protocol |" >> $GITHUB_STEP_SUMMARY; COMPLETE=$((COMPLETE+1)); fi
+          if grep -q "positive_prompt\|negative_prompt" app.py; then echo "| 11 | ✅ | Column mapping |" >> $GITHUB_STEP_SUMMARY; COMPLETE=$((COMPLETE+1)); fi
+          if grep -q "Shot.*Negative" app.py; then echo "| 12 | ✅ | 1-to-1 Mapping |" >> $GITHUB_STEP_SUMMARY; COMPLETE=$((COMPLETE+1)); fi
+          echo "complete=$COMPLETE" >> $GITHUB_OUTPUT; echo "missing=$MISSING" >> $GITHUB_OUTPUT
+  update-dna-from-training:
+    needs: validate-training-core
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Update DNA.md
+        run: |
+          echo "## AI_TRAINING_CORE Status ($(date '+%Y-%m-%d'))" >> DNA.md
+          echo "- Compliance: ${{ needs.validate-training-core.outputs.sections_complete }}/16" >> DNA.md
+          git config --global user.name 'AI Training Bot'; git config --global user.email 'training@hoopstreet.com'
+          git add DNA.md && git commit -m "docs: sync training status" && git push origin main

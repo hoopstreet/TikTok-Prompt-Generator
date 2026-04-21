@@ -1,0 +1,33 @@
+name: AI Code Analyzer
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+  pull_request:
+    branches: [main, stable-v3]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Run Code Analysis
+        id: analyze
+        run: |
+          python .github/scripts/analyze_code.py
+          
+      - name: Upload Analysis Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: analysis-report
+          path: analysis_report.json

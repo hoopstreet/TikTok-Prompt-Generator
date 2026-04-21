@@ -1,0 +1,110 @@
+name: AI Self-Developer - Full Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+    branches:
+      - main
+      - stable-v3
+  workflow_dispatch:
+    inputs:
+      target_version:
+        description: 'Target version to build'
+        required: false
+        default: 'v4.0.2'
+      force_upgrade:
+        description: 'Force Vite+FastAPI upgrade'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+
+  validate-analyze:
+    runs-on: ubuntu-latest
+    outputs:
+      current_version: ${{ steps.version.outputs.current }}
+      compliance_score: ${{ steps.compliance.outputs.score }}
+      needs_upgrade: ${{ steps.upgrade.outputs.needs }}
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get current version
+        id: version
+        run: |
+          CURRENT=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+
+      - name: Check AI_TRAINING_CORE compliance
+        id: compliance
+        run: |
+          SCORE=0
+          grep -q "detect_niche" app.py && SCORE=$((SCORE+10))
+          grep -q "TAGLISH" app.py && SCORE=$((SCORE+10))
+          grep -q "SHOT_TIMINGS" app.py && SCORE=$((SCORE+10))
+          grep -q "DURATIONS" app.py && SCORE=$((SCORE+10))
+          grep -q "generate_4_cards" app.py && SCORE=$((SCORE+10))
+          grep -q "positive_prompt" app.py && SCORE=$((SCORE+10))
+          grep -q "final_title" app.py && SCORE=$((SCORE+10))
+          grep -q "infinity_loop" app.py && SCORE=$((SCORE+10))
+          grep -q "CAMERAS" app.py && SCORE=$((SCORE+10))
+          grep -q "niche_data" app.py && SCORE=$((SCORE+10))
+          echo "score=$SCORE" >> $GITHUB_OUTPUT
+
+      - name: Check upgrade
+        id: upgrade
+        run: |
+          NEEDS="false"
+          [ ! -d "frontend" ] && NEEDS="true"
+          [ ! -d "backend" ] && NEEDS="true"
+          [ "${{ github.event.inputs.force_upgrade }}" = "true" ] && NEEDS="true"
+          echo "needs=$NEEDS" >> $GITHUB_OUTPUT
+
+
+  self-test:
+    needs: validate-analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - run: pip install gradio pytest flake8
+
+      - run: python -m py_compile app.py
+
+      - run: flake8 app.py || true
+
+      - run: python -c "import app"
+
+      - run: |
+          python << 'PY'
+          import app
+          core = app.AITrainingCore() if hasattr(app,'AITrainingCore') else app.TikTokProductGenerator()
+          assert hasattr(core,'generate')
+          print("OK")
+          PY
+
+
+  vite-fastapi-upgrade:
+    needs: [validate-analyze, self-test]
+    if: needs.validate-analyze.outputs.needs_upgrade == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'

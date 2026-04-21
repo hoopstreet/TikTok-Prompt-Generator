@@ -1,0 +1,50 @@
+* 72b5cb3 docs: Update DNA.md with v4.0.0 version history
+* f78256c feat: v4.0.0 - HF Space deployment with full AI_TRAINING_CORE
+* a198013 feat: v4.0.0 - React + FastAPI with full AI_TRAINING_CORE
+* 30dfb97 feat: v3.6.0 - Delete button with confirmation, master checkbox, zebra table rows
+* b5c0f3e feat: v3.6.0 - Delete button with confirmation, master checkbox, zebra table rows
+* e892caa feat: v3.6.0 - Delete button with confirmation, master checkbox, zebra table rows
+* 42f4ed4 feat: v3.5.0 - layout: [Format] [Download] [Clear] | [x] | ID | Positive | Negative | Final Title
+* 74cda3c feat: v3.4.0 - layout: Format dropdown then Download button, table with [x] checkbox
+* 4d442e6 feat: v3.3.0 - clean table layout: Download | Format | [x] | ID | Positive | Negative | Final Title
+* 3fd0552 feat: v3.2.0 - UI refactor: clean header, aligned controls, row download
+* 8f23d84 Fix formatting and improve clarity in DNA.md
+* 3990046 fix: remove duplicate sections from DNA.md, add clean Database Maintenance section
+* 419a462 Update AI_TRAINING_CORE.md with final structure
+* 6af2727 fix: v2.8.1 - Gradio 6.0 compatibility, removed theme/css from Blocks, moved to launch()
+* 0771bf1 Update AI_TRAINING_CORE.md
+* fcaa81a feat: v3.1.0 - aligned checkboxes, cell copy icons, instant export dropdown, no confirm button
+* b2ae0b8 feat: v3.0.0 - final UI spec with aligned checkboxes, copy icons in cells, instant export dropdown
+* 76e1ebf feat: v2.9.0 - table with copy icons in cells, instant export dropdown
+* 4627700 feat: v2.8.0 - dark mode UI with checkbox selection and export system
+* 882db5e Update mobile-first rules in DNA.md
+* 08a0c6a Update Git push guidelines in DNA.md
+* 078b813 fix: remove duplicate sections, clean AI_TRAINING_CORE and DNA
+* 4bb20ef Delete AI_DEVELOPER.md
+* 8b03ac0 Rename AI_DEVELOPER to AI_DEVELOPER.md
+* d276f39 Add HTML structure for AI Developer Protocol
+* 979ddbd Revise AI Developer Protocol section in DNA.md
+* c93b4cf docs: v2.6.0 - add AI training responsibilities, DNA update protocol, auto-update instructions
+* 6d3cbf4 docs: append missing sections to DNA and AI_TRAINING_CORE
+* 63d56a1 docs: update AI_TRAINING_CORE.md and DNA.md to v2.5.0
+* 6939e75 feat: v2.5.0 - complete Supabase connection with testing_explorer table
+* 3cf3621 docs: add .env.template for environment variables
+* 4e1790d chore: remove .env from git, add to gitignore for security
+* af3b1c9 chore: add .env file with credentials
+* 59f8bfa chore: add .env with Supabase credentials, public RLS policies
+* e0e9e2e feat: v2.4.0 - Supabase integration with generation_history, training_materials, chat_history tables
+* 117e95f feat: v2.3.0 - download button with popup format selection, selectable rows in history table
+* 1105d33 feat: v2.2.0 - simplified UI, removed copy/refresh/clear icons, download button with dropdown
+* 227e7c2 fix: remove theme parameter and height attribute for Gradio 6.0 compatibility
+* 5217adc feat: v2.1.0 - mobile friendly UI, simplified table columns ID/Timestamp/Positive/Negative/Final Title
+* f2c38b0 feat: v2.0.0 - full UI with icons, history table, copy button, export dropdown, view expand
+* a197da9 feat: v1.9.0 - history table, copy button, CSV/JSON/Markdown export, bulk download
+* 3adc27b feat: clean output format - positive_prompt, negative_prompt, final_title only
+* 3cc6716 feat: enhanced app.py with shot matching, infinity loop, Supabase integration
+* d3bd5d9 docs: complete DNA.md and AI_TRAINING_CORE.md for v1.6.0
+* 4546f48 feat: enhanced app.py with 4-card output and full AI training integration
+* b018e50 feat: update app.py with matched input fields and image URL analyzer
+* d993980 update: v1.4.1 protocol rules
+* 189f6e1 update: v1.4.1 protocol (EOF safety + 150-char fragmentation rule)
+* 835c50f fix: clean corrupted app.py (removed nested bash + syntax errors)
+* 17b05da feat: integrate AI_TRAINING_CORE into app.py - TikTok Affiliate AI v1.4.0

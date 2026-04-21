@@ -1,0 +1,37 @@
+name: PR Labeler
+
+on:
+  pull_request:
+    types: [opened, edited]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label based on branch
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            let labels = [];
+            
+            if (branch === 'stable-v3') {
+              labels.push('stable-release');
+            } else if (branch === 'main') {
+              labels.push('production');
+            } else if (branch.startsWith('feature/')) {
+              labels.push('enhancement');
+            } else if (branch.startsWith('fix/')) {
+              labels.push('bug');
+            } else if (branch.startsWith('docs/')) {
+              labels.push('documentation');
+            }
+            
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: labels
+              });
+            }

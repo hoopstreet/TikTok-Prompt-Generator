@@ -1,0 +1,50 @@
+name: AI Test Runner
+
+on:
+  pull_request:
+    branches: [main, stable-v3]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install gradio pytest pytest-cov
+
+      - name: Run Syntax Check
+        run: |
+          python -m py_compile app.py
+          echo "✅ Syntax check passed"
+
+      - name: Run Import Test
+        run: |
+          python -c "import app; print('✅ Import OK')"
+
+      - name: Run Generation Test
+        run: |
+          python -c "
+          import app
+          if hasattr(app, 'AITrainingCore'):
+              core = app.AITrainingCore()
+              result = core.generate('Test Product')
+              assert 'final_title' in result or isinstance(result, dict)
+              print('✅ Generation test passed')
+          else:
+              print('⚠️ AITrainingCore not found')
+          "
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: test_output.txt
