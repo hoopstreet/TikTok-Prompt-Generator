@@ -1,0 +1,34 @@
+name: AI Self-Healing Loop
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"
+  workflow_dispatch:
+
+jobs:
+  self-heal:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run Analyzer
+        uses: ./.github/workflows/ai-code-analyzer.yml
+
+      - name: Run Fix Generator
+        uses: ./.github/workflows/ai-auto-fix.yml
+
+      - name: Run Tests
+        uses: ./.github/workflows/ai-test-runner.yml
+
+      - name: Auto Merge if Safe
+        uses: ./.github/workflows/ai-auto-merge.yml
+
+      - name: Bump Version
+        uses: ./.github/workflows/ai-version-bump.yml
+
+      - name: Log Healing Event
+        run: |
+          echo "## Self-Healing Loop Complete" >> $GITHUB_STEP_SUMMARY
+          echo "- Time: $(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: Success" >> $GITHUB_STEP_SUMMARY

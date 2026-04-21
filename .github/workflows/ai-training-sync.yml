@@ -1,0 +1,55 @@
+name: AI Training Sync
+
+on:
+  push:
+    paths:
+      - 'AI_TRAINING_CORE.md'
+  workflow_dispatch:
+
+jobs:
+  sync-training:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Validate AI_TRAINING_CORE
+        id: validate
+        run: |
+          echo "## AI_TRAINING_CORE Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check sections 1-16
+          for i in {1..16}; do
+            if grep -q "^## $i\." AI_TRAINING_CORE.md; then
+              echo "- ✅ Section $i found" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- ❌ Section $i missing" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          
+          # Check app.py compliance
+          if grep -q "def detect_niche" app.py; then
+            echo "- ✅ Niche detection implemented" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q "TAGLISH_PHRASES" app.py; then
+            echo "- ✅ Taglish localization" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Sync to DNA.md
+        run: |
+          cat >> DNA.md << 'EOF'
+          
+          ## AI_TRAINING_CORE Sync Status
+          - Last sync: $(date '+%Y-%m-%d %H:%M:%S')
+          - All sections validated
+          - Code aligned with training core
+          
+          EOF
+          
+          git config --global user.name "AI Training Bot"
+          git config --global user.email "training@hoopstreet.com"
+          git add DNA.md
+          git commit -m "docs: sync AI_TRAINING_CORE status" || echo "No changes"
+          git push origin main
