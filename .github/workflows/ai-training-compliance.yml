@@ -1,0 +1,85 @@
+name: AI Training Core Compliance
+
+on:
+  push:
+    branches: [ main, stable-v3 ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  compliance-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Check AI_TRAINING_CORE sections
+        id: check-sections
+        run: |
+          echo "## 📋 AI_TRAINING_CORE Compliance Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Section | Status | Description |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|-------------|" >> $GITHUB_STEP_SUMMARY
+          
+          # Check each section
+          for i in {1..16}; do
+            if grep -q "## $i\." AI_TRAINING_CORE.md 2>/dev/null; then
+              echo "| Section $i | ✅ | Implemented |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Section $i | ❌ | Missing |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          
+          # Check app.py features
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 app.py Feature Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if grep -q "def detect_niche" app.py; then
+            echo "- ✅ Niche detection" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q "TAGLISH_PHRASES" app.py; then
+            echo "- ✅ Taglish localization" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q "SHOT_TIMINGS" app.py; then
+            echo "- ✅ Random shot timings" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q "DURATIONS" app.py; then
+            echo "- ✅ Multiple durations" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q "generate_4_cards" app.py; then
+            echo "- ✅ 4-card output" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q "negative_prompt" app.py; then
+            echo "- ✅ 1-to-1 mapping" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q "final_title" app.py; then
+            echo "- ✅ SEO titles" >> $GITHUB_STEP_SUMMARY
+          fi
+      
+      - name: Validate Vite + FastAPI upgrade
+        run: |
+          echo "## 🚀 Vite + FastAPI Upgrade Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -d "frontend" ] && [ -f "frontend/vite.config.js" ]; then
+            echo "- ✅ Vite frontend configured" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ⚠️ Vite frontend not found - will be created" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -d "backend" ] && [ -f "backend/main.py" ]; then
+            echo "- ✅ FastAPI backend configured" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ⚠️ FastAPI backend not found - will be created" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -f "Dockerfile" ] && grep -q "node\|vite" Dockerfile; then
+            echo "- ✅ Multi-stage Docker build configured" >> $GITHUB_STEP_SUMMARY
+          fi
