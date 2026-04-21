@@ -1,0 +1,18 @@
+name: Update AI Dashboard
+on:
+  push:
+    branches: [ main, stable-v3 ]
+  workflow_dispatch:
+
+jobs:
+  build-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Generate HTML
+        run: python3 .github/scripts/dashboard.py
+      - name: Upload Dashboard
+        uses: actions/upload-artifact@v3
+        with:
+          name: devops-dashboard
+          path: dashboard.html
