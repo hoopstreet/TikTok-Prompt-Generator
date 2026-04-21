@@ -1,4 +1,5 @@
 name: Update AI Dashboard
+
 on:
   push:
     branches: [ main, stable-v3 ]
@@ -9,8 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
       - name: Generate HTML
-        run: python3 .github/scripts/dashboard.py
+        run: |
+          if [ -f ".github/scripts/dashboard.py" ]; then
+            python3 .github/scripts/dashboard.py
+          else
+            echo "Dashboard script not found"
+          fi
       - name: Upload Dashboard
         uses: actions/upload-artifact@v3
         with:
