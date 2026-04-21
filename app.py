@@ -282,125 +282,64 @@ def delete_with_confirmation(history, selected_ids, confirm):
 
 custom_css = """
 body, .gradio-container { background-color: #1b1b1f !important; }
+
+/* Buttons */
 .gr-button-primary { background-color: #FF6600 !important; border-color: #FF6600 !important; }
 .gr-button-primary:hover { background-color: #FF5500 !important; }
-.delete-btn { background-color: #dc2626 !important; border-color: #dc2626 !important; color: white !important; }
+
+.delete-btn { background-color: #dc2626 !important; color: white !important; }
 .delete-btn:hover { background-color: #b91c1c !important; }
-input[type="checkbox"] { accent-color: #FF6600 !important; width: 18px; height: 18px; cursor: pointer; }
-.gr-dataframe { background-color: #2a2a2e !important; color: #FFFFFF !important; }
-.gr-dataframe table { width: 100%; border-collapse: collapse; }
-.gr-dataframe th, .gr-dataframe td { padding: 10px; text-align: left; border-bottom: 1px solid #3a3a3e; }
+
+/* Table */
+.gr-dataframe { background-color: #2a2a2e !important; color: #fff !important; }
+.gr-dataframe th { background-color: #000 !important; color: #FF6600 !important; }
 .gr-dataframe tr:nth-child(even) { background-color: #1f1f23; }
 .gr-dataframe tr:nth-child(odd) { background-color: #2a2a2e; }
-.gr-dataframe th { background-color: #000000; color: #FF6600; font-weight: 600; }
-.gr-dataframe td:first-child { width: 40px; text-align: center; }
-.gr-dataframe .gr-button { display: none !important; }
+
+/* Hide unwanted icons */
+button[title="Copy"] { display: none !important; }
+button[title="Fullscreen"] { display: none !important; }
+
 footer { visibility: hidden; }
 """
 
 with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
     gr.Markdown("# 🎬 TikTok-Prompt-Generator")
-    
+
+    # INPUT
     with gr.Row():
-        with gr.Column(scale=1):
-            product_title = gr.Textbox(label="Product Title", placeholder="Enter product name")
-            about_this_product = gr.Textbox(label="About This Product", lines=2)
-            product_description = gr.Textbox(label="Product Description", lines=3)
-            image_url = gr.Textbox(label="Image URL", placeholder="https://...")
-            generate_btn = gr.Button("Generate", variant="primary")
-    
+        product_title = gr.Textbox(label="Product Title")
+        about_this_product = gr.Textbox(label="About", lines=2)
+        product_description = gr.Textbox(label="Description", lines=3)
+        image_url = gr.Textbox(label="Image URL")
+
+    generate_btn = gr.Button("Generate", variant="primary")
+
+    output = gr.Textbox(label="Generated Output", lines=15)
+
+    # HISTORY SECTION
+    gr.Markdown("### Generation History")
+
+    # 🔥 TOP BAR (MATCH YOUR SPEC)
     with gr.Row():
-        with gr.Column(scale=1):
-            output = gr.Textbox(label="Generated Output", lines=20)
-    
-    with gr.Row():
-        with gr.Column(scale=1):
-            gr.Markdown("### Generation History")
-            with gr.Row():
-                format_dropdown = gr.Dropdown(label="Format", choices=["CSV", "JSON", "Markdown"], scale=1)
-                download_btn = gr.Button("Download", scale=0, size="sm")
-                delete_btn = gr.Button("Delete", scale=0, size="sm", elem_classes="delete-btn")
-            
-            history_display = gr.Dataframe(
-                label="",
-                headers=["[ ]", "ID", "Timestamp", "Positive Prompt", "Negative Prompt", "Final Title"],
-                interactive=True,
-                wrap=True
-            )
-            delete_confirm = gr.Radio(choices=["no", "yes"], label="Confirm delete?", visible=False)
-    
-    history_state = gr.State([])
-    selected_ids_state = gr.State([])
-    def update_table(history, selected_ids):
-        return [["✅" if h["id"] in selected_ids else "⬜", h["id"], h["timestamp"], h["positive_prompt"], h["negative_prompt"], h["final_title"]] for h in history]
-    
-    generate_btn.click(
-        fn=generator.generate,
-        inputs=[product_title, about_this_product, product_description, image_url],
-        outputs=[output, history_state]
-    ).then(
-        fn=update_table,
-        inputs=[history_state, selected_ids_state],
-        outputs=[history_display]
-    )
-    
-    def select_row(evt: gr.SelectData, history, selected_ids):
-        if evt.index and evt.index[1] == 0:
-            row_id = history[evt.index[0]]["id"]
-            if row_id in selected_ids:
-                selected_ids.remove(row_id)
-            else:
-                selected_ids.append(row_id)
-        return selected_ids
-    
-    history_display.select(
-        fn=select_row,
-        inputs=[history_state, selected_ids_state],
-        outputs=[selected_ids_state]
-    ).then(
-        fn=update_table,
-        inputs=[history_state, selected_ids_state],
-        outputs=[history_display]
-    )
-    
-    def toggle_all(history, selected_ids, select_all):
-        if select_all:
-            selected_ids = [h["id"] for h in history]
-        else:
-            selected_ids = []
-        return selected_ids
-    
-    download_btn.click(
-        fn=export_with_format,
-        inputs=[history_state, selected_ids_state, format_dropdown],
-        outputs=[output]
-    )
-    def show_delete_confirm():
-        return gr.update(visible=True)
-    
-    delete_btn.click(
-        fn=show_delete_confirm,
-        inputs=[],
-        outputs=[delete_confirm]
-    )
-    
-    def process_delete(history, selected_ids, confirm):
-        if confirm == "yes":
-            if not selected_ids:
-                selected_ids = [h["id"] for h in history]
-            new_history = [h for h in history if h["id"] not in selected_ids]
-            generator.history = new_history
-            return new_history, [], "Deleted", gr.update(visible=False)
-        return history, selected_ids, "Cancelled", gr.update(visible=False)
-    
-    delete_confirm.change(
-        fn=process_delete,
-        inputs=[history_state, selected_ids_state, delete_confirm],
-        outputs=[history_state, selected_ids_state, output, delete_confirm]
-    ).then(
-        fn=update_table,
-        inputs=[history_state, selected_ids_state],
-        outputs=[history_display]
+        format_dropdown = gr.Dropdown(
+            choices=["CSV", "JSON"],
+            value="CSV",
+            scale=1,
+            label=None
+        )
+        download_btn = gr.Button("Download", scale=0)
+        delete_btn = gr.Button("Delete", scale=0, elem_classes="delete-btn")
+
+    # ✅ MASTER SELECT
+    select_all = gr.Checkbox(label="Select All")
+
+    # TABLE
+    history_display = gr.Dataframe(
+        headers=["Select", "ID", "Timestamp", "Positive Prompt", "Negative Prompt", "Final Title"],
+        interactive=False
     )
 
-demo.launch(server_name="0.0.0.0", server_port=7860, css=custom_css)
+    # STATE
+    history_state = gr.State([])
+    selected_ids_state = gr.State([])
