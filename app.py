@@ -250,6 +250,10 @@ final_title
             neg_short = h["negative_prompt"][:80] + "..." if len(h["negative_prompt"]) > 80 else h["negative_prompt"]
             md += f"| {h['id']} | {h['timestamp']} | {pos_short} | {neg_short} | {h['final_title']} |\n"
         return md
+    
+    def delete_selected(self, selected_ids):
+        self.history = [h for h in self.history if h["id"] not in selected_ids]
+        return self.history, []
 
 generator = TikTokProductGenerator()
 
@@ -258,10 +262,9 @@ def toggle_select_all(select_all, history):
         return list(range(1, len(history) + 1))
     return []
 
-def clear_selected():
-    return []
-
 def export_with_format(history, selected_ids, format_type):
+    if not selected_ids:
+        selected_ids = [h["id"] for h in history]
     selected_data = [h for h in history if h["id"] in selected_ids]
     if format_type == "CSV":
         return generator.export_to_csv(selected_data)
@@ -271,14 +274,24 @@ def export_with_format(history, selected_ids, format_type):
         return generator.export_to_markdown(selected_data)
     return "Select format"
 
+def delete_with_confirmation(history, selected_ids, confirm):
+    if confirm == "yes":
+        generator.history = [h for h in history if h["id"] not in selected_ids]
+        return generator.history, [], "Deleted successfully"
+    return history, selected_ids, "Cancelled"
+
 custom_css = """
 body, .gradio-container { background-color: #1b1b1f !important; }
 .gr-button-primary { background-color: #FF6600 !important; border-color: #FF6600 !important; }
 .gr-button-primary:hover { background-color: #FF5500 !important; }
+.delete-btn { background-color: #dc2626 !important; border-color: #dc2626 !important; color: white !important; }
+.delete-btn:hover { background-color: #b91c1c !important; }
 input[type="checkbox"] { accent-color: #FF6600 !important; width: 18px; height: 18px; cursor: pointer; }
 .gr-dataframe { background-color: #2a2a2e !important; color: #FFFFFF !important; }
 .gr-dataframe table { width: 100%; border-collapse: collapse; }
 .gr-dataframe th, .gr-dataframe td { padding: 10px; text-align: left; border-bottom: 1px solid #3a3a3e; }
+.gr-dataframe tr:nth-child(even) { background-color: #1f1f23; }
+.gr-dataframe tr:nth-child(odd) { background-color: #2a2a2e; }
 .gr-dataframe th { background-color: #000000; color: #FF6600; font-weight: 600; }
 .gr-dataframe td:first-child { width: 40px; text-align: center; }
 .gr-dataframe .gr-button { display: none !important; }
@@ -306,63 +319,86 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
             with gr.Row():
                 format_dropdown = gr.Dropdown(label="Format", choices=["CSV", "JSON", "Markdown"], scale=1)
                 download_btn = gr.Button("Download", scale=0, size="sm")
-                clear_btn = gr.Button("Clear", scale=0, size="sm")
+                delete_btn = gr.Button("Delete", scale=0, size="sm", elem_classes="delete-btn")
             
             history_display = gr.Dataframe(
                 label="",
-                headers=["[x]", "ID", "Positive Prompt", "Negative Prompt", "Final Title"],
+                headers=["[ ]", "ID", "Timestamp", "Positive Prompt", "Negative Prompt", "Final Title"],
                 interactive=True,
                 wrap=True
             )
+            delete_confirm = gr.Radio(choices=["no", "yes"], label="Confirm delete?", visible=False)
     
     history_state = gr.State([])
     selected_ids_state = gr.State([])
+    def update_table(history, selected_ids):
+        return [["✅" if h["id"] in selected_ids else "⬜", h["id"], h["timestamp"], h["positive_prompt"], h["negative_prompt"], h["final_title"]] for h in history]
+    
     generate_btn.click(
         fn=generator.generate,
         inputs=[product_title, about_this_product, product_description, image_url],
         outputs=[output, history_state]
     ).then(
-        fn=lambda h: [["", h[i]["id"], h[i]["positive_prompt"], h[i]["negative_prompt"], h[i]["final_title"]] for i in range(len(h))],
-        inputs=[history_state],
-        outputs=[history_display]
-    )
-    
-    def get_selected_ids(evt: gr.SelectData, history):
-        if evt.index:
-            if evt.index[1] == 0:
-                current = selected_ids_state.value if hasattr(selected_ids_state, 'value') else []
-                row_id = history[evt.index[0]]["id"]
-                if row_id in current:
-                    current.remove(row_id)
-                else:
-                    current.append(row_id)
-                return current
-        return selected_ids_state.value if hasattr(selected_ids_state, 'value') else []
-    
-    def update_checkbox_display(history, selected_ids):
-        return [["✅" if h["id"] in selected_ids else "⬜", h["id"], h["positive_prompt"], h["negative_prompt"], h["final_title"]] for h in history]
-    
-    history_display.select(
-        fn=get_selected_ids,
-        inputs=[history_state],
-        outputs=[selected_ids_state]
-    ).then(
-        fn=update_checkbox_display,
+        fn=update_table,
         inputs=[history_state, selected_ids_state],
         outputs=[history_display]
     )
+    
+    def select_row(evt: gr.SelectData, history, selected_ids):
+        if evt.index and evt.index[1] == 0:
+            row_id = history[evt.index[0]]["id"]
+            if row_id in selected_ids:
+                selected_ids.remove(row_id)
+            else:
+                selected_ids.append(row_id)
+        return selected_ids
+    
+    history_display.select(
+        fn=select_row,
+        inputs=[history_state, selected_ids_state],
+        outputs=[selected_ids_state]
+    ).then(
+        fn=update_table,
+        inputs=[history_state, selected_ids_state],
+        outputs=[history_display]
+    )
+    
+    def toggle_all(history, selected_ids, select_all):
+        if select_all:
+            selected_ids = [h["id"] for h in history]
+        else:
+            selected_ids = []
+        return selected_ids
+    
     download_btn.click(
         fn=export_with_format,
         inputs=[history_state, selected_ids_state, format_dropdown],
         outputs=[output]
     )
+    def show_delete_confirm():
+        return gr.update(visible=True)
     
-    clear_btn.click(
-        fn=clear_selected,
+    delete_btn.click(
+        fn=show_delete_confirm,
         inputs=[],
-        outputs=[selected_ids_state]
+        outputs=[delete_confirm]
+    )
+    
+    def process_delete(history, selected_ids, confirm):
+        if confirm == "yes":
+            if not selected_ids:
+                selected_ids = [h["id"] for h in history]
+            new_history = [h for h in history if h["id"] not in selected_ids]
+            generator.history = new_history
+            return new_history, [], "Deleted", gr.update(visible=False)
+        return history, selected_ids, "Cancelled", gr.update(visible=False)
+    
+    delete_confirm.change(
+        fn=process_delete,
+        inputs=[history_state, selected_ids_state, delete_confirm],
+        outputs=[history_state, selected_ids_state, output, delete_confirm]
     ).then(
-        fn=update_checkbox_display,
+        fn=update_table,
         inputs=[history_state, selected_ids_state],
         outputs=[history_display]
     )
