@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
     inputs:
       model_priority:
-        description: 'Model priority'
-        default: 'deepseek'
+        description: 'Priority (auto/deepseek-api/deepseek-hf/codellama/starcoder)'
+        default: 'auto'
       force_fix:
         description: 'Force fix generation'
         type: boolean
@@ -18,29 +18,48 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - name: Dependencies
+        with: { python-version: '3.10' }
+      - name: Install dependencies
         run: pip install requests
       - name: Run Multi-Model AI Check
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: python .github/scripts/multi_model_ai.py
-      - name: Check Model Status
+      - name: Generate Status Report
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           python -c "
           import os
-          summary = '## 🤖 Model Status Report\n\n'
-          summary += '- ✅ DeepSeek: Configured\n' if os.environ.get('DEEPSEEK_API_KEY') else '- ⚠️ DeepSeek: Missing\n'
-          summary += '- ✅ Hugging Face: Configured\n' if os.environ.get('HF_TOKEN') else '- ⚠️ Hugging Face: Missing\n'
+          ds_api = '✅' if os.environ.get('DEEPSEEK_API_KEY') else '❌'
+          hf_tok = '✅' if os.environ.get('HF_TOKEN') else '❌'
+          summary = f'''
+          ## 🤖 AI Status Report
+          | Credential | Status |
+          |---|---|
+          | DeepSeek API | {ds_api} |
+          | HF Token | {hf_tok} |
+          
+          ### Fallback Chain
+          1. **DeepSeek API** ({ds_api})
+          2. **DeepSeek HF** ({hf_tok})
+          3. **CodeLlama** ({hf_tok})
+          4. **StarCoder** ({hf_tok})
+          5. **CodeGen** ({hf_tok})
+          '''
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f: f.write(summary)
           "
       - name: Update DNA.md
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          echo -e "\n### Multi-Model AI Status (v4.2.0)\n- DeepSeek: Active\n- CodeLlama/StarCoder: Available (HF)\n- Auto-fallback: Enabled" >> DNA.md
+          DS_ST=$( [ -z "$DEEPSEEK_API_KEY" ] && echo "⚠️ HF Fallback" || echo "✅ Active" )
+          echo -e "\n### Multi-Model AI Status (v4.2.1)\n- DeepSeek API: $DS_ST\n- Auto-fallback: Enabled (5 models)\n- Last check: $(date '+%Y-%m-%d %H:%M:%S')" >> DNA.md
           git config --global user.name "AI Multi-Model Bot"
           git config --global user.email "ai@hoopstreet.com"
           git add DNA.md
           git commit -m "docs: sync multi-model status" || echo "No changes"
-          git push origin main || echo "Push skipped"
+          git push origin main
