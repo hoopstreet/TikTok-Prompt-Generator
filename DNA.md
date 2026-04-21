@@ -168,3 +168,40 @@ cat << 'EOF' >> CHANGELOG.md
 - Uses existing HF_TOKEN from GitHub Secrets
 - No additional setup required
 - Automatic model health checks every 4 hours
+
+
+## 18. Multi-Model AI Support (v4.2.1) - CURRENT
+
+### Model Architecture
+
+### Model Priority Table
+
+| Priority | Model | Provider | Requirements | Quality |
+|----------|-------|----------|--------------|---------|
+| 1 | DeepSeek Coder (API) | DeepSeek | API Key | ⭐⭐⭐⭐⭐ |
+| 2 | DeepSeek Coder (HF) | Hugging Face | HF Token | ⭐⭐⭐⭐⭐ |
+| 3 | CodeLlama 7B | Hugging Face | HF Token | ⭐⭐⭐⭐ |
+| 4 | StarCoder2 3B | Hugging Face | HF Token | ⭐⭐⭐⭐ |
+| 5 | CodeGen 350M | Hugging Face | HF Token | ⭐⭐⭐ |
+| 6 | Rule-Based | Built-in | None | ⭐⭐ |
+
+### Features
+
+- ✅ **Dual DeepSeek Access** - API key OR Hugging Face token
+- ✅ **5 AI Models** - Maximum coverage
+- ✅ **Automatic Fallback** - Seamless degradation
+- ✅ **Zero Cost Options** - HF Token provides 4 free models
+- ✅ **Graceful Degradation** - Works even with no keys
+
+### Credential Flexibility
+
+| You Have | Models Available |
+|----------|------------------|
+| Both API Key + HF Token | All 5 models |
+| Only HF Token | 4 models (DeepSeek HF + CodeLlama + StarCoder + CodeGen) |
+| Only API Key | 1 model (DeepSeek API) |
+| Neither | Rule-based fallback |
+
+**Status:** ✅ CURRENT - Production Ready
+**Version:** v4.2.1
+
