@@ -1,0 +1,73 @@
+name: AI Orchestrator - Main Controller
+
+on:
+  schedule:
+    - cron: "0 */4 * * *"  # Every 4 hours
+  workflow_dispatch:
+    inputs:
+      force_full_scan:
+        description: 'Force full system scan'
+        type: boolean
+        default: false
+
+jobs:
+  orchestrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Run Task Manager
+        id: task
+        run: |
+          python .github/scripts/task_manager.py
+          echo "status=done" >> $GITHUB_OUTPUT
+      
+      - name: Check API Keys Status
+        id: check-api
+        run: |
+          MISSING_KEYS=""
+          if [ -z "${{ secrets.DEEPSEEK_API_KEY }}" ]; then
+            MISSING_KEYS="$MISSING_KEYS DEEPSEEK_API_KEY"
+          fi
+          if [ -z "${{ secrets.HF_TOKEN }}" ]; then
+            MISSING_KEYS="$MISSING_KEYS HF_TOKEN"
+          fi
+          
+          if [ -n "$MISSING_KEYS" ]; then
+            echo "⚠️ Missing API keys:$MISSING_KEYS"
+            echo "⚠️ AI features limited. Add to GitHub Secrets."
+            echo "missing=true" >> $GITHUB_OUTPUT
+          else
+            echo "✅ All API keys configured"
+            echo "missing=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Run Code Analysis (if keys OK)
+        if: steps.check-api.outputs.missing == 'false'
+        uses: ./.github/workflows/ai-code-analyzer.yml
+      
+      - name: Run Self-Healing (always)
+        uses: ./.github/workflows/ai-self-healing.yml
+      
+      - name: Create Summary Report
+        run: |
+          cat > $GITHUB_STEP_SUMMARY << 'SUMMARY'
+          # 🤖 AI Orchestrator Report
+          
+          ## System Status
+          - **Timestamp:** $(date '+%Y-%m-%d %H:%M:%S')
+          - **API Keys:** ${{ steps.check-api.outputs.missing == 'false' && '✅ Configured' || '⚠️ Missing' }}
+          - **Workflows:** Active
+          
+          ## Next Steps
+          - Check dashboard: https://github.com/hoopstreet/TikTok-Prompt-Generator/actions
+          - Review DNA.md for roadmap
+          - Add missing API keys to enable full AI features
+          
+          SUMMARY

@@ -1,0 +1,29 @@
+name: AI Notifications
+
+on:
+  workflow_run:
+    workflows: ["AI Code Analyzer", "AI Auto Fix", "AI Self-Healing Loop"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Run Task Manager
+        run: |
+          python .github/scripts/task_manager.py
+      
+      - name: Create Status Badge
+        run: |
+          # Create status badge for README
+          echo "![AI DevOps Status](https://github.com/hoopstreet/TikTok-Prompt-Generator/actions/workflows/ai-self-healing.yml/badge.svg)" > status_badge.md
+      
+      - name: Send Notification (if configured)
+        if: github.event.workflow_run.conclusion == 'failure'
+        run: |
+          echo "⚠️ Workflow failed: ${{ github.event.workflow_run.name }}"
+          echo "Check logs: ${{ github.event.workflow_run.html_url }}"
