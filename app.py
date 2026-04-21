@@ -253,6 +253,14 @@ final_title
 
 generator = TikTokProductGenerator()
 
+def toggle_select_all(select_all, history):
+    if select_all:
+        return list(range(1, len(history) + 1))
+    return []
+
+def clear_selected():
+    return []
+
 def export_with_format(history, selected_ids, format_type):
     selected_data = [h for h in history if h["id"] in selected_ids]
     if format_type == "CSV":
@@ -267,6 +275,7 @@ custom_css = """
 body, .gradio-container { background-color: #1b1b1f !important; }
 .gr-button-primary { background-color: #FF6600 !important; border-color: #FF6600 !important; }
 .gr-button-primary:hover { background-color: #FF5500 !important; }
+input[type="checkbox"] { accent-color: #FF6600 !important; width: 18px; height: 18px; cursor: pointer; }
 .gr-dataframe { background-color: #2a2a2e !important; color: #FFFFFF !important; }
 .gr-dataframe table { width: 100%; border-collapse: collapse; }
 .gr-dataframe th, .gr-dataframe td { padding: 10px; text-align: left; border-bottom: 1px solid #3a3a3e; }
@@ -297,6 +306,7 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
             with gr.Row():
                 format_dropdown = gr.Dropdown(label="Format", choices=["CSV", "JSON", "Markdown"], scale=1)
                 download_btn = gr.Button("Download", scale=0, size="sm")
+                clear_btn = gr.Button("Clear", scale=0, size="sm")
             
             history_display = gr.Dataframe(
                 label="",
@@ -307,7 +317,6 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
     
     history_state = gr.State([])
     selected_ids_state = gr.State([])
-    
     generate_btn.click(
         fn=generator.generate,
         inputs=[product_title, about_this_product, product_description, image_url],
@@ -321,19 +330,41 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
     def get_selected_ids(evt: gr.SelectData, history):
         if evt.index:
             if evt.index[1] == 0:
-                return [history[evt.index[0]]["id"]]
-        return []
+                current = selected_ids_state.value if hasattr(selected_ids_state, 'value') else []
+                row_id = history[evt.index[0]]["id"]
+                if row_id in current:
+                    current.remove(row_id)
+                else:
+                    current.append(row_id)
+                return current
+        return selected_ids_state.value if hasattr(selected_ids_state, 'value') else []
+    
+    def update_checkbox_display(history, selected_ids):
+        return [["✅" if h["id"] in selected_ids else "⬜", h["id"], h["positive_prompt"], h["negative_prompt"], h["final_title"]] for h in history]
     
     history_display.select(
         fn=get_selected_ids,
         inputs=[history_state],
         outputs=[selected_ids_state]
+    ).then(
+        fn=update_checkbox_display,
+        inputs=[history_state, selected_ids_state],
+        outputs=[history_display]
     )
-    
     download_btn.click(
         fn=export_with_format,
         inputs=[history_state, selected_ids_state, format_dropdown],
         outputs=[output]
+    )
+    
+    clear_btn.click(
+        fn=clear_selected,
+        inputs=[],
+        outputs=[selected_ids_state]
+    ).then(
+        fn=update_checkbox_display,
+        inputs=[history_state, selected_ids_state],
+        outputs=[history_display]
     )
 
 demo.launch(server_name="0.0.0.0", server_port=7860, css=custom_css)
