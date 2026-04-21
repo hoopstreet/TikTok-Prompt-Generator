@@ -204,8 +204,8 @@ final_title
         history_entry = {
             "id": len(self.history) + 1,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "positive_prompt": positives[:500] + "..." if len(positives) > 500 else positives,
-            "negative_prompt": negatives[:500] + "..." if len(negatives) > 500 else negatives,
+            "positive_prompt": positives[:300] + "..." if len(positives) > 300 else positives,
+            "negative_prompt": negatives[:300] + "..." if len(negatives) > 300 else negatives,
             "final_title": final_title,
             "full_output": output
         }
@@ -272,14 +272,15 @@ custom_css = """
 body, .gradio-container { background-color: #1b1b1f !important; }
 .gr-button-primary { background-color: #FF6600 !important; border-color: #FF6600 !important; }
 .gr-button-primary:hover { background-color: #FF5500 !important; }
-input[type="checkbox"] { accent-color: #FF6600 !important; }
+input[type="checkbox"] { accent-color: #FF6600 !important; width: 18px; height: 18px; cursor: pointer; }
 .gr-dataframe { background-color: #2a2a2e !important; color: #FFFFFF !important; }
 .gr-dataframe table { width: 100%; border-collapse: collapse; }
 .gr-dataframe th, .gr-dataframe td { padding: 12px; text-align: left; border-bottom: 1px solid #3a3a3e; }
-.gr-dataframe th { background-color: #1f1f23; color: #FF6600; }
-footer { visibility: hidden; }
+.gr-dataframe th { background-color: #000000; color: #FF6600; font-weight: 600; }
+.gr-dataframe td:first-child { text-align: center; width: 40px; }
 /* Remove copy and expand icons from table header */
 .gr-dataframe .gr-button { display: none !important; }
+footer { visibility: hidden; }
 """
 
 with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
@@ -301,13 +302,13 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
         with gr.Column(scale=1):
             gr.Markdown("### Generation History")
             with gr.Row():
-                select_all_checkbox = gr.Checkbox(label="Select All", scale=0)
-                format_dropdown = gr.Dropdown(label="Format", choices=["CSV", "JSON", "Markdown"], scale=1)
                 download_btn = gr.Button("Download", scale=0, size="sm")
+                gr.Markdown("&nbsp;&nbsp;|&nbsp;&nbsp;")
+                format_dropdown = gr.Dropdown(label="Format", choices=["CSV", "JSON", "Markdown"], scale=1)
             
             history_display = gr.Dataframe(
                 label="",
-                headers=["ID", "Timestamp", "Positive Prompt", "Negative Prompt", "Final Title", "Actions"],
+                headers=["[x]", "ID", "Positive Prompt", "Negative Prompt", "Final Title"],
                 interactive=False,
                 wrap=True
             )
@@ -320,28 +321,9 @@ with gr.Blocks(title="TikTok-Prompt-Generator") as demo:
         inputs=[product_title, about_this_product, product_description, image_url],
         outputs=[output, history_state]
     ).then(
-        fn=lambda h: [[h[i]["id"], h[i]["timestamp"], h[i]["positive_prompt"], h[i]["negative_prompt"], h[i]["final_title"], "⬇️"] for i in range(len(h))],
+        fn=lambda h: [["⬜" if i+1 not in [] else "✅", h[i]["id"], h[i]["positive_prompt"], h[i]["negative_prompt"], h[i]["final_title"]] for i in range(len(h))],
         inputs=[history_state],
         outputs=[history_display]
-    )
-    
-    select_all_checkbox.change(
-        fn=toggle_select_all,
-        inputs=[select_all_checkbox, history_state],
-        outputs=[selected_ids_state]
-    )
-    
-    def get_selected_from_table(evt: gr.SelectData, history):
-        if evt.index:
-            if evt.index[1] == 5:
-                return [history[evt.index[0]]["id"]]
-            return [history[i]["id"] for i in evt.index if i < len(history)]
-        return []
-    
-    history_display.select(
-        fn=get_selected_from_table,
-        inputs=[history_state],
-        outputs=[selected_ids_state]
     )
     
     download_btn.click(
