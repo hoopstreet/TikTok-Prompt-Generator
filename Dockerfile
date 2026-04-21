@@ -1,5 +1,17 @@
-FROM python:3.10
+FROM python:3.10-slim
+
 WORKDIR /app
-COPY backend/ backend/
-RUN pip install fastapi uvicorn
-CMD ["uvicorn","backend.main:app","--host","0.0.0.0","--port","8000"]
+
+# Copy requirements and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY app.py .
+COPY space.yaml . 2>/dev/null || true
+
+# Expose port
+EXPOSE 7860
+
+# Run the application
+CMD ["python", "app.py"]
