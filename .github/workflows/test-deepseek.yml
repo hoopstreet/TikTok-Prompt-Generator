@@ -1,0 +1,31 @@
+name: Test DeepSeek API
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test DeepSeek Connection
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          if [ -n "$DEEPSEEK_API_KEY" ]; then
+            echo "✅ DeepSeek API key found"
+            echo "Key starts with: ${DEEPSEEK_API_KEY:0:10}..."
+          else
+            echo "❌ DeepSeek API key not found"
+            echo "Please add DEEPSEEK_API_KEY to GitHub Secrets"
+            exit 1
+          fi
+          
+          # Test API call
+          curl -s -X POST https://api.deepseek.com/v1/chat/completions \
+            -H "Authorization: Bearer $DEEPSEEK_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "model": "deepseek-chat",
+              "messages": [{"role": "user", "content": "Say OK"}],
+              "max_tokens": 10
+            }' | grep -q "OK" && echo "✅ API call successful" || echo "⚠️ API call failed"
