@@ -1,0 +1,67 @@
+name: AI Self-Healing Dev System
+
+on:
+  push:
+    tags: ['v*']
+  pull_request:
+    branches: [main, stable-v3]
+  workflow_dispatch:
+
+jobs:
+
+  self-heal:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - run: pip install --upgrade pip
+
+      - run: |
+          pip install requests gradio || true
+
+      - run: python .github/scripts/self-heal.py
+
+      - name: Commit fixes
+        run: |
+          git config --global user.name "AI Self-Healer"
+          git config --global user.email "ai@bot.com"
+          git add .
+          git diff --cached --quiet || git commit -m "🤖 Auto Heal Fix"
+          git push || echo "No changes"
+
+  test:
+    needs: self-heal
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - run: python -m py_compile app.py
+
+      - run: python -c "import app"
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: |
+          echo "FROM python:3.10" > Dockerfile
+          echo "WORKDIR /app" >> Dockerfile
+          echo "COPY . ." >> Dockerfile
+          echo "RUN pip install -r requirements.txt || true" >> Dockerfile
+          echo "CMD ['python','app.py']" >> Dockerfile
+
+      - run: docker build -t ai-self-heal .
+
