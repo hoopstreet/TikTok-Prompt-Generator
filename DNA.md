@@ -2444,3 +2444,8 @@ cat << 'EOF' >> CHANGELOG.md
 - DeepSeek API: ✅ Active
 - Auto-fallback: Enabled (5 models)
 - Last check: 2026-07-04 10:02:43
+
+### Multi-Model AI Status (v4.2.1)
+- DeepSeek API: ✅ Active
+- Auto-fallback: Enabled (5 models)
+- Last check: 2026-07-04 13:10:35
